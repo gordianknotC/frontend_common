@@ -1,0 +1,68 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "allowSyntheticDefaultImports": true,
+    "baseUrl": ".",
+    "declaration": true,                   /* Generates corresponding '.d.ts' file. */
+    "diagnostics": true,
+    "emitDecoratorMetadata": true,         /* Enables experimental support for emitting type metadata for decorators. */
+    "esModuleInterop": true,
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "jsx": "preserve",
+    "jsxFactory": "h",                        /* Specify the JSX factory function to use when targeting react JSX emit, e.g. React.createElement or h. */
+    "lib": [
+      "esnext",
+      "dom",
+      "dom.iterable",
+      "scripthost"
+    ],
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "noEmit": true,
+    "noImplicitAny": true,                 /* Raise error on expressions and declarations with an implied 'any' type. */
+    "noImplicitReturns": true,             /* Report error when not all code paths in function return a value. */
+    "noImplicitThis": true,                 /* Raise error on 'this' expressions with an implied 'any' type. */
+    "outDir": "./dist/out-tsc",                        /* Redirect output structure to the directory. */
+    "paths": {
+      /*
+      *     A L I A S   P A T H
+      *     需要同時設置 vue.config.js - alias
+      **/
+      "~/*": [
+        "src/*"
+      ],
+      "@/*": [
+        "src/*"
+      ]
+    },
+    "skipLibCheck": true,
+    "sourceMap": true,
+    /** strict mode ...*/
+    //    "noImplicitUseStrict": true,
+    "strict": true,
+    "strictBindCallApply": true,/**/
+    "strictFunctionTypes": true,
+    "strictNullChecks": true,              /* Enable strict null checks. */
+    "strictPropertyInitialization": true,
+    "target": "ES2018",
+    "typeRoots": [
+      "node_modules/@types",
+      "src/types",
+      "src/types/thirdParty"
+    ],
+    "types": [
+    ]
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "src/**/*.vue",
+    "tests/**/*.ts",
+    "tests/**/*.tsx",
+    "src/**/*.svg"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}
