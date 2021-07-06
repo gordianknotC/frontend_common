@@ -62,7 +62,7 @@ function watchProps<T>(option: TWatchPropOption<T>){
 export
 function propNamesGuard<T>(option: TPropNamesGuardOption<T>){
     const {props, properties} = option;
-    if (!APP_CONFIGS.isInProduction){
+    if (!APP_CONFIGS!.isInProduction){
         console.log('propname guard1'.red, 'keys:', Object.keys(props), props)
         Object.keys(props).forEach((key) => {
             assert(properties.contains(key), `property guard, invalid key:${key}`);
@@ -91,7 +91,7 @@ function vModelTypeGuard<T>(option: TAssertVModel<T>){
  * */
 export
 function withDebugKey<T>(key: string, anyThing: T): T {
-    if (!APP_CONFIGS.isInProduction){
+    if (!APP_CONFIGS!.isInProduction){
         (window as any)._$debug ??= {};
         (window as any)._$debug[key] = anyThing;
         (window as any)._$debug['reactive'] ??= reactive;

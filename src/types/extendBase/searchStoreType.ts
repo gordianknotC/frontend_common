@@ -7,7 +7,7 @@ export interface DebouncedFunc<T extends (...args: any[]) => any> {
 }
 
 
-export type TSearchReactState = {
+export type TSearchStoreState = {
   search: string;
 }
 

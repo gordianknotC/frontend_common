@@ -1,31 +1,63 @@
-import {FACADE_KEY, TFacade} from "~/types/extendBase/facadeTypes";
 import {useBuiltIn} from "~/types/base/builtinAddonsTypes";
+import {IBaseApiService, TOptional} from "~/types/base/baseApiTypes";
+import {Router} from "vue-router";
+import {IParamStore} from "~/types/base/baseParamStore";
 
-const container = {};
+const singletonContainer: Record<string, any> = {};
+const nonSingletonContainer: Record<string, ()=>any> = {};
+let facade: any;
 
-export function Facade<T extends Object>(mapping?: T): T {
-  return new Proxy<T>({} as T, {
-    get: function (target, name) {
-      // @ts-ignore
-      const facade = container[FACADE_KEY];
-      assert(facade[name as keyof TFacade] !== undefined, `key name "${name.toString()}" not found in facade`)
-      return facade[name as keyof TFacade];
-    }
-  });
+export interface IFacade  {
+  apiService: IBaseApiService;
+  router: Router;
+  paramStore: IParamStore<any>;
 }
+
+
+
+export class Facade{
+  static inject<T extends Object>(name:string, singleton:boolean = true): T{
+    if (singleton){
+      const val = singletonContainer[name];
+      assert(val !== undefined, `key name "${name.toString()}" not found in facade`)
+      return val;
+    }else{
+      const val = nonSingletonContainer[name];
+      assert(val !== undefined, `key name "${name.toString()}" not found in facade`)
+      assert(val.constructor === Function, "Type Miss Match");
+      return val();
+    }
+  }
+
+  static provide<T>(providers: Partial<T>, singleton:boolean = true){
+    useBuiltIn();
+    if (singleton){
+      assert(Object.keys(providers).length > 0, "Type Miss Matched");
+      Object.keys(providers).forEach((prop) => {
+        //@ts-ignore
+        singletonContainer[prop] = providers[prop];
+      });
+    }else{
+      assert(providers.constructor === Function, "Type Miss Matched");
+      Object.keys(providers).forEach((prop) => {
+        //@ts-ignore
+        singletonContainer[prop] = providers[prop];
+      });
+    }
+  }
+
+  static asProxy<T extends Object>(): T{
+    return facade ??= new Proxy<T>({} as T, {
+      get: function (target, name) {
+        return Facade.inject(name as any);
+      }
+    });
+  }
+}
+
 
 function assert(condition: any, message?: string): asserts condition{
   if (!condition){
     throw new Error(`AssertionError: ${message ?? ""}`);
   }
-}
-
-export function setupFacade(providers: Partial<TFacade>){
-  useBuiltIn();
-  //@ts-ignore
-  container[FACADE_KEY] ??= {};
-  Object.keys(providers).forEach((prop) => {
-    //@ts-ignore
-    container[FACADE_KEY][prop] = providers[prop];
-  });
 }

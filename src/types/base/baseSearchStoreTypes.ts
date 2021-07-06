@@ -4,10 +4,10 @@ import {UnwrapRef} from "vue";
 import {TOptional} from "~/types/base/baseApiTypes";
 
 export
-type TSearchReactOptions<S , P > = {
+type TSearchStoreOptions<S , P > = {
   initialState    : S,
-  payloadGetter   : TSearchReactPayloadGetter<P>,
-  onUpdate        : TSearchReactOnUpdate<P>,
+  payloadGetter   : TSearchStorePayloadGetter<P>,
+  onUpdate        : TSearchStoreOnUpdate<P>,
   onBeforeRoute   : (payload: P) => RouteLocationNormalized,
   onPushRoute?    : (location: RouteLocationNormalized)=>Promise<TOptional<Router>>,
   outputField     : ComputedRef<string>,
@@ -15,16 +15,16 @@ type TSearchReactOptions<S , P > = {
 }
 
 export
-type TSearchReactPayloadGetter<P> = ()=> P;
+type TSearchStorePayloadGetter<P> = ()=> P;
 
 export
-type TSearchReactOnUpdate<P> = (payload: P, cache?: any)=> Promise<any>;
+type TSearchStoreOnUpdate<P> = (payload: P, cache?: any)=> Promise<any>;
 
 export
-interface ISearchReact<S, P> {
+interface ISearchStore<S, P> {
   state: UnwrapRef<S>;
-  payloadGetter: TSearchReactPayloadGetter<P>;
-  onUpdate: TSearchReactOnUpdate<P>;
+  payloadGetter: TSearchStorePayloadGetter<P>;
+  onUpdate: TSearchStoreOnUpdate<P>;
   outputField: ComputedRef<string>;
   validationRule: ComputedRef<string>;
   onInput(value: string): Promise<void>;

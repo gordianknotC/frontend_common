@@ -1,29 +1,30 @@
 import {reactive, UnwrapRef} from "~/types/base/vueTypes";
-import {watchAndStore} from "~/types/extendBase/impls/baseStorageService";
+import {watchAndStore, WatchStoreInstance} from "~/types/extendBase/impls/baseStorageService";
 import {APP_CONFIGS} from "~/types/extendBase/appConfigs";
 import {asCascadeClass, is} from "~/types/extendBase/impls/utils/typeInferernce";
 import {assert} from "~/types/extendBase/impls/utils/assert";
-import {TParamReactState} from "~/types/extendBase/paramReactTypes";
-import {IParamReact, TUpdateFromRouteOption} from "~/types/base/baseParamReact";
+import {TParamStoreState} from "~/types/extendBase/paramStoreTypes";
+import {IParamStore, TUpdateFromRouteOption} from "~/types/base/baseParamStore";
 import {TOptional} from "~/types/base/baseApiTypes";
 
-export class BaseParamReact implements  IParamReact<TParamReactState> {
-  preState: TOptional<TParamReactState>;
-  state: UnwrapRef<TParamReactState>;
-  stateKeys: Partial<(keyof TParamReactState)>[];
+export class BaseParamStore implements  IParamStore<TParamStoreState> {
+  protected storage: WatchStoreInstance<any>;
+  preState: TOptional<TParamStoreState>;
+  state: UnwrapRef<TParamStoreState>;
+  stateKeys: Partial<(keyof TParamStoreState)>[];
+
   constructor(
-    state: Omit<TParamReactState, 'fullPath'>,
-    propToStore: (keyof TParamReactState)[]
+    state: Omit<TParamStoreState, 'fullPath'>,
+    propToStore: (keyof TParamStoreState)[]
   ){
-    this.stateKeys = Object.keys(state) as Partial<(keyof TParamReactState)>[];
+    this.stateKeys = Object.keys(state) as Partial<(keyof TParamStoreState)>[];
     this.preState={} as any;
     this.state = reactive(state) as any;
-
-    watchAndStore({
+    this.storage = watchAndStore({
       unwrapRef: this.state,
       storage: localStorage,
       loadOnInitialize: true,
-      storeIdent: `${APP_CONFIGS.APP_IDENT}AtUI`,
+      storeIdent: `${APP_CONFIGS!.APP_IDENT}AtUI`,
       pick: propToStore
     });
 
@@ -39,7 +40,7 @@ export class BaseParamReact implements  IParamReact<TParamReactState> {
 
   /** 由 router guard 呼叫
    *  用於同步 router.currentRoute.value 內的
-   *  params/query 至 paramReact
+   *  params/query 至 paramStore
    * */
   updateFromRoute(option: TUpdateFromRouteOption) {
     console.log('updateFromRoute', option);
@@ -75,5 +76,9 @@ export class BaseParamReact implements  IParamReact<TParamReactState> {
       // @ts-ignore
       this.state[_] = record[_];
     });
+  }
+
+  clearAll(): void{
+    this.storage.clearAll();
   }
 }

@@ -1,7 +1,6 @@
 import {ComputedRef} from "~/types/base/vueTypes";
 import {UnwrapRef} from "vue";
 import {TDataResponse, TOptional, TResponse} from "~/types/base/baseApiTypes";
-import {TUserState} from "~/types/extendBase/userReactTypes";
 
 export enum EFlashType {
   success = "success",
@@ -70,7 +69,7 @@ export type TWrappedStateMappingConfig<S, Login, Update, Reset, Register, ExtraF
   email: TOptional<string>;
 } & TStateMappingConfig<S, Login, Update, Reset, Register, ExtraFields>;
 
-export abstract class IBaseUserReact<
+export abstract class IBaseUserStore<
   S,
   LoginPayload,
   UpdatePayload,
@@ -89,7 +88,7 @@ export abstract class IBaseUserReact<
 
   abstract updateFromModel(model: Partial<S>): void;
   abstract updateFromLocalStorage(): void;
-  abstract clearUserData(except: Partial<keyof TUserState>[]): void;
+  abstract clearUserData(except: Partial<keyof S>[]): void;
   abstract login(payload: LoginPayload): Promise<boolean>;
   abstract resetPassword(payload: ResetPayload): Promise<boolean>;
   abstract updatePassword(payload: UpdatePayload): Promise<boolean>;
@@ -98,14 +97,6 @@ export abstract class IBaseUserReact<
   abstract notifySuccess(): void;
   abstract notifyError(e: any): void;
 }
-
-export abstract class IBaseUserReactExt {
-  abstract isMaintainer: ComputedRef<boolean>;
-  abstract isMerchant: ComputedRef<boolean>;
-  abstract isAdminSite: ComputedRef<boolean>;
-  abstract isMerchantSite: ComputedRef<boolean>;
-}
-
 
 
 

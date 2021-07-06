@@ -3,13 +3,26 @@ import {is} from "~/types/extendBase/impls/utils/typeInferernce";
 import {AxiosRequestConfig, AxiosResponse, AxiosStatic} from "axios";
 import {RouteLocationObject} from "~/types/base/vueTypes";
 import {TDataResponse, TErrorResponse, TOptional} from "~/types/base/baseApiTypes";
-import {facade} from "~/types/extendBase/facadeTypes";
+import {Facade, IFacade} from "~/types/base/baseFacadeTypes";
 
 export type TApiCaller<T> = () => Promise<T>;
 export type TKeeperOption = {
   keeper: IParamKeeper,
   clearAfterRoute?: boolean,
 }
+
+export enum ERedirectReason{
+  accessTokenExpired="accessTokenExpired",
+  noAuthToken="noAuthToken",
+  unVerifiedUser="unVerifiedUser"
+}
+
+export enum EApiForwardingStage{
+  none,
+  forwarding,
+}
+
+
 
 export class Doer{
   constructor(
@@ -160,7 +173,7 @@ export abstract class BaseApiRedirectGuard{
     errorResponse: TErrorResponse,
     axios: AxiosStatic,
   ): Promise<any> {
-
+    const facade = Facade.asProxy<IFacade>();
     const prevRequest = (this.chain?.prev ?? this.chain?.root)?.request;
     let result:any = errorResponse;
 
@@ -188,7 +201,7 @@ export abstract class BaseApiRedirectGuard{
   async feedErrorResponse(axios: AxiosStatic, error: {response: AxiosResponse<TErrorResponse>}): Promise<any>{
     console.log('error:', error);
     console.log('response:', error.response);
-
+    const facade = Facade.asProxy<IFacade>();
     const errorResponse = error.response.data;
     if (is.initialized(this.chain)){
       for (let i = 0; i < this.config.length; i++) {
@@ -220,16 +233,5 @@ export abstract class BaseApiRedirectGuard{
     console.log('3');
     return Promise.reject(errorResponse);
   }
-}
-
-export enum ERedirectReason{
-  accessTokenExpired="accessTokenExpired",
-  noAuthToken="noAuthToken",
-  unVerifiedUser="unVerifiedUser"
-}
-
-export enum EApiForwardingStage{
-  none,
-  forwarding,
 }
 

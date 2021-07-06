@@ -37,6 +37,8 @@ declare global {
 
     firstWhere(val: ConditionCallback<T>, orElse?: () => T): T | null;
 
+    fold(initialValue: T,  cb: (acc:T, current:T)=>T): T;
+
     add(val: T): number;
 
     addAll(val: T[]): T[];
@@ -217,6 +219,12 @@ Array.prototype.any = function <T>(condition: ConditionCallback<T>): boolean {
       return true;
   }
   return false;
+}
+
+Array.prototype.fold = function<T>(initialValue: T,  cb: (acc:T, current:T)=>T): T{
+  return this.reduce((prev, current, cidx, arr)=>{
+    return cb(prev, current);
+  }, initialValue)
 }
 
 Array.prototype.firstWhere = function <T>(condition: ConditionCallback<T>, orElse?: () => T): T | null {
@@ -658,8 +666,8 @@ export class DateExtension {
 }
 
 export const DateExt = new DateExtension(
-  APP_CONFIGS.DATE_TEMPLATE_FOR_QUERY,
-  APP_CONFIGS.DATE_TEMPLATE_FOR_QUERY,
+  APP_CONFIGS!.DATE_TEMPLATE_FOR_QUERY,
+  APP_CONFIGS!.DATE_TEMPLATE_FOR_QUERY,
   true,
 );
 

@@ -1,13 +1,13 @@
 import {UnwrapRef} from "vue";
 
-export type TAppReactState<L, T, Extra> ={
+export type TAppStoreState<L, T, Extra> ={
   language: L,
   theme: T,
   formErrors: {[K: string]: string};
 } & Extra
 
-export abstract class IBaseAppReact<L, T, Extra> {
-  abstract state: UnwrapRef<TAppReactState<L, T, Extra>>;
+export abstract class IBaseAppStore<L, T, Extra> {
+  abstract state: UnwrapRef<TAppStoreState<L, T, Extra>>;
   abstract setLanguage(language: L): void;
   abstract setTheme(theme: T): void;
   abstract clearTabs(): void;

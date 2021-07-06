@@ -1,6 +1,6 @@
 import {TOptional, TPager} from "~/types/base/baseApiTypes";
 
-export type TParamReactState = {
+export type TParamStoreState = {
   start_date : TOptional<string>,
   end_date   : TOptional<string>,
   channel    : TOptional<string>,
@@ -22,7 +22,7 @@ export type TParamReactState = {
   fullPath: TOptional<string>
 }
 
-export type TParamReactGetter = {
+export type TParamStoreGetter = {
 
 }
 

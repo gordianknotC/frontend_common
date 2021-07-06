@@ -63,6 +63,8 @@ export abstract class IBaseResponseRestorer{
 }
 
 export abstract class IBaseApiService{
+  abstract isErrorResponse(result: any): boolean;
+  abstract isSuccessResponse(response: TDataResponse<any> | TSuccessResponse | TErrorResponse):boolean;
   abstract lastResponse: any[];
   abstract restoreResponse(restorer: IBaseResponseRestorer): void;
 }

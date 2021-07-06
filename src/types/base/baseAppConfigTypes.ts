@@ -1,9 +1,3 @@
-import {IAppReact, ILanguageService} from "~/types/extendBase/appReactTypes";
-import {IRouterInterceptor} from "~/types/base/guardianTypes";
-import {BaseStorageService} from "~/types/extendBase/impls/baseStorageService";
-import {TUserState} from "~/types/extendBase/userReactTypes";
-import {TExtraAppState} from "~/types/extendBase/facadeTypes";
-
 
 export abstract class IBaseAppConfig<User>{
   abstract API_DOMAIN: string;
@@ -12,17 +6,16 @@ export abstract class IBaseAppConfig<User>{
   abstract isInDevelopment: boolean;
   abstract DATE_TEMPLATE_FOR_QUERY: string;
   abstract DATE_TEMPLATE_FOR_UILABEL: string;
+  abstract EXPOSE_GLOBALS: boolean;
   abstract DEFAULT_MODELS: {
     AUTH_EXPIRATION_IN_DAYS: number;
     USER: User,
     LANGUAGE: string,
     THEME: string,
   } & any;
+
+  abstract isInTestMode: boolean;
+  abstract isInDevelopMode: boolean;
+  abstract isInProductionMode: boolean;
 }
 
-export type TAppSetupConfig ={
-  userStoreService: BaseStorageService<TUserState>,
-  languageService: ILanguageService,
-  appReact: IAppReact<TExtraAppState>,
-  routerInterceptor: IRouterInterceptor,
-}

@@ -52,6 +52,7 @@
       "src/types/thirdParty"
     ],
     "types": [
+      "node"
     ]
   },
   "include": [

@@ -2,17 +2,16 @@ import {computed, ComputedRef, UnwrapRef} from "~/types/base/vueTypes";
 import {DateDiff} from "~/types/base/builtinAddonsTypes";
 import {asCascadeClass, is} from "~/types/extendBase/impls/utils/typeInferernce";
 import {TSuccessResponse} from "~/types/base/baseApiTypes";
-import {IBaseUserReact, TStateMappingConfig, TWrappedStateMappingConfig} from "~/types/base/baseUserTypes";
+import {IBaseUserStore, TStateMappingConfig, TWrappedStateMappingConfig} from "~/types/base/baseUserTypes";
 import axios from "axios";
-import {TUserState} from "~/types/extendBase/userReactTypes";
 import {debounce} from "debounce";
 
 export type  DebouncedFunc<T extends Function> = T
   & { clear(): void; }
   & { flush(): void; };
 
-export class BaseUserReact<S extends object, L, U, R, F, ExtraField>
-implements IBaseUserReact<
+export class BaseUserStore<S extends object, L, U, R, F, ExtraField>
+implements IBaseUserStore<
   S, L, U, R, F, ExtraField
 > {
   state: UnwrapRef<S>;
@@ -102,12 +101,12 @@ implements IBaseUserReact<
     this.updateFromModel(data);
   }
 
-  clearUserData(except: Partial<(keyof TUserState)>[] = []){
+  clearUserData(except: Partial<(keyof S)>[] = []){
     const username = this.config.username; /// keep username
     const DEFAULT = this.config.defaultUser;
     console.log(DEFAULT);
     Object.keys(this.state).forEach((element) => {
-      if (except.contains(element as keyof TUserState)){
+      if (except.contains(element as keyof S)){
         // pass
       }else{
         //@ts-ignore

@@ -7,9 +7,11 @@ export type TUpdateFromRouteOption ={
   considerInterceptor?: boolean,
 }
 
-export abstract class IParamReact<S>{
+export abstract class IParamStore<S>{
   abstract state: UnwrapRef<S>
   abstract updateFromRoute(option: TUpdateFromRouteOption): void;
   abstract updateFromRecord(record: Record<string, any>): void;
+  abstract clearAll(): void;
+  abstract preStateInit(): void;
 }
 
