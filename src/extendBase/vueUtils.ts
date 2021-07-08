@@ -1,7 +1,7 @@
 import {watch, reactive, UnwrapRef, computed} from "vue";
-import {assert} from "~/types/extendBase/impls/utils/assert";
-import {isRefImpl} from "~/types/extendBase/impls/utils/typeInferernce";
-import {APP_CONFIGS} from "~/types/extendBase/appConfigs";
+import {assert} from "~/extendBase/impls/utils/assert";
+import {isRefImpl} from "~/extendBase/impls/utils/typeInferernce";
+import {APP_CONFIGS} from "~/extendBase/appConfigs";
 
 
 type Data = { [key: string]: unknown };

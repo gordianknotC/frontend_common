@@ -1,5 +1,5 @@
-import {ComputedRef, UnwrapRef} from "~/types/base/vueTypes";
-import {TOptional} from "~/types/base/baseApiTypes";
+import {ComputedRef, UnwrapRef} from "~/base/vueTypes";
+import {TOptional} from "~/base/baseApiTypes";
 
 export enum ECompStage{
   loading,

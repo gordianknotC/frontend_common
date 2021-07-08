@@ -1,7 +1,7 @@
 
 export declare namespace VForm{
-  import {ComputedRef, UnwrapRef} from "~/types/base/vueTypes";
-  import {TOptional} from "~/types/extendBase/impls/utils/typeInferernce";
+  import {ComputedRef, UnwrapRef} from "~/base/vueTypes";
+  import {TOptional} from "~/extendBase/impls/utils/typeInferernce";
 
   export type AtLeastOne<T, U = {[K in keyof T]: Pick<T, K> }> = Partial<T> & U[keyof U];
 

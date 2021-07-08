@@ -1,6 +1,6 @@
-import {EStorageType, IStoreHelper} from "~/types/base/jsonStoreServiceType";
-import {is} from "~/types/extendBase/impls/utils/typeInferernce";
-import {TOptional} from "~/types/base/baseApiTypes";
+import {EStorageType, IStoreHelper} from "~/base/jsonStoreServiceType";
+import {is} from "~/extendBase/impls/utils/typeInferernce";
+import {TOptional} from "~/base/baseApiTypes";
 
 type TStoreParam<T> = {
   key: string;

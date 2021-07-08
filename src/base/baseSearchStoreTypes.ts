@@ -1,7 +1,7 @@
 import {RouteLocationNormalized, Router} from "vue-router";
-import {ComputedRef} from "~/types/base/vueTypes";
+import {ComputedRef} from "~/base/vueTypes";
 import {UnwrapRef} from "vue";
-import {TOptional} from "~/types/base/baseApiTypes";
+import {TOptional} from "~/base/baseApiTypes";
 
 export
 type TSearchStoreOptions<S , P > = {

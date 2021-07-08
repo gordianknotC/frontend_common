@@ -1,11 +1,11 @@
-import {reactive, UnwrapRef} from "~/types/base/vueTypes";
-import {watchAndStore, WatchStoreInstance} from "~/types/extendBase/impls/baseStorageService";
-import {APP_CONFIGS} from "~/types/extendBase/appConfigs";
-import {asCascadeClass, is} from "~/types/extendBase/impls/utils/typeInferernce";
-import {assert} from "~/types/extendBase/impls/utils/assert";
-import {TParamStoreState} from "~/types/extendBase/paramStoreTypes";
-import {IParamStore, TUpdateFromRouteOption} from "~/types/base/baseParamStore";
-import {TOptional} from "~/types/base/baseApiTypes";
+import {reactive, UnwrapRef} from "~/base/vueTypes";
+import {watchAndStore, WatchStoreInstance} from "~/extendBase/impls/baseStorageService";
+import {APP_CONFIGS} from "~/extendBase/appConfigs";
+import {asCascadeClass, is} from "~/extendBase/impls/utils/typeInferernce";
+import {assert} from "~/extendBase/impls/utils/assert";
+import {TParamStoreState} from "~/extendBase/paramStoreTypes";
+import {IParamStore, TUpdateFromRouteOption} from "~/base/baseParamStore";
+import {TOptional} from "~/base/baseApiTypes";
 
 export class BaseParamStore implements  IParamStore<TParamStoreState> {
   protected storage: WatchStoreInstance<any>;

@@ -1,6 +1,6 @@
-import {ComputedRef} from "~/types/base/vueTypes";
+import {ComputedRef} from "~/base/vueTypes";
 import {UnwrapRef} from "vue";
-import {TDataResponse, TOptional, TResponse} from "~/types/base/baseApiTypes";
+import {TDataResponse, TOptional, TResponse} from "~/base/baseApiTypes";
 
 export enum EFlashType {
   success = "success",

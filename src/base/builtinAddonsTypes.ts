@@ -1,10 +1,10 @@
 import format from "string-format";
 import dayjs from "dayjs";
 
-import {is} from "~/types/extendBase/impls/utils/typeInferernce";
-import {APP_CONFIGS} from "~/types/extendBase/appConfigs";
-import {NotImplementedError} from "~/types/base/baseExceptions";
-import {assert, assertMsg} from "~/types/extendBase/impls/utils/assert";
+import {is} from "~/extendBase/impls/utils/typeInferernce";
+import {APP_CONFIGS} from "~/extendBase/appConfigs";
+import {NotImplementedError} from "~/base/baseExceptions";
+import {assert, assertMsg} from "~/extendBase/impls/utils/assert";
 
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';

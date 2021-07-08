@@ -1,7 +1,7 @@
-import {useBuiltIn} from "~/types/base/builtinAddonsTypes";
-import {IBaseApiService, TOptional} from "~/types/base/baseApiTypes";
+import {useBuiltIn} from "~/base/builtinAddonsTypes";
+import {IBaseApiService, TOptional} from "~/base/baseApiTypes";
 import {Router} from "vue-router";
-import {IParamStore} from "~/types/base/baseParamStore";
+import {IParamStore} from "~/base/baseParamStore";
 
 const singletonContainer: Record<string, any> = {};
 const nonSingletonContainer: Record<string, ()=>any> = {};
@@ -53,6 +53,17 @@ export class Facade{
       }
     });
   }
+}
+
+export function LazyHolder<T extends object>(initializer: ()=>T): T {
+  let instance: T;
+  return new Proxy<T>({} as T, {
+    get: function (target, name) {
+      instance ??= initializer();
+      //@ts-ignore
+      return instance[name];
+    }
+  }) as T;
 }
 
 

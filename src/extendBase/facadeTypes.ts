@@ -131,3 +131,18 @@ export type TFacade = {
 export const facade = Facade.asProxy<TFacade>();
 
 */
+
+
+
+function defineDefaultUser<T>(defaultUser: T): T{
+
+  return defaultUser;
+}
+
+function defineLannguage(){
+
+}
+
+
+
+

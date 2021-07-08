@@ -1,11 +1,11 @@
-import {getOmitsBy, is} from "~/types/extendBase/impls/utils/typeInferernce";
+import {getOmitsBy, is} from "~/extendBase/impls/utils/typeInferernce";
 
-import {EStorageType, IStoreService} from "~/types/base/jsonStoreServiceType";
-import {StoreHelper} from "~/types/base/storeHelper";
-import {AtLeastOne, watch, watchEffect} from "~/types/base/vueTypes";
-import {NotImplementedError} from "~/types/base/baseExceptions";
-import {TOptional} from "~/types/base/baseApiTypes";
-import {IBaseAppConfig} from "~/types/base/baseAppConfigTypes";
+import {EStorageType, IStoreService} from "~/base/jsonStoreServiceType";
+import {StoreHelper} from "~/base/storeHelper";
+import {AtLeastOne, watch, watchEffect} from "~/base/vueTypes";
+import {NotImplementedError} from "~/base/baseExceptions";
+import {TOptional} from "~/base/baseApiTypes";
+import {IBaseAppConfig} from "~/base/baseAppConfigTypes";
 import _ from "ramda";
 
 const localStorage = window.localStorage;

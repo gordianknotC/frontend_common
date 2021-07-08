@@ -1,7 +1,11 @@
+import {assert} from "~/extendBase/impls/utils/assert";
+import {is} from "~/extendBase/impls/utils/typeInferernce";
+import axios, {AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosStatic} from "axios";
+import {BaseApiGuard} from "~/base/baseApiGuard";
 
-let errorcodes: TOptional<ErrorCodes>;
+let errorcodes: TOptional<BaseErrorCodes>;
 
-export class ErrorCodes {
+export class BaseErrorCodes {
   static setup(option:{
     ACCESS_TOKEN_MISSING?: number,
     ACCESS_TOKEN_EXPIRED?: number,
@@ -10,15 +14,16 @@ export class ErrorCodes {
     USER_IS_BLOCK?: number,
     USER_NOT_VERIFY?: number,
   }){
-    errorcodes = new ErrorCodes();
+    errorcodes = new BaseErrorCodes();
     Object.keys(option).forEach((element) => {
       //@ts-ignore
       errorcodes[element] = option[element as keyof typeof option];
     });
   }
 
-  static singleton(): ErrorCodes{
-    return errorcodes ??= new ErrorCodes();
+  static singleton(): BaseErrorCodes{
+    assert(is.initialized(errorcodes), "errorcodes Initialized before setup!!");
+    return errorcodes ??= new BaseErrorCodes();
   }
 
   ACCESS_TOKEN_MISSING=3101;
@@ -68,3 +73,39 @@ export abstract class IBaseApiService{
   abstract lastResponse: any[];
   abstract restoreResponse(restorer: IBaseResponseRestorer): void;
 }
+
+export abstract class IInternalBaseApiService{
+}
+
+type TErrorCodeGuardOption={
+  statusCode?: number,
+  errorCode?: number,
+  handler: ()=>Promise<any>;
+}
+
+type TErrorCodeGuardConfig = {
+}
+
+function title(config: AxiosRequestConfig): string {
+  const method = config.method?.toUpperCase();
+  switch (config.method?.toUpperCase()) {
+    case 'GET':
+      return `GET: ${config.url}`.bgBlue;
+    case 'DELETE':
+      return `DEL: ${config.url}`.bgRed;
+    case 'POST':
+      return `POST: ${config.url}`.bgGreen;
+    case 'PUT':
+      return `PUT: ${config.url}`.bgCyan;
+  }
+  return config.url ?? '';
+}
+
+class BaseApiService implements IInternalBaseApiService{
+  constructor(
+    public guard: BaseApiGuard
+  ) {
+
+  }
+}
+

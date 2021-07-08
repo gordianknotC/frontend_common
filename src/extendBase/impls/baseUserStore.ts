@@ -1,8 +1,8 @@
-import {computed, ComputedRef, UnwrapRef} from "~/types/base/vueTypes";
-import {DateDiff} from "~/types/base/builtinAddonsTypes";
-import {asCascadeClass, is} from "~/types/extendBase/impls/utils/typeInferernce";
-import {TSuccessResponse} from "~/types/base/baseApiTypes";
-import {IBaseUserStore, TStateMappingConfig, TWrappedStateMappingConfig} from "~/types/base/baseUserTypes";
+import {computed, ComputedRef, UnwrapRef} from "~/base/vueTypes";
+import {DateDiff} from "~/base/builtinAddonsTypes";
+import {asCascadeClass, is} from "~/extendBase/impls/utils/typeInferernce";
+import {TSuccessResponse} from "~/base/baseApiTypes";
+import {IBaseUserStore, TStateMappingConfig, TWrappedStateMappingConfig} from "~/base/baseUserTypes";
 import axios from "axios";
 import {debounce} from "debounce";
 
@@ -70,6 +70,7 @@ implements IBaseUserStore<
     }) as ComputedRef<boolean>
 
     this.isVerifiedUser = computed(()=>this.config.isVerified);
+
     this.labels = {
       username: computed(() => {
         return this.config.username ?? 'username'

@@ -1,4 +1,4 @@
-import {TOptional, TPager} from "~/types/base/baseApiTypes";
+import {TOptional, TPager} from "~/base/baseApiTypes";
 
 export type TParamStoreState = {
   start_date : TOptional<string>,

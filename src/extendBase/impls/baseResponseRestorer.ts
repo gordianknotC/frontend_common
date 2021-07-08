@@ -1,6 +1,6 @@
-import {asCascadeClass, is} from "~/types/extendBase/impls/utils/typeInferernce";
-import {IBaseApiService, IBaseResponseRestorer, TDataResponse} from "~/types/base/baseApiTypes";
-import {Facade, IFacade} from "~/types/base/baseFacadeTypes";
+import {asCascadeClass, is} from "~/extendBase/impls/utils/typeInferernce";
+import {IBaseApiService, IBaseResponseRestorer, TDataResponse} from "~/base/baseApiTypes";
+import {Facade, IFacade} from "~/base/baseFacadeTypes";
 
 export class PagerResponseRestorer implements IBaseResponseRestorer{
   restore(response: TDataResponse<any>): void {

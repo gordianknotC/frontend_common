@@ -1,4 +1,4 @@
-import {TOptional} from "~/types/base/baseApiTypes";
+import {TOptional} from "~/base/baseApiTypes";
 
 export enum EStorageType{
   sessionStorage,

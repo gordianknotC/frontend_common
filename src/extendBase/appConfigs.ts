@@ -1,12 +1,13 @@
-import {DateExt, useBuiltIn} from "~/types/base/builtinAddonsTypes";
-import {useColors} from "~/types/colorsPlugin";
-import {is} from "~/types/extendBase/impls/utils/typeInferernce";
-import {IBaseAppConfig} from "~/types/base/baseAppConfigTypes";
-import {TOptional} from "~/types/base/baseApiTypes";
+import {DateExt, useBuiltIn} from "~/base/builtinAddonsTypes";
+import {useColors} from "~/colorsPlugin";
+import {is} from "~/extendBase/impls/utils/typeInferernce";
+import {IBaseAppConfig} from "~/base/baseAppConfigTypes";
+import {TOptional} from "~/base/baseApiTypes";
 
 export let APP_CONFIGS: TOptional<IBaseAppConfig<any>>;
 
 export function appConfigInit<T>(config: IBaseAppConfig<T>){
+  APP_CONFIGS = config;
   useBuiltIn();
   useColors();
   if (APP_CONFIGS!.isInTestMode && APP_CONFIGS!.EXPOSE_GLOBALS){

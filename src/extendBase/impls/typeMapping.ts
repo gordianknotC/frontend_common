@@ -1,4 +1,4 @@
-import {is} from "~/types/extendBase/impls/utils/typeInferernce";
+import {is} from "~/extendBase/impls/utils/typeInferernce";
 
 type TMapping<
   Design extends object,

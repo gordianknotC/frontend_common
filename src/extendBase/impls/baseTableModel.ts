@@ -1,7 +1,7 @@
-import {IBaseTableModels, TableColConfig, TableCol, TableState} from "~/types/base/baseTableTypes";
-import {computed, ComputedRef, reactive, UnwrapRef} from "~/types/base/vueTypes";
-import {is} from "~/types/extendBase/impls/utils/typeInferernce";
-import {NotImplementedError} from "~/types/base/baseExceptions";
+import {IBaseTableModels, TableColConfig, TableCol, TableState} from "~/base/baseTableTypes";
+import {computed, ComputedRef, reactive, UnwrapRef} from "~/base/vueTypes";
+import {is} from "~/extendBase/impls/utils/typeInferernce";
+import {NotImplementedError} from "~/base/baseExceptions";
 
 
 export class BaseTableModel<T, E=any, S={}> implements IBaseTableModels<T, E, S>{

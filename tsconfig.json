@@ -48,8 +48,7 @@
     "target": "ES2018",
     "typeRoots": [
       "node_modules/@types",
-      "src/types",
-      "src/types/thirdParty"
+      "src/types"
     ],
     "types": [
       "node"
@@ -58,12 +57,11 @@
   "include": [
     "src/**/*.ts",
     "src/**/*.tsx",
-    "src/**/*.vue",
     "tests/**/*.ts",
-    "tests/**/*.tsx",
-    "src/**/*.svg"
+    "tests/**/*.tsx"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "dist"
   ]
 }
