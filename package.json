@@ -9,6 +9,7 @@
     "type": "git",
     "url": "git+https://github.com/gordianknot1981/vue_facade.git"
   },
+
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "dependencies": {
