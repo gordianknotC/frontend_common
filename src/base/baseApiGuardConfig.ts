@@ -7,6 +7,7 @@ import {NotImplementedError} from "~/base/baseExceptions";
 import {BaseApiGuard} from "~/base/baseApiGuard";
 import {getReasonPhrase, StatusCodes} from "http-status-codes";
 
+
 export abstract class IBaseApiGuardConfig {
   abstract verifyRoute: TOptional<RouteLocationRaw>;
   abstract refreshAuthRequester: () => Promise<any>;

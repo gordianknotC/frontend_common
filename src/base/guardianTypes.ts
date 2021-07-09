@@ -1,9 +1,8 @@
 import {RouteLocation, RouteLocationNormalized, RouteLocationRaw, Router, RouteRecord} from "vue-router";
 import {is} from "~/extendBase/impls/utils/typeInferernce";
-import {AxiosError, AxiosRequestConfig, AxiosResponse, AxiosStatic} from "axios";
+import {AxiosError, AxiosRequestConfig, AxiosResponse} from "axios";
 import {RouteLocationObject} from "~/base/vueTypes";
 import {TDataResponse, TErrorResponse, TOptional} from "~/base/baseApiTypes";
-import {Facade, IFacade} from "~/base/baseFacadeTypes";
 
 export enum ERedirectReason{
   accessTokenExpired="accessTokenExpired",
