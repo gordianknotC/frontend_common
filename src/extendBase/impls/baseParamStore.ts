@@ -10,7 +10,6 @@ import {TOptional} from "~/base/baseApiTypes";
 
 type temp = {}
 export class BaseParamStore implements  IParamStore<TParamStoreState> {
-  private temp: number;
   protected storage: WatchAndStore <any>;
   preState: TOptional<TParamStoreState>;
   state: UnwrapRef<TParamStoreState>;
