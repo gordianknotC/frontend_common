@@ -1,5 +1,5 @@
 import {reactive, UnwrapRef} from "~/base/vueTypes";
-import {watchAndStore, WatchStoreInstance} from "~/extendBase/impls/baseStorageService";
+import {watchAndStore, WatchAndStore} from "~/extendBase/impls/baseStorageService";
 import {APP_CONFIGS} from "~/extendBase/appConfigs";
 import {asCascadeClass, is} from "~/extendBase/impls/utils/typeInferernce";
 import {assert} from "~/extendBase/impls/utils/assert";
@@ -10,7 +10,8 @@ import {TOptional} from "~/base/baseApiTypes";
 
 type temp = {}
 export class BaseParamStore implements  IParamStore<TParamStoreState> {
-  protected storage: WatchStoreInstance<any>;
+  private temp: number;
+  protected storage: WatchAndStore <any>;
   preState: TOptional<TParamStoreState>;
   state: UnwrapRef<TParamStoreState>;
   stateKeys: Partial<(keyof TParamStoreState)>[];
