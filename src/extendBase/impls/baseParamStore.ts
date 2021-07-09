@@ -8,6 +8,7 @@ import {IParamStore, TUpdateFromRouteOption} from "~/base/baseParamStore";
 import {TOptional} from "~/base/baseApiTypes";
 
 
+type temp = {}
 export class BaseParamStore implements  IParamStore<TParamStoreState> {
   protected storage: WatchStoreInstance<any>;
   preState: TOptional<TParamStoreState>;
