@@ -41,12 +41,9 @@ export abstract class IBaseRouterGuard{
   }
 }
 
-
 export enum EApiGuardType{
   general, auth
 }
-
-
 
 export type TApiRedirectGuard = {
   reason?: string;

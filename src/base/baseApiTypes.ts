@@ -1,6 +1,6 @@
 import {assert} from "~/extendBase/impls/utils/assert";
 import {is} from "~/extendBase/impls/utils/typeInferernce";
-import axios, {AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosStatic} from "axios";
+import axios, {AxiosInstance, AxiosRequestConfig} from "axios";
 import {BaseApiGuard} from "~/base/baseApiGuard";
 
 let errorcodes: TOptional<BaseErrorCodes>;
@@ -32,6 +32,22 @@ export class BaseErrorCodes {
   INVALID_PERMISSION=208;
   USER_IS_BLOCK=205;
   USER_NOT_VERIFY=206;
+}
+
+
+
+export abstract class IInternalBaseApiService {
+  abstract guard: BaseApiGuard;
+  abstract axiosGeneral: AxiosInstance;
+  abstract axiosToken: AxiosInstance;
+
+  abstract updateAuthorizationToken(): void;
+  abstract post(url: string, data: Record<string, any>): Promise<any>;
+  abstract postToken(url: string, data: Record<string, any>): Promise<any>;
+  abstract dl<T>(url: string, data: Record<string, any>): Promise<T>;
+  abstract get<T>(url: string, data: Record<string, any>): Promise<T>;
+  abstract put(url: string, data: Record<string, any>): Promise<any>;
+  abstract del(url: string, data: Record<string, any>): Promise<any>;
 }
 
 
@@ -70,42 +86,9 @@ export abstract class IBaseResponseRestorer{
 export abstract class IBaseApiService{
   abstract isErrorResponse(result: any): boolean;
   abstract isSuccessResponse(response: TDataResponse<any> | TSuccessResponse | TErrorResponse):boolean;
-  abstract lastResponse: any[];
-  abstract restoreResponse(restorer: IBaseResponseRestorer): void;
+  // abstract lastResponse: any[];
+  // abstract restoreResponse(restorer: IBaseResponseRestorer): void;
 }
 
-export abstract class IInternalBaseApiService{
-}
 
-type TErrorCodeGuardOption={
-  statusCode?: number,
-  errorCode?: number,
-  handler: ()=>Promise<any>;
-}
-
-type TErrorCodeGuardConfig = {
-}
-
-function title(config: AxiosRequestConfig): string {
-  const method = config.method?.toUpperCase();
-  switch (config.method?.toUpperCase()) {
-    case 'GET':
-      return `GET: ${config.url}`.bgBlue;
-    case 'DELETE':
-      return `DEL: ${config.url}`.bgRed;
-    case 'POST':
-      return `POST: ${config.url}`.bgGreen;
-    case 'PUT':
-      return `PUT: ${config.url}`.bgCyan;
-  }
-  return config.url ?? '';
-}
-
-class BaseApiService implements IInternalBaseApiService{
-  constructor(
-    public guard: BaseApiGuard
-  ) {
-
-  }
-}
 

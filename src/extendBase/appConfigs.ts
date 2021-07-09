@@ -1,5 +1,5 @@
 import {DateExt, useBuiltIn} from "~/base/builtinAddonsTypes";
-import {useColors} from "~/colorsPlugin";
+import {useColors} from "~/plugin/colorsPlugin";
 import {is} from "~/extendBase/impls/utils/typeInferernce";
 import {IBaseAppConfig} from "~/base/baseAppConfigTypes";
 import {TOptional} from "~/base/baseApiTypes";

@@ -1,5 +1,5 @@
 import {Facade} from "~/base/baseFacadeTypes";
-import {BaseErrorCodes, TDataResponse, TErrorResponse, TOptional, TSuccessResponse} from "~/base/baseApiTypes";
+import {IInternalBaseApiService, TDataResponse, TErrorResponse, TSuccessResponse} from "~/base/baseApiTypes";
 import {UnCaughtCondition} from "~/base/baseExceptions";
 import {PagerResponseRestorer} from "~/extendBase/impls/baseResponseRestorer";
 import {is} from "~/extendBase/impls/utils/typeInferernce";
@@ -59,8 +59,8 @@ function rectifyResponseType(response: TDataResponse<any> | TSuccessResponse | T
 }
 
 
-export class BaseApiService{
-  protected guard: BaseApiGuard;
+export class BaseApiService implements IInternalBaseApiService {
+  guard: BaseApiGuard;
   axiosGeneral: AxiosInstance;
   axiosToken: AxiosInstance;
 
@@ -125,13 +125,13 @@ export class BaseApiService{
     )
   }
 
-  protected updateAuthorizationToken() {
+  updateAuthorizationToken() {
     const facade = Facade.asProxy<any>();
-    this.axiosGeneral!.defaults.headers.common["Authorization"] = facade.userReact.state.token ;
-    this.axiosToken!.defaults.headers.common["Authorization"] = facade.userReact.state.token ;
+    this.axiosGeneral!.defaults.headers.common["Authorization"] = facade.userReact.state.token;
+    this.axiosToken!.defaults.headers.common["Authorization"] = facade.userReact.state.token;
   };
 
-  protected post(url: string, data: Record<string, any>): Promise<any> {
+  post(url: string, data: Record<string, any>): Promise<any> {
     this.updateAuthorizationToken();
     return new Promise((resolve, reject) => {
       this.axiosGeneral({
@@ -147,7 +147,7 @@ export class BaseApiService{
     });
   }
 
-  protected postToken(url: string, data: Record<string, any>): Promise<any> {
+  postToken(url: string, data: Record<string, any>): Promise<any> {
     const facade = Facade.asProxy<any>();
     return new Promise((resolve, reject) => {
       this.axiosToken({
@@ -167,7 +167,7 @@ export class BaseApiService{
     });
   }
 
-  protected dl<T>(url: string, data: Record<string, any> = {}): Promise<T> {
+  dl<T>(url: string, data: Record<string, any> = {}): Promise<T> {
     this.updateAuthorizationToken();
     const duration = 200000;
     return new Promise((resolve, reject) => {
@@ -200,7 +200,7 @@ export class BaseApiService{
     });
   }
 
-  protected get<T>(url: string, data: Record<string, any> = {}): Promise<T> {
+  get<T>(url: string, data: Record<string, any> = {}): Promise<T> {
     this.updateAuthorizationToken();
     return new Promise((resolve, reject) => {
       this.axiosGeneral({
@@ -218,7 +218,7 @@ export class BaseApiService{
     });
   }
 
-  protected put(url: string, data: Record<string, any>): Promise<any> {
+  put(url: string, data: Record<string, any>): Promise<any> {
     this.updateAuthorizationToken();
     return new Promise((resolve, reject) => {
       this.axiosGeneral({
@@ -236,7 +236,7 @@ export class BaseApiService{
     });
   }
 
-  protected del(url: string, data: Record<string, any>): Promise<any> {
+  del(url: string, data: Record<string, any>): Promise<any> {
     this.updateAuthorizationToken();
     return new Promise((resolve, reject) => {
       this.axiosGeneral({
