@@ -127,7 +127,7 @@ type TWatchAndStore<T> = {
 
 
 // fixme: needTest: 當存入的值為 undefined...
-export class WatchStoreInstance<T extends object> {
+export class WatchAndStore<T extends object> {
   propsToWatch: (keyof T)[];
 
   constructor(public option: TWatchAndStore<T>){
@@ -137,6 +137,7 @@ export class WatchStoreInstance<T extends object> {
 
     if (is.initialized(omits)){
       this.propsToWatch = keys.where((_)=> !omits!.includes(_ as any));
+
     }else if (is.initialized(pick)){
       this.propsToWatch = keys.where((_)=> pick!.includes(_ as any))
     }
@@ -145,7 +146,8 @@ export class WatchStoreInstance<T extends object> {
       this.propsToWatch.forEach((element) => {
         try{
           const val = this.getItem(element);
-          unwrapRef[element as keyof typeof unwrapRef] = val ?? defaults?.[element as keyof typeof unwrapRef] ?? undefined;
+          unwrapRef[element as keyof typeof unwrapRef] =
+            val ?? defaults?.[element as keyof typeof unwrapRef] ?? undefined;
         }catch(e){
           unwrapRef[element as keyof typeof unwrapRef] = undefined;
         }
@@ -166,8 +168,12 @@ export class WatchStoreInstance<T extends object> {
   }
 
   // untested:
-  getItem(prop: keyof T): T[keyof T]{
-    return JSON.parse(this.option.storage.getItem(this.getPropKey(prop)) as string);
+  getItem(prop: keyof T): TOptional<T[keyof T]>{
+    try{
+      return JSON.parse(this.option.storage.getItem(this.getPropKey(prop)) as string);
+    } catch(e){
+      return undefined;
+    }
   }
 
   // untested:
@@ -187,7 +193,7 @@ export class WatchStoreInstance<T extends object> {
 /** 僅用於非敏感資料，如 UI 狀態，user data可能需要整包加密
  *  所以使用 json dump {@link WebStorageService} 方式
  * */
-export function watchAndStore<T extends object>(option: TWatchAndStore<T>): WatchStoreInstance<T>{
-  return new WatchStoreInstance(option);
+export function watchAndStore<T extends object>(option: TWatchAndStore<T>): WatchAndStore<T>{
+  return new WatchAndStore(option);
 }
 
