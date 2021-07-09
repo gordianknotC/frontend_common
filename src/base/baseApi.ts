@@ -1,7 +1,6 @@
 import {Facade} from "~/base/baseFacadeTypes";
 import {IInternalBaseApiService, TDataResponse, TErrorResponse, TSuccessResponse} from "~/base/baseApiTypes";
 import {UnCaughtCondition} from "~/base/baseExceptions";
-import {PagerResponseRestorer} from "~/extendBase/impls/baseResponseRestorer";
 import {is} from "~/extendBase/impls/utils/typeInferernce";
 import axios, {AxiosInstance, AxiosRequestConfig} from "axios";
 import {BaseApiGuard} from "~/base/baseApiGuard";
@@ -34,9 +33,6 @@ export function trace() {
 }
 
 
-export const responseRestorers = {
-  pager: new PagerResponseRestorer()
-}
 
 /** 修正 api response, 強制 response.data 為 Array
  *  1）當 response.data 為物件而非 array 時

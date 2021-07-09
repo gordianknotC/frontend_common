@@ -2,7 +2,6 @@
   "name": "vue_facade",
   "version": "0.1.0",
   "description": "",
-  "main": "index.js",
   "scripts": {
     "serve": "vue-cli-service serve"
   },
@@ -10,6 +9,8 @@
     "type": "git",
     "url": "git+https://github.com/gordianknot1981/vue_facade.git"
   },
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
   "dependencies": {
     "axios": "^0.21.1",
     "colors": "^1.4.0",

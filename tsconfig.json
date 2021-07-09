@@ -19,11 +19,15 @@
     ],
     "module": "ESNext",
     "moduleResolution": "node",
-    "noEmit": true,
+    /**
+    You shouldn't use "noEmit": true in your tsconfig.json
+    if you compile with tsc.
+    From compiler options description --noEmit - Do not emit outputs.*/
+    "noEmit": false,
     "noImplicitAny": true,                 /* Raise error on expressions and declarations with an implied 'any' type. */
     "noImplicitReturns": true,             /* Report error when not all code paths in function return a value. */
     "noImplicitThis": true,                 /* Raise error on 'this' expressions with an implied 'any' type. */
-    "outDir": "./dist/out-tsc",                        /* Redirect output structure to the directory. */
+    "outDir": "dist",                        /* Redirect output structure to the directory. */
     "paths": {
       /*
       *     A L I A S   P A T H
@@ -56,12 +60,14 @@
   },
   "include": [
     "src/**/*.ts",
-    "src/**/*.tsx",
     "tests/**/*.ts",
-    "tests/**/*.tsx"
+    "tests/**/*.tsx",
+    "src/index.ts"
   ],
   "exclude": [
     "node_modules",
     "dist"
-  ]
+  ],
+  "compileOnSave": false,
+  "buildOnSave": false
 }

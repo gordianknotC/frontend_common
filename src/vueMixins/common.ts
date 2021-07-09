@@ -11,7 +11,7 @@ export class CommonMixin {
   asVModel<R, T extends object=any>(props: Readonly<T>, propName: keyof T, emit: TEmitFn<any>): WritableComputedRef<R>{
     const event = `update:${propName}`;
     this.vModelEvents.add(event as any);
-    return computed({
+    return computed ({
       get(){
         return props[propName];
       },
