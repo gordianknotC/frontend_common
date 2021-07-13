@@ -8,6 +8,7 @@
   },
   "main": "src/entry.ts",
   "types": "src/index.d.ts",
+  "typings": "src/index.d.ts",
   "notes": {
     "main": "lib/index.js",
     "types": "lib/index.d.ts",
