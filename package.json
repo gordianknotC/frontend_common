@@ -1,17 +1,23 @@
 {
   "name": "vue_app_common",
-  "version": "0.1.0+2",
+  "version": "0.1.0+3",
   "description": "",
   "scripts": {
-    "prepublish": "tsc",
+    "prepublish": "tsc -p tsconfig.json",
     "serve": "vue-cli-service serve"
   },
-  "repository": {
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+    "repository": {
     "type": "git",
     "url": "git+https://github.com/gordianknotC/vue_app_common.git"
   },
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "files": [
+    "lib"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
     "axios": "^0.21.1",
     "colors": "^1.4.0",
@@ -43,9 +49,5 @@
     "webpack-cli": "^4.5.0"
   },
   "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/gordianknot1981/vue_facade/issues"
-  },
-  "homepage": "https://github.com/gordianknot1981/vue_facade#readme"
+  "license": "ISC"
 }
