@@ -351,7 +351,7 @@ class Is {
   }
 }
 
-export const is = new Is();
+export const is: Is = new Is();
 
 
 class IsNot {

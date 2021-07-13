@@ -140,3 +140,13 @@ export{
   CommonMixin
 }from "~/vueMixins/common";
 
+
+export namespace VueAppCommon {
+
+}
+
+
+
+
+
+
