@@ -1,6 +1,6 @@
 {
   "name": "vue_app_common",
-  "version": "0.1.0+3",
+  "version": "0.1.0+4",
   "description": "",
   "scripts": {
     "prepublish": "tsc -p tsconfig.json",
