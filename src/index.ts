@@ -92,7 +92,7 @@ export{
 export{
   isRefImpl,asEnum, getAccessibleProperties, asCascadeClass,
   asUnWrappedVueRefMap, UnWrappedVueRef, TUnWrapVueRef,
-  addStringMappingFromNumEnum, is,
+  addStringMappingFromNumEnum, is, Is
 }from "~/extendBase/impls/utils/typeInferernce";
 
 export{

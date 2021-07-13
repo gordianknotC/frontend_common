@@ -245,7 +245,7 @@ export function addStringMappingFromNumEnum<N extends number,
 }
 
 
-class Is {
+export class Is {
   /**
    * 用於 type class, 有 constructor name 無法分辦
    *   1) generic class
