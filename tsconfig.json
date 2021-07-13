@@ -20,8 +20,7 @@
     "module": "ESNext",
     "moduleResolution": "node",
     /**
-    You shouldn't use "noEmit": true in your tsconfig.json
-    if you compile with tsc.
+    You shouldn't use "noEmit": true in your tsconfig.json if you compile with tsc.
     From compiler options description --noEmit - Do not emit outputs.*/
     "noEmit": false,
     "noImplicitAny": true,                 /* Raise error on expressions and declarations with an implied 'any' type. */
