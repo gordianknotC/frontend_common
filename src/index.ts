@@ -4,77 +4,74 @@
  * */
 import {
   BaseApiService,
-} from "~/base/baseApi";
+} from "~/appCommon/base/baseApi";
 
 import {
   BaseApiGuard,
-} from "~/base/baseApiGuard";
+} from "~/appCommon/base/baseApiGuard";
 
 import {
-  IBaseApiGuardConfig, BaseApiGuardConfig, BaseGeneralApiGuardConfig,
-  BaseAuthApiGuardConfig
-} from "~/base/baseApiGuardConfig";
+  IBaseApiGuardHelper, InternalApiGuardHelper
+} from "~/appCommon/base/internalApiGuardHelper";
 
 import {
-  BaseErrorCodes, IBaseResponseRestorer, IBaseApiService,
-  IInternalBaseApiService, TPager, TOptional, TErrorResponse,
-  TSuccessResponse, TDataResponse, TResponse,
-
-} from "~/base/baseApiTypes";
+  AppErrorCodes, Optional,
+  IInternalBaseApiService, TPager, TFuzzyResponse,
+} from "~/appCommon/base/baseApiTypes";
 
 import {
   IBaseAppConfig,
-} from "~/base/baseAppConfigTypes";
+} from "~/appCommon/base/baseAppConfigTypes";
 
 import {
   IBaseAppStore, IBaseLanguageService
-} from "~/base/baseAppStoreTypes";
+} from "~/appCommon/base/baseAppStoreTypes";
 
 import {
   UnCaughtCondition, UncaughtEnumType, NotImplementedError,
   TypeMismatchError, InvalidUsage, UnExpectedRole
-} from "~/base/baseExceptions"
+} from "~/appCommon/base/baseExceptions"
 
 import {
   IParamStore, TUpdateFromRouteOption
-} from "~/base/baseParamStore"
+} from "~/appCommon/base/baseParamStore"
 
 import {
   BaseRouterInterceptor,
-} from "~/base/baseRouterGuard"
+} from "~/appCommon/base/baseRouterGuard"
 
 import {
   TSearchStorePayloadGetter, TSearchStoreOptions,
   TSearchStoreOnUpdate, ISearchStore,
-} from "~/base/baseSearchStoreTypes"
+} from "~/appCommon/base/baseSearchStoreTypes"
 
 import {
   TableState, TableStateForceExtra, TableColConfig,
   TableCol, IBaseTableModels, IBaseTableCtrl
-} from "~/base/baseTableTypes"
+} from "~/appCommon/base/baseTableTypes"
 
 import {
-  EFlashType, EUserRole, USER_ROLES, TCommonUserStateProps,
+  EFlashType, EUserRole, TCommonUserStateProps,
   StateMapping, TStateMappingConfig, TWrappedStateMappingConfig,
   IBaseUserStore,
-} from "~/base/baseUserTypes"
+} from "~/appCommon/base/baseUserTypes"
 
 import {
   ERedirectReason, EApiForwardingStage, IRouterInterceptor,
   IBaseRouterGuard, EApiGuardType, TApiRedirectGuard,
-} from "~/base/guardianTypes"
+} from "~/appCommon/base/guardianTypes"
 
 import {
   EStorageType, IStoreService, IStoreHelper,
-} from "~/base/jsonStoreServiceType"
+} from "~/appCommon/base/jsonStoreServiceType"
 
 import {
   StoreHelper,
-} from "~/base/storeHelper"
+} from "~/appCommon/base/storeHelper"
 
 import {
   VForm,
-} from "~/base/vformTypes"
+} from "~/appCommon/types/vformTypes"
 
 
 /***
@@ -84,50 +81,40 @@ import {
  * */
 
 import {
-  AssertMsg, assertMsg, AssertionError, assert
-} from "~/extendBase/impls/utils/assert";
-
+  AssertMsg, AssertionError, assert,
+  assertMsg as _assertMsg,
+} from "~/appCommon/extendBase/impls/utils/assert";
 
 import {
   isRefImpl, asEnum, getAccessibleProperties, asCascadeClass,
   asUnWrappedVueRefMap, UnWrappedVueRef, TUnWrapVueRef,
-  addStringMappingFromNumEnum, is, Is
-} from "~/extendBase/impls/utils/typeInferernce";
+  addStringMappingFromNumEnum, Is,
+  is as _is,
+} from "~/appCommon/extendBase/impls/utils/typeInferernce";
 
 import {
   BaseParamStore
-} from "~/extendBase/impls/baseParamStore";
-
+} from "~/appCommon/extendBase/impls/baseParamStore";
 
 import {
   BaseStorageService, WatchAndStore, watchAndStore
-} from "~/extendBase/impls/baseStorageService";
+} from "~/appCommon/extendBase/impls/baseStorageService";
 
 import {
   BaseTableModel
-} from "~/extendBase/impls/baseTableModel";
+} from "~/appCommon/extendBase/impls/baseTableModel";
 
 import {
   BaseUserStore
-} from "~/extendBase/impls/baseUserStore";
-
-
-import {
-  appConfigInit
-} from "~/extendBase/appConfigs";
-
-import {
-  TParamStoreState
-} from "~/extendBase/paramStoreTypes";
-
+} from "~/appCommon/extendBase/impls/baseUserStore";
 
 import {
   DebouncedFunc, TSearchStoreState, TSearchPayload
-} from "~/extendBase/searchStoreType";
+} from "~/appCommon/extendBase/searchStoreType";
 
 import {
   watchProps, withDebugKey
-} from "~/extendBase/vueUtils";
+} from "~/appCommon/extendBase/vueUtils";
 
 
 /**
@@ -137,18 +124,18 @@ import {
  * */
 import {
   CommonMixin
-} from "~/vueMixins/common";
+} from "~/appCommon/vueMixins/common";
 
+export const is: Is = _is;
+export const assertMsg: typeof _assertMsg = _assertMsg;
 
 export {
   AssertionError,
   AssertMsg,
   BaseApiGuard,
-  BaseApiGuardConfig,
+  InternalApiGuardHelper,
   BaseApiService,
-  BaseAuthApiGuardConfig,
-  BaseErrorCodes,
-  BaseGeneralApiGuardConfig,
+  AppErrorCodes,
   BaseParamStore,
   BaseRouterInterceptor,
   BaseStorageService,
@@ -161,12 +148,10 @@ export {
   ERedirectReason,
   EStorageType,
   EUserRole,
-  IBaseApiGuardConfig,
-  IBaseApiService,
+  IBaseApiGuardHelper,
   IBaseAppConfig,
   IBaseAppStore,
   IBaseLanguageService,
-  IBaseResponseRestorer,
   IBaseRouterGuard,
   IBaseTableCtrl,
   IBaseTableModels,
@@ -186,12 +171,7 @@ export {
   UnExpectedRole,
   WatchAndStore,
 
-  assertMsg,
-  is,
-  USER_ROLES,
-
   addStringMappingFromNumEnum,
-  appConfigInit,
   asCascadeClass,
   asEnum,
   assert,
@@ -212,26 +192,20 @@ export {
   TableStateForceExtra,
   TApiRedirectGuard,
   TCommonUserStateProps,
-  TDataResponse,
-  TErrorResponse,
-  TOptional,
+  TFuzzyResponse,
   TPager,
-  TParamStoreState,
-  TResponse,
   TSearchPayload,
   TSearchStoreOnUpdate,
   TSearchStoreOptions,
   TSearchStorePayloadGetter,
   TSearchStoreState,
   TStateMappingConfig,
-  TSuccessResponse,
   TUnWrapVueRef,
   TUpdateFromRouteOption,
   TWrappedStateMappingConfig,
   VForm,
-
+  Optional,
 }
-
 
 
 
