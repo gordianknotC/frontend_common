@@ -43,7 +43,6 @@ export type ApiGuardConfigOptions = {
 }
 
 
-
 export class InternalApiGuardHelper implements IBaseApiGuardHelper {
   constructor(
     public options: ApiGuardConfigOptions

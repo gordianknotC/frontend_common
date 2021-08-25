@@ -132,11 +132,14 @@ import {DateDiff, DateExt} from "~/appCommon/base/addon";
 import {BaseSpanCounter} from "~/appCommon/counter/counters_span";
 import {BaseReactiveCounter} from "~/appCommon/counter/counter_base";
 import {BasePeriodCounter} from "~/appCommon/counter/counters_period";
+import {BaseFormContext, BaseFormImpl, BaseFormModel} from "~/appCommon/extendBase/baseFormImpl";
 export const is: Is = _is;
 export const assertMsg: typeof _assertMsg = _assertMsg;
 
-
 export {
+  BaseFormImpl,
+  BaseFormModel,
+  BaseFormContext,
   DateDiff,
   BaseSpanCounter,
   BaseReactiveCounter,
@@ -185,8 +188,6 @@ export {
   BaseAuthGuardHelper,
   BaseGeneralGuardHelper,
   EIOStage,
-
-
   //
   addStringMappingFromNumEnum,
   asCascadeClass,
@@ -224,7 +225,7 @@ export {
   VForm,
   Optional,
   ApiGuardConfigOptions,
-//
+  //
   DateExt,
 }
 
