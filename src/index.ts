@@ -125,6 +125,7 @@ import {
 import {
   CommonMixin
 } from "~/appCommon/vueMixins/common";
+import { appConfigInit } from "./appCommon/extendBase/appConfigs";
 
 export const is: Is = _is;
 export const assertMsg: typeof _assertMsg = _assertMsg;
@@ -182,6 +183,7 @@ export {
   watchAndStore,
   watchProps,
   withDebugKey,
+  appConfigInit,
 
   DebouncedFunc,
   ISearchStore,

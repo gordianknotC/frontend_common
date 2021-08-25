@@ -6,11 +6,11 @@
     "prepublish": "tsc -p tsconfig.json",
     "serve": "vue-cli-service serve"
   },
-  "main": "lib/index.js",
-  "types": "lib/index.d.ts",
+  "main": "src/index.js",
+  "types": "src/index.d.ts",
   "notes": {
-    "main": "lib/index.js",
-    "types": "lib/index.d.ts",
+    "main": "src/index.js",
+    "types": "src/index.d.ts",
     "repository": {
       "type": "git",
       "url": "git+https://github.com/gordianknotC/vueGeneralApp.git"
