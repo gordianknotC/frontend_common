@@ -14,7 +14,7 @@ export
 abstract class BasePeriodCounter extends BaseSpanCounter implements IBasePeriodCounter{
   spanCounter: BaseSpanCounter;
 
-  protected constructor(option: {
+  constructor(option: {
     maxTimes: number,
     period: number,
     spanCounter: BaseSpanCounter,
@@ -136,3 +136,4 @@ abstract class BasePeriodCounter extends BaseSpanCounter implements IBasePeriodC
 //   protected afterSet(lbound: number): void {
 //   }
 // }
+

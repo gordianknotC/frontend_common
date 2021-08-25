@@ -10,6 +10,9 @@ import {
 } from "~/appCommon/base/baseApiGuard";
 
 import {
+  ApiGuardConfigOptions,
+  BaseAuthGuardHelper,
+  BaseGeneralGuardHelper,
   IBaseApiGuardHelper, InternalApiGuardHelper
 } from "~/appCommon/base/internalApiGuardHelper";
 
@@ -46,7 +49,7 @@ import {
 
 import {
   TableState, TableStateForceExtra, TableColConfig,
-  TableCol, IBaseTableModels, IBaseTableCtrl
+  TableCol, IBaseTableModels, IBaseTableCtrl, EIOStage
 } from "~/appCommon/base/baseTableTypes"
 
 import {
@@ -125,14 +128,19 @@ import {
   CommonMixin
 } from "~/appCommon/vueMixins/common";
 import { appConfigInit } from "./appCommon/extendBase/appConfigs";
-import {DateExt} from "~/appCommon/base/addon";
-
-
+import {DateDiff, DateExt} from "~/appCommon/base/addon";
+import {BaseSpanCounter} from "~/appCommon/counter/counters_span";
+import {BaseReactiveCounter} from "~/appCommon/counter/counter_base";
+import {BasePeriodCounter} from "~/appCommon/counter/counters_period";
 export const is: Is = _is;
 export const assertMsg: typeof _assertMsg = _assertMsg;
 
 
 export {
+  DateDiff,
+  BaseSpanCounter,
+  BaseReactiveCounter,
+  BasePeriodCounter,
   AssertionError,
   AssertMsg,
   BaseApiGuard,
@@ -174,6 +182,10 @@ export {
   UnExpectedRole,
   WatchAndStore,
   IBaseApiService,
+  BaseAuthGuardHelper,
+  BaseGeneralGuardHelper,
+  EIOStage,
+
 
   //
   addStringMappingFromNumEnum,
@@ -211,9 +223,9 @@ export {
   TWrappedStateMappingConfig,
   VForm,
   Optional,
-  //
+  ApiGuardConfigOptions,
+//
   DateExt,
 }
-
 
 
