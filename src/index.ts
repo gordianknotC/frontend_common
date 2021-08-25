@@ -5,7 +5,6 @@
 import {
   BaseApiService,
 } from "~/appCommon/base/baseApi";
-
 import {
   BaseApiGuard,
 } from "~/appCommon/base/baseApiGuard";
@@ -16,7 +15,7 @@ import {
 
 import {
   AppErrorCodes, Optional,
-  IInternalBaseApiService, TPager, TFuzzyResponse,
+  IInternalBaseApiService, TPager, TFuzzyResponse, IBaseApiService,
 } from "~/appCommon/base/baseApiTypes";
 
 import {
@@ -174,6 +173,8 @@ export {
   UncaughtEnumType,
   UnExpectedRole,
   WatchAndStore,
+  IBaseApiService,
+
   //
   addStringMappingFromNumEnum,
   asCascadeClass,
