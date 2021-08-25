@@ -14,7 +14,7 @@ export abstract class BaseSpanCounter extends BaseReactiveCounter implements IBa
   hasExceedMaxRetries: ComputedRef<boolean>;
   private storeKey: string;
 
-  protected constructor(option: {
+  constructor(option: {
     maxTimes: number,
     span: number,
     storeKey: string,
