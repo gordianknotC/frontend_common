@@ -126,9 +126,12 @@ import {
   CommonMixin
 } from "~/appCommon/vueMixins/common";
 import { appConfigInit } from "./appCommon/extendBase/appConfigs";
+import {DateExt} from "~/appCommon/base/addon";
+
 
 export const is: Is = _is;
 export const assertMsg: typeof _assertMsg = _assertMsg;
+
 
 export {
   AssertionError,
@@ -171,7 +174,7 @@ export {
   UncaughtEnumType,
   UnExpectedRole,
   WatchAndStore,
-
+  //
   addStringMappingFromNumEnum,
   asCascadeClass,
   asEnum,
@@ -184,7 +187,7 @@ export {
   watchProps,
   withDebugKey,
   appConfigInit,
-
+  //
   DebouncedFunc,
   ISearchStore,
   StateMapping,
@@ -207,6 +210,8 @@ export {
   TWrappedStateMappingConfig,
   VForm,
   Optional,
+  //
+  DateExt,
 }
 
 
