@@ -39,9 +39,11 @@ import {
  *
  * */
 import {useBuiltIn} from "~/appCommon/base/builtinAddonsTypes";
-export {assertMsg} from "~/appCommon/extendBase/impls/utils/assert";
-export {is} from "~/appCommon/extendBase/impls/utils/typeInferernce";
+import {assertMsg as _assertMsg} from "~/appCommon/extendBase/impls/utils/assert";
+import {is as _is} from "~/appCommon/extendBase/impls/utils/typeInferernce";
 
+export const is: InterfaceIs = _is;
+export const assertMsg: AssertMsg = _assertMsg;
 export {
   AssertionError,
   AssertMsg,
