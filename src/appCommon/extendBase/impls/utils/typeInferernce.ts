@@ -266,7 +266,7 @@ export interface InterfaceIs {
   array(val: any): boolean;
   string(val: any): boolean;
   number(val: any): boolean;
-  undefined(val: any, countUndefinedString: boolean): boolean;
+  undefined(val: any, countUndefinedString?: boolean): boolean;
   null(val: any, countNullString: boolean): boolean;
   initialized(val: any): boolean;
   empty(val: any): boolean;
@@ -394,7 +394,7 @@ export class Is implements InterfaceIs {
   private static _mobile: boolean;
 }
 
-export const is: Is = new Is();
+export const is: InterfaceIs = new Is();
 
 
 class IsNot implements InterfaceIs{
@@ -445,4 +445,4 @@ class IsNot implements InterfaceIs{
   }
 }
 
-const isnot = new IsNot();
+const isnot:InterfaceIs = new IsNot();
