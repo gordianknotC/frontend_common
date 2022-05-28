@@ -16,6 +16,4 @@ import { isRefImpl, asEnum, getAccessibleProperties, asCascadeClass, asUnWrapped
  *
  * */
 import { useBuiltIn } from "~/base/builtinAddonsTypes";
-export declare const is: InterfaceIs;
-export declare const assertMsg: AssertMsg;
 export { AssertionError, AssertMsg, InvalidUsage, Is, NotImplementedError, TypeMismatchError, UnCaughtCondition, UncaughtEnumType, UnExpectedRole, addStringMappingFromNumEnum, asCascadeClass, asEnum, assert, asUnWrappedVueRefMap, getAccessibleProperties, isRefImpl, UnWrappedVueRef, useBuiltIn, TUnWrapVueRef, InterfaceIs, };
