@@ -246,7 +246,35 @@ export function addStringMappingFromNumEnum<N extends number,
 
 const axiosKeys = ["data", "status", "statusText", "headers", "config"];
 
-export class Is {
+export interface InterfaceIs {
+  readonly not: InterfaceIs;
+  readonly mobile: boolean;
+
+  /**
+   * 用於 type class, 有 constructor name 無法分辦
+   *   1) generic class
+   *   2) 非 class object (沒有 constructor name者）
+   *      小心使用
+   *   e.g:
+   *    > is.type([], "Object") // false 讀 constructor.name
+   *    > is.type([], "Array")  // true 讀 constructor.name
+   *    > is.type({}, "Object") // true 讀 constructor.name
+   *
+   * */
+  type(val: any | null | undefined, name: string): boolean;
+  true(val: any): boolean;
+  array(val: any): boolean;
+  string(val: any): boolean;
+  number(val: any): boolean;
+  undefined(val: any, countUndefinedString: boolean): boolean;
+  null(val: any, countNullString: boolean): boolean;
+  initialized(val: any): boolean;
+  empty(val: any): boolean;
+  axiosResponse(e: any): boolean;
+}
+
+
+export class Is implements InterfaceIs {
   /**
    * 用於 type class, 有 constructor name 無法分辦
    *   1) generic class
@@ -267,11 +295,11 @@ export class Is {
   }
 
   array(val: any): boolean {
-    if (typeof val === "object"){
-      if (val.length === undefined || val.length === null){
+    if (typeof val === "object") {
+      if (val.length === undefined || val.length === null) {
         return false;
       }
-      if (typeof val === "number"){
+      if (typeof val === "number") {
         return true;
       }
       return false;
@@ -323,10 +351,10 @@ export class Is {
   // - false
   // - 0
   empty(val: any): boolean {
-    if (val === undefined || val === null){
+    if (val === undefined || val === null) {
       return true;
     }
-    if (val === 0 || val === false || val === true){
+    if (val === 0 || val === false || val === true) {
       return false;
     }
     if (typeof val === "object") {
@@ -346,20 +374,20 @@ export class Is {
     }
   }
 
-  axiosResponse(e: any){
-    if (this.initialized(e) && typeof e === "object" ){
+  axiosResponse(e: any) {
+    if (this.initialized(e) && typeof e === "object") {
       const keys = Object.keys(e);
-      return axiosKeys.every((_)=> keys.contains(_));
+      return axiosKeys.every((_) => keys.contains(_));
     }
     return false;
   }
 
   // is.not
-  get not(): IsNot {
+  get not(): InterfaceIs {
     return isnot;
   }
 
-  get mobile(): boolean{
+  get mobile(): boolean {
     return Is._mobile ??= /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
   }
 
@@ -369,7 +397,7 @@ export class Is {
 export const is: Is = new Is();
 
 
-class IsNot {
+class IsNot implements InterfaceIs{
   type(val: any, name: string): boolean {
     return !is.type(val, name);
   }
@@ -396,6 +424,24 @@ class IsNot {
 
   string(val: any): boolean {
     return !is.string(val);
+  }
+
+  get mobile(): boolean {
+    return !is.mobile;
+  }
+
+  readonly not: InterfaceIs = is;
+
+  axiosResponse(e: any): boolean {
+    return !is.axiosResponse(e);
+  }
+
+  number(val: any): boolean {
+    return !is.number(val);
+  }
+
+  true(val: any): boolean {
+    return !is.true(val);
   }
 }
 

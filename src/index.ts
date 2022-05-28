@@ -27,7 +27,7 @@ import {
 import {
   isRefImpl, asEnum, getAccessibleProperties, asCascadeClass,
   asUnWrappedVueRefMap, UnWrappedVueRef, TUnWrapVueRef,
-  addStringMappingFromNumEnum, Is,
+  addStringMappingFromNumEnum, Is, InterfaceIs,
   is as _is,
 } from "~/appCommon/extendBase/impls/utils/typeInferernce";
 
@@ -66,5 +66,6 @@ export {
   useBuiltIn,
   //
   TUnWrapVueRef,
+  InterfaceIs
 }
 
