@@ -1,5 +1,5 @@
 {
-  "name": "vue_general_app",
+  "name": "common_js_util",
   "version": "v0.1.0+22",
   "description": "",
   "scripts": {
@@ -13,7 +13,7 @@
     "types": "src/index.d.ts",
     "repository": {
       "type": "git",
-      "url": "git+https://github.com/gordianknotC/vueGeneralApp.git"
+      "url": "git+https://github.com/gordianknotC/commonJSBuiltin.git"
     }
   },
   "files": [
@@ -24,9 +24,6 @@
   },
   "dependencies": {
     "colors": "^1.4.0",
-    "email-validator": "^2.0.4",
-    "numeral": "^2.0.6",
-    "ramda": "^0.27.1",
     "string-format": "^2.0.0"
   },
   "devDependencies": {
