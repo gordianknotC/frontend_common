@@ -1,6 +1,6 @@
 {
   "name": "common_js_util",
-  "version": "v0.1.0+1",
+  "version": "v0.0.1",
   "description": "",
   "scripts": {
     "prepublish": "tsc -p tsconfig.json",

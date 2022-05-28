@@ -41,7 +41,7 @@ import {
  *
  * */
 import {useBuiltIn} from "~/appCommon/base/builtinAddonsTypes";
-export const is: Is = _is;
+export const is: InterfaceIs = _is;
 export const assertMsg: typeof _assertMsg = _assertMsg;
 
 export {
@@ -66,6 +66,6 @@ export {
   useBuiltIn,
   //
   TUnWrapVueRef,
-  InterfaceIs
+  InterfaceIs,
 }
 
