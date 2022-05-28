@@ -394,7 +394,7 @@ export class Is implements InterfaceIs {
   private static _mobile: boolean;
 }
 
-export const is: InterfaceIs = new Is();
+const is: InterfaceIs = new Is();
 
 
 class IsNot implements InterfaceIs{
@@ -446,3 +446,8 @@ class IsNot implements InterfaceIs{
 }
 
 const isnot:InterfaceIs = new IsNot();
+
+export{
+  is,
+  isnot
+}
