@@ -25,7 +25,7 @@
     "noImplicitReturns": true,             /* Report error when not all code paths in function return a value. */
     "noImplicitThis": true,                 /* Raise error on 'this' expressions with an implied 'any' type. */
     "outDir": "src",                        /* Redirect output structure to the directory. */
-
+    "target": "ES2018",
     "paths": {
       /*
       *     A L I A S   P A T H
@@ -47,10 +47,8 @@
     "strictFunctionTypes": true,
     "strictNullChecks": true,              /* Enable strict null checks. */
     "strictPropertyInitialization": true,
-    "target": "ES2018",
     "typeRoots": [
-      "node_modules/@types",
-      "src/appCommon/types"
+      "node_modules/@types"
     ],
     "types": [
       "node"
