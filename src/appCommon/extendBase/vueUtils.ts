@@ -1,22 +1,11 @@
 import {watch, reactive, UnwrapRef} from "vue";
 import {assert} from "~/appCommon/extendBase/impls/utils/assert";
 import {isRefImpl} from "~/appCommon/extendBase/impls/utils/typeInferernce";
-import {getAppConfigs} from "~/appCommon/extendBase/appConfigs";
 
 type TWatchPropOption<T> ={
     props: T,
     initializeOnCall?: boolean,
     config:Partial<{[K in keyof T]: (val: T[K])=> void}>,
-}
-
-type TPropNamesGuardOption<T> ={
-    props: T,
-    properties: string[],
-}
-
-type TAssertVModel<T> ={
-    vModel: UnwrapRef<T>,
-    config:Partial<{[K in keyof UnwrapRef<T>]: (val: UnwrapRef<T>[K])=> UnwrapRef<T>[K]}>,
 }
 
 
@@ -54,47 +43,4 @@ function watchProps<T>(option: TWatchPropOption<T>){
         }
     })
 }
-
-export
-function propNamesGuard<T>(option: TPropNamesGuardOption<T>){
-    const {props, properties} = option;
-    if (!getAppConfigs()!.isInProductionMode){
-        console.log("propname guard1".red, "keys:", Object.keys(props), props)
-        Object.keys(props).forEach((key) => {
-            assert(properties.contains(key), `property guard, invalid key:${key}`);
-        })
-    }
-}
-
-export
-function vModelTypeGuard<T>(option: TAssertVModel<T>){
-    const {vModel, config} = option;
-    Object.keys(config).forEach((_propname) => {
-        const propName = _propname as keyof typeof vModel;
-        watch(()=>vModel[propName], function(){
-            const value = config[propName]!(vModel[propName]);
-            if (vModel[propName] !== value){
-                vModel[propName] = value;
-            }
-        });
-    })
-}
-
-
-/**
- *    vue 組件 debug 用，debug key 會將該組件存於
- *    window._$debug.[debugKey]
- * */
-export
-function withDebugKey<T>(key: string, anyThing: T): T {
-    if (!getAppConfigs()!.isInProductionMode){
-        (window as any)._$debug ??= {};
-        (window as any)._$debug[key] = anyThing;
-        (window as any)._$debug["reactive"] ??= reactive;
-    }
-    return anyThing;
-}
-
-
-
 

@@ -1,6 +1,5 @@
 import {is} from "~/appCommon/extendBase/impls/utils/typeInferernce";
 import format from "string-format";
-import {DateDiff} from "~/appCommon/base/addon";
 
 type ConditionCallback<T> = (x: T) => boolean;
 
@@ -113,28 +112,6 @@ declare global {
     trap: string;
     random: string;
     zalgo: string;
-  }
-
-  interface Date {
-    envNow(): Date;
-
-    difference(input: this): DateDiff;
-
-    isWithin(a: Date | string, b: Date | string): boolean;
-
-    subtract(input: number): Date;
-
-    toQueryString(): string;
-
-    toLabelString(): string;
-
-    TODAY: string;
-    YESTERDAY: string;
-    THIS_WEEK: string[];
-    LAST_WEEK: string[];
-    THIS_MONTH: string[];
-    LAST_MONTH: string[];
-    YEARS_AGO: (year: number) => string[]
   }
 }
 

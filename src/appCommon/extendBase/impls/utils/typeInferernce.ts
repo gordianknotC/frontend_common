@@ -1,7 +1,4 @@
 import {ComputedRef, toRef} from "vue";
-import {RealAxiosError} from "~/appCommon/base/baseApiGuard";
-import {AxiosResponse} from "axios";
-import {Optional} from "~/appCommon/base/baseApiTypes";
 
 let refImplClassName: string = undefined as any;
 
@@ -261,7 +258,7 @@ export class Is {
    *    > is.type({}, "Object") // true 讀 constructor.name
    *
    * */
-  type(val: Optional<any>, name: string): boolean {
+  type(val: any | null | undefined, name: string): boolean {
     return (val?.constructor?.name == name);
   }
 

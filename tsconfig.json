@@ -13,7 +13,7 @@
     "jsxFactory": "h",                        /* Specify the JSX factory function to use when targeting react JSX emit, e.g. React.createElement or h. */
     "lib": [
       "esnext",
-      "dom",
+      "dom"
     ],
     "module": "ESNext",
     "moduleResolution": "node",
@@ -50,7 +50,7 @@
     "target": "ES2018",
     "typeRoots": [
       "node_modules/@types",
-      "src/appCommon/types",
+      "src/appCommon/types"
     ],
     "types": [
       "node"

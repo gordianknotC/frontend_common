@@ -1,5 +1,5 @@
 import {ComputedRef, UnwrapRef} from "~/appCommon/base/vueTypes";
-import {Optional} from "~/appCommon/base/baseApiTypes";
+type Optional<T> = T | undefined | null;
 
 export namespace VForm{
   export type AtLeastOne<T, U = {[K in keyof T]: Pick<T, K> }> = Partial<T> & U[keyof U];
