@@ -1,13 +1,13 @@
-import { is } from "~/appCommon/extendBase/impls/utils/typeInferernce";
 import format from "string-format";
+import { is } from "~/utils/typeInferernce";
 // 以下改寫入 common, 以 patch 的方式實作
 //
-Object.defineProperty(Array.prototype, "first", {
+Object.defineProperty(Array.prototype, 'first', {
     get: function first() {
         return this[0];
     }
 });
-Object.defineProperty(Array.prototype, "last", {
+Object.defineProperty(Array.prototype, 'last', {
     get: function first() {
         return this[this.length - 1];
     }
@@ -83,6 +83,36 @@ String.prototype.contains = function (val) {
 String.prototype.format = function (option) {
     return format(this, option);
 };
-export function useBuiltin() {
+String.prototype.toAsciiArray = function () {
+    const utf8 = [];
+    const val = this;
+    for (let i = 0; i < val.length; i++) {
+        let charcode = val.charCodeAt(i);
+        if (charcode < 0x80)
+            utf8.push(charcode);
+        else if (charcode < 0x800) {
+            utf8.push(0xc0 | (charcode >> 6), 0x80 | (charcode & 0x3f));
+        }
+        else if (charcode < 0xd800 || charcode >= 0xe000) {
+            utf8.push(0xe0 | (charcode >> 12), 0x80 | ((charcode >> 6) & 0x3f), 0x80 | (charcode & 0x3f));
+        }
+        // surrogate pair
+        else {
+            i++;
+            // UTF-16 encodes 0x10000-0x10FFFF by
+            // subtracting 0x10000 and splitting the
+            // 20 bits of 0x0-0xFFFFF into two halves
+            charcode = 0x10000 + (((charcode & 0x3ff) << 10)
+                | (val.charCodeAt(i) & 0x3ff));
+            utf8.push(0xf0 | (charcode >> 18), 0x80 | ((charcode >> 12) & 0x3f), 0x80 | ((charcode >> 6) & 0x3f), 0x80 | (charcode & 0x3f));
+        }
+    }
+    return utf8;
+};
+Number.prototype.asInt = function () {
+    return Math.floor(this);
+};
+export function useBuiltIn() {
+    console.log('builtin initialized');
 }
-//# sourceMappingURL=builtinTypes.js.map
+//# sourceMappingURL=builtinAddonsTypes.js.map
