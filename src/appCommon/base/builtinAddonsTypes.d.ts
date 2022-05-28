@@ -1,10 +1,3 @@
-export declare enum EDatePreset {
-    TODAY = "1",
-    LAST_WEEK = "2",
-    THIS_WEEK = "3",
-    LAST_MONTH = "4",
-    THIS_MONTH = "5"
-}
 declare type ConditionCallback<T> = (x: T) => boolean;
 declare global {
     interface Array<T> {

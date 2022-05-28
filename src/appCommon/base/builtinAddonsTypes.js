@@ -1,14 +1,5 @@
 import format from "string-format";
 import { is } from "~/appCommon/extendBase/impls/utils/typeInferernce";
-const forWebpackReloadingTypescript = "";
-export var EDatePreset;
-(function (EDatePreset) {
-    EDatePreset["TODAY"] = "1";
-    EDatePreset["LAST_WEEK"] = "2";
-    EDatePreset["THIS_WEEK"] = "3";
-    EDatePreset["LAST_MONTH"] = "4";
-    EDatePreset["THIS_MONTH"] = "5";
-})(EDatePreset || (EDatePreset = {}));
 // 以下改寫入 common, 以 patch 的方式實作
 //
 Object.defineProperty(Array.prototype, 'first', {
