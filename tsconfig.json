@@ -57,6 +57,7 @@
     ]
   },
   "include": [
+    "src",
     "src/**/*.ts",
     "src/appCommon/**/*.ts",
     "src/appCommon/*.ts",

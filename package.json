@@ -1,13 +1,13 @@
 {
   "name": "common_js_util",
-  "version": "v0.0.14",
+  "version": "v0.0.15",
   "description": "",
   "scripts": {
     "prepublish": "tsc -p tsconfig.json",
     "serve": "vue-cli-service serve"
   },
-  "main": "src/index.ts",
-  "types": "src/index.d.ts",
+  "main": "index.ts",
+  "types": "index.d.ts",
   "notes": {
     "main": "src/index.js",
     "types": "src/index.d.ts",

@@ -92,5 +92,5 @@ declare global {
         zalgo: string;
     }
 }
-export declare function useBuiltin(): void;
+export declare function useBuiltIn(): void;
 export {};

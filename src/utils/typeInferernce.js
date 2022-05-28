@@ -323,7 +323,7 @@ export class Is {
         return (_a = Is._mobile) !== null && _a !== void 0 ? _a : (Is._mobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
     }
 }
-export const is = new Is();
+const is = new Is();
 class IsNot {
     constructor() {
         this.not = is;
@@ -363,4 +363,5 @@ class IsNot {
     }
 }
 const isnot = new IsNot();
+export { is, isnot };
 //# sourceMappingURL=typeInferernce.js.map

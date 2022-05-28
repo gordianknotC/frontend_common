@@ -178,5 +178,6 @@ export declare class Is implements InterfaceIs {
     get mobile(): boolean;
     private static _mobile;
 }
-export declare const is: InterfaceIs;
-export {};
+declare const is: InterfaceIs;
+declare const isnot: InterfaceIs;
+export { is, isnot };
