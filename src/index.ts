@@ -42,8 +42,8 @@ import {useBuiltIn} from "~/base/builtinAddonsTypes";
 import {assertMsg as _assertMsg} from "~/utils/assert";
 import {is as _is} from "~/utils/typeInferernce";
 
-export const is: InterfaceIs = _is;
-export const assertMsg: AssertMsg = _assertMsg;
+// export const is: InterfaceIs = _is;
+// export const assertMsg: AssertMsg = _assertMsg;
 export {
   AssertionError,
   AssertMsg,
