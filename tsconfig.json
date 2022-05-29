@@ -57,8 +57,6 @@
   "include": [
     "src",
     "src/**/*.ts",
-    "src/appCommon/**/*.ts",
-    "src/appCommon/*.ts",
     "tests/**/*.ts",
     "tests/**/*.tsx",
     "src/index.ts"
