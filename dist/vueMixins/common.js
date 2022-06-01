@@ -1,4 +1,4 @@
-import { computed } from "~/base/vueTypes";
+import { computed } from "../base/vueTypes";
 export class CommonMixin {
     constructor() {
         this.vModelEvents = new Set();
