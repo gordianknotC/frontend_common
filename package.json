@@ -1,13 +1,17 @@
 {
   "name": "common_js_util",
-  "version": "v0.0.1+4",
+  "version": "v0.0.1+5",
   "description": "",
   "scripts": {
     "prepublish": "tsc -p tsconfig.json",
     "serve": "vue-cli-service serve"
   },
-  "main": "dist/index.ts",
-  "types": "dist/index.d.ts",
+  "files": [
+    "src/",
+    "tsconfig.json"
+  ],
+  "main": "src/index.ts",
+  "types": "src/index.d.ts",
   "publishConfig": {
     "access": "public"
   },

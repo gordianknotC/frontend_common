@@ -24,7 +24,8 @@
     "noImplicitAny": true,                 /* Raise error on expressions and declarations with an implied 'any' type. */
     "noImplicitReturns": true,             /* Report error when not all code paths in function return a value. */
     "noImplicitThis": true,                 /* Raise error on 'this' expressions with an implied 'any' type. */
-    "outDir": "dist",                        /* Redirect output structure to the directory. */
+    "outDir": "src",                        /* Redirect output structure to the directory. */
+    "rootDir": "/src",
     "target": "ES2018",
     "paths": {
       /*
@@ -62,12 +63,8 @@
     "src/index.ts"
   ],
   "exclude": [
-    "node_modules",
-    "dist"
+    "node_modules"
   ],
   "compileOnSave": false,
-  "buildOnSave": false,
-  "files": [
-    "src/index.ts"
-  ]
+  "buildOnSave": false
 }
