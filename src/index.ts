@@ -8,7 +8,7 @@
 export {
   UnCaughtCondition, UncaughtEnumType, NotImplementedError,
   TypeMismatchError, InvalidUsage, UnExpectedRole
-} from "base/baseExceptions"
+} from "~/base/baseExceptions"
 
 
 
@@ -21,7 +21,7 @@ export {
 
 export {
   AssertMsg, AssertionError, assert,
-} from "utils/assert";
+} from "~/utils/assert";
 
 export {
   isRefImpl, asEnum, getAccessibleProperties, asCascadeClass,
