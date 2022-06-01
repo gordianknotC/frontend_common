@@ -26,18 +26,6 @@
     "noImplicitThis": true,                 /* Raise error on 'this' expressions with an implied 'any' type. */
     "outDir": "src",                        /* Redirect output structure to the directory. */
     "target": "ES2018",
-    "paths": {
-      /*
-      *     A L I A S   P A T H
-      *     需要同時設置 vue.config.js - alias
-      **/
-      "~/*": [
-        "src/*"
-      ],
-      "@/*": [
-        "src/*"
-      ]
-    },
     "skipLibCheck": true,
     "sourceMap": true,
     /** strict mode ...*/
