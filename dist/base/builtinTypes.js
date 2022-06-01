@@ -1,4 +1,4 @@
-import { is } from "src/utils/typeInferernce";
+import { is } from "utils/typeInferernce";
 import format from "string-format";
 // 以下改寫入 common, 以 patch 的方式實作
 //

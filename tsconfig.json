@@ -2,7 +2,6 @@
   "compilerOptions": {
     "allowJs": true,
     "allowSyntheticDefaultImports": true,
-    "baseUrl": ".",
     "declaration": true,                   /* Generates corresponding '.d.ts' file. */
     "diagnostics": true,
     "emitDecoratorMetadata": true,         /* Enables experimental support for emitting type metadata for decorators. */
@@ -25,7 +24,8 @@
     "noImplicitReturns": true,             /* Report error when not all code paths in function return a value. */
     "noImplicitThis": true,                 /* Raise error on 'this' expressions with an implied 'any' type. */
     "outDir": "dist",                        /* Redirect output structure to the directory. */
-    "rootDir": ".",
+    "rootDirs": ["src", "dist"],
+    "baseUrl": "src",
     "target": "ES2018",
     "paths": {
       /*
@@ -33,10 +33,10 @@
       *     需要同時設置 vue.config.js - alias
       **/
       "~/*": [
-        "src/*"
+        "*"
       ],
       "@/*": [
-        "src/*"
+        "*"
       ]
     },
     "skipLibCheck": true,

@@ -1,5 +1,5 @@
 import {WritableComputedRef}    from "@vue/reactivity";
-import {computed} from "src/base/vueTypes";
+import {computed} from "base/vueTypes";
 type TEmitFn<E> = (event: E, ...args: any[])=>void;
 
 export class CommonMixin {
