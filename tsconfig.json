@@ -24,8 +24,8 @@
     "noImplicitAny": true,                 /* Raise error on expressions and declarations with an implied 'any' type. */
     "noImplicitReturns": true,             /* Report error when not all code paths in function return a value. */
     "noImplicitThis": true,                 /* Raise error on 'this' expressions with an implied 'any' type. */
-    "outDir": "dist/src",                        /* Redirect output structure to the directory. */
-    "rootDir": "./src",
+    "outDir": "dist",                        /* Redirect output structure to the directory. */
+    "rootDir": ".",
     "target": "ES2018",
     "paths": {
       /*

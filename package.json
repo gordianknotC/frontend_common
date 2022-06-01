@@ -1,6 +1,6 @@
 {
   "name": "common_js_util",
-  "version": "v0.0.1+8",
+  "version": "v0.0.1+9",
   "description": "",
   "scripts": {
     "prepublish": "tsc -p tsconfig.json",
@@ -10,15 +10,15 @@
     "dist/",
     "tsconfig.json"
   ],
-  "main": "dist/src/index.ts",
-  "types": "dist/src/index.d.ts",
+  "main": "dist/index.ts",
+  "types": "dist/index.d.ts",
   "publishConfig": {
     "access": "public"
   },
 
   "notes": {
-    "main": "dist/src/index.js",
-    "types": "dist/src/index.d.ts",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
     "reference": "https://github.com/tomchen/example-typescript-package",
     "repository": {
       "type": "git",
