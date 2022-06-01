@@ -27,11 +27,11 @@ export {
   isRefImpl, asEnum, getAccessibleProperties, asCascadeClass,
   asUnWrappedVueRefMap, UnWrappedVueRef,
   addStringMappingFromNumEnum, Is,
-} from "utils/typeInferernce";
+} from "~/utils/typeInferernce";
 
 export type {
   TUnWrapVueRef, InterfaceIs,
-} from "utils/typeInferernce";
+} from "~/utils/typeInferernce";
 
 
 
@@ -41,9 +41,9 @@ export type {
  *
  *
  * */
-export {useBuiltIn} from "base/builtinTypes";
-export {assertMsg} from "utils/assert";
-export {is} from "utils/typeInferernce";
+export {useBuiltIn} from "~/base/builtinTypes";
+export {assertMsg} from "~/utils/assert";
+export {is} from "~/utils/typeInferernce";
 
 
 
