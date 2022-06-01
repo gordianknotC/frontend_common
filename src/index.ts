@@ -5,7 +5,7 @@
 
 
 
-import {
+export {
   UnCaughtCondition, UncaughtEnumType, NotImplementedError,
   TypeMismatchError, InvalidUsage, UnExpectedRole
 } from "~/base/baseExceptions"
@@ -19,16 +19,19 @@ import {
  *    B A S E
  * */
 
-import {
+export {
   AssertMsg, AssertionError, assert,
 } from "~/utils/assert";
 
-import {
+export {
   isRefImpl, asEnum, getAccessibleProperties, asCascadeClass,
-  asUnWrappedVueRefMap, UnWrappedVueRef, TUnWrapVueRef,
-  addStringMappingFromNumEnum, Is, InterfaceIs,
+  asUnWrappedVueRefMap, UnWrappedVueRef,
+  addStringMappingFromNumEnum, Is,
 } from "~/utils/typeInferernce";
 
+export type {
+  TUnWrapVueRef, InterfaceIs,
+} from "~/utils/typeInferernce";
 
 
 
@@ -38,36 +41,8 @@ import {
  *
  *
  * */
-import {useBuiltIn} from "~/base/builtinTypes";
-// import {assertMsg as _assertMsg} from "~/utils/assert";
-// import {is as _is} from "~/utils/typeInferernce";
-// export const is: InterfaceIs = _is;
-// export const assertMsg: AssertMsg = _assertMsg;
+export {useBuiltIn} from "~/base/builtinTypes";
 export {assertMsg} from "~/utils/assert";
 export {is} from "~/utils/typeInferernce";
 
-export {
-  AssertionError,
-  AssertMsg,
-  InvalidUsage,
-  Is,
-  NotImplementedError,
-  TypeMismatchError,
-  UnCaughtCondition,
-  UncaughtEnumType,
-  UnExpectedRole,
-  //
-  addStringMappingFromNumEnum,
-  asCascadeClass,
-  asEnum,
-  assert,
-  asUnWrappedVueRefMap,
-  getAccessibleProperties,
-  isRefImpl,
-  UnWrappedVueRef,
-  useBuiltIn,
-  //
-  TUnWrapVueRef,
-  InterfaceIs,
-}
 
