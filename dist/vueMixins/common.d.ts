@@ -5,4 +5,6 @@ export declare class CommonMixin {
     constructor();
     asVModelFromProps<R, T extends object = any>(props: Readonly<T>, propName: keyof T, emit: TEmitFn<any>): WritableComputedRef<R>;
 }
+export declare function injectFacade<T>(providers: Partial<T>): void;
+export declare function IFacade<T extends Object>(mapping?: T): T;
 export {};

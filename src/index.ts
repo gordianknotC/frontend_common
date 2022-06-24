@@ -5,6 +5,7 @@
 
 
 
+
 export {
   UnCaughtCondition, UncaughtEnumType, NotImplementedError,
   TypeMismatchError, InvalidUsage, UnExpectedRole
@@ -46,4 +47,4 @@ export {assertMsg} from "~/utils/assert";
 export {is} from "~/utils/typeInferernce";
 
 
-
+export {IFacade, injectFacade, CommonMixin} from "~/vueMixins/common";

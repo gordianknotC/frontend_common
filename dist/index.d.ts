@@ -19,3 +19,4 @@ export type { TUnWrapVueRef, InterfaceIs, } from "./utils/typeInferernce";
 export { useBuiltIn } from "./base/builtinTypes";
 export { assertMsg } from "./utils/assert";
 export { is } from "./utils/typeInferernce";
+export { IFacade, injectFacade, CommonMixin } from "./vueMixins/common";
