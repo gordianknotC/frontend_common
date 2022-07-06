@@ -1,20 +1,23 @@
-import { computed } from "../base/vueTypes";
+import { computed, watch } from "../base/vueTypes";
 import { assert } from "../utils/assert";
 export class CommonMixin {
     constructor() {
         this.vModelEvents = new Set();
     }
-    asVModelFromProps(props, propName, emit) {
-        const event = `update:${propName}`;
+    asVModelFromProps(option) {
+        const event = `update:${option.propName}`;
         this.vModelEvents.add(event);
-        return computed({
+        const ret = computed({
             get() {
-                return props[propName];
+                return option.props[option.propName];
             },
             set(v) {
-                emit(event, v);
+                option.onChange(option.props[option.propName], v);
+                option.emit(event, v);
             }
         });
+        watch(() => option.props[option.propName], option.onChange);
+        return ret;
     }
 }
 const container = {};
