@@ -1,7 +1,6 @@
 import {WritableComputedRef}    from "@vue/reactivity";
-import {computed} from "~/base/vueTypes";
+import {computed, watch} from "~/base/vueTypes";
 import {assert} from "~/utils/assert";
-type TEmitFn<E> = (event: E, ...args: any[])=>void;
 
 export class CommonMixin {
   vModelEvents: Set<string>;
@@ -9,17 +8,20 @@ export class CommonMixin {
     this.vModelEvents=new Set();
   }
 
-  asVModelFromProps<R, T extends object=any>(props: Readonly<T>, propName: keyof T, emit: TEmitFn<any>): WritableComputedRef<R>{
-    const event = `update:${propName}`;
+  asVModelFromProps<R, T extends object=any>(option: {props: Readonly<T>, propName: keyof T, emit: any, onChange: (prev:R, val: R)=>void}): WritableComputedRef<R>{
+    const event = `update:${option.propName}`;
     this.vModelEvents.add(event as any);
-    return computed ({
+    const ret =  computed ({
       get(){
-        return props[propName];
+        return option.props[option.propName];
       },
       set(v: any){
-        emit(event, v);
+        option.onChange(option.props[option.propName] as any, v);
+        option.emit(event, v);
       }
-    })
+    });
+    watch(()=>option.props[option.propName], option.onChange as any);
+    return ret;
   }
 }
 
