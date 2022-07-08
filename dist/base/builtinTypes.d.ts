@@ -92,5 +92,18 @@ declare global {
         zalgo: string;
     }
 }
+declare class _Obj<T extends object> {
+    delegate: T;
+    constructor(delegate: T);
+    omitBy(condition: (key: keyof T, val: T[keyof T]) => boolean): Partial<T>;
+    stripEmptyProperties<E extends Array<string>>(props: E): Omit<T, E[number]>;
+    pick(elements: Array<Partial<keyof T>>): Partial<T>;
+}
+declare class _Arr<S, T extends Array<S>> {
+    delegate: T;
+    constructor(delegate: T);
+}
+export declare const Obj: <T extends object>(obj: T) => _Obj<T>;
+export declare const Arr: <S, T extends S[]>(obj: T) => _Arr<S, T>;
 export declare function useBuiltIn(): void;
 export {};

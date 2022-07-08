@@ -131,6 +131,43 @@ Object.defineProperty(Array.prototype, "last", {
   }
 });
 
+class _Obj<T extends object>{
+  constructor(public delegate: T) {
+  }
+  omitBy(condition: (key: keyof T, val: T[keyof T])=>boolean): Partial<T>{
+    const delegate = {...this.delegate};
+    const entries = Object.entries(this.delegate);
+    for (let i = 0; i < entries.length; i++) {
+      const [key, val] = entries[i] as [keyof T, T[keyof T]];
+      if (condition(key, val)){
+        delete delegate[key];
+      }
+    }
+    return delegate;
+  }
+  stripEmptyProperties<E extends Array<string>>(props: E): Omit<T, E[number]>{
+    return this.omitBy((k, v)=> props.includes(k as string)) as Omit<T, E[number]>;
+  }
+  pick(elements: Array<Partial<keyof T>>): Partial<T>{
+    return this.omitBy((k, v)=>{
+      return elements.includes(k);
+    });
+  }
+}
+
+class _Arr<S, T extends Array<S>>{
+  constructor(public delegate: T) {}
+}
+
+export
+const Obj = <T extends object>(obj: T):_Obj<T>=>{
+  return new _Obj<T>(obj);
+}
+
+export
+const Arr = <S, T extends Array<S>>(obj: T):_Arr<S, T>=>{
+  return new _Arr<S, T>(obj);
+}
 
 Array.prototype.contains = function <T>(val: T): boolean {
   return this.includes(val);
@@ -195,12 +232,6 @@ Array.prototype.firstWhere = function <T>(condition: ConditionCallback<T>, orEls
   return orElse!();
 }
 
-// String.prototype.splitRight = function(splitter: string, n: number = 1){
-//   let current: string = this as any;
-//   const idx = current.lastIndexOf(splitter);
-//
-// }
-
 String.prototype.trimRightChar = function(charToRemove: string) {
   let result: string = this as any;
   while(result.charAt(result.length - 1)==charToRemove) {
@@ -216,7 +247,6 @@ String.prototype.contains = function (val: string): boolean {
 String.prototype.format = function (option: any): string {
   return format(this as any, option);
 }
-
 
 String.prototype.toAsciiArray = function (): number[] {
   const utf8 = [];
@@ -252,6 +282,7 @@ String.prototype.toAsciiArray = function (): number[] {
 Number.prototype.asInt = function(): number{
   return Math.floor(this as number);
 }
+
 export function useBuiltIn() {
   console.log('builtin initialized');
 }

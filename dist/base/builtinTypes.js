@@ -12,6 +12,41 @@ Object.defineProperty(Array.prototype, "last", {
         return this[this.length - 1];
     }
 });
+class _Obj {
+    constructor(delegate) {
+        this.delegate = delegate;
+    }
+    omitBy(condition) {
+        const delegate = { ...this.delegate };
+        const entries = Object.entries(this.delegate);
+        for (let i = 0; i < entries.length; i++) {
+            const [key, val] = entries[i];
+            if (condition(key, val)) {
+                delete delegate[key];
+            }
+        }
+        return delegate;
+    }
+    stripEmptyProperties(props) {
+        return this.omitBy((k, v) => props.includes(k));
+    }
+    pick(elements) {
+        return this.omitBy((k, v) => {
+            return elements.includes(k);
+        });
+    }
+}
+class _Arr {
+    constructor(delegate) {
+        this.delegate = delegate;
+    }
+}
+export const Obj = (obj) => {
+    return new _Obj(obj);
+};
+export const Arr = (obj) => {
+    return new _Arr(obj);
+};
 Array.prototype.contains = function (val) {
     return this.includes(val);
 };
@@ -65,11 +100,6 @@ Array.prototype.firstWhere = function (condition, orElse) {
         return null;
     return orElse();
 };
-// String.prototype.splitRight = function(splitter: string, n: number = 1){
-//   let current: string = this as any;
-//   const idx = current.lastIndexOf(splitter);
-//
-// }
 String.prototype.trimRightChar = function (charToRemove) {
     let result = this;
     while (result.charAt(result.length - 1) == charToRemove) {
