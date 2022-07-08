@@ -149,9 +149,11 @@ class _Obj<T extends object>{
     return this.omitBy((k, v)=> props.includes(k as string)) as Omit<T, E[number]>;
   }
   pick(elements: Array<Partial<keyof T>>): Partial<T>{
-    return this.omitBy((k, v)=>{
-      return elements.includes(k);
+    const result: Partial<T> = {}
+    elements.forEach((_)=>{
+      result[_] = this.delegate[_];
     });
+    return result;
   }
 }
 

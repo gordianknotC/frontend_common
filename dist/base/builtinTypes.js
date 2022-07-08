@@ -31,9 +31,11 @@ class _Obj {
         return this.omitBy((k, v) => props.includes(k));
     }
     pick(elements) {
-        return this.omitBy((k, v) => {
-            return elements.includes(k);
+        const result = {};
+        elements.forEach((_) => {
+            result[_] = this.delegate[_];
         });
+        return result;
     }
 }
 class _Arr {
