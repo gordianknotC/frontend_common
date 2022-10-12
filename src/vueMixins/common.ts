@@ -27,7 +27,7 @@ export class CommonMixin {
   }
 }
 
-const container = {};
+const container: any = {};
 const FACADE_KEY = Symbol();
 export function injectFacade<T>(providers: Partial<T>) {
   //@ts-ignore
@@ -54,15 +54,14 @@ function pathRoute(path: string, obj: any){
   return getByPath(pathObj, obj);
 } 
 
-export function IFacade<T extends Object>(mapping?: T, prefixKey?: string ): T {
+export function IFacade<T extends Object>(mapping?: T, path?: string ): T {
   return new Proxy<T>({} as T, {
     get: function (target, name) {
-      // @ts-ignore
       container[FACADE_KEY] ??= {};
-      const facade = prefixKey == undefined  // @ts-ignore
-        ? container[FACADE_KEY]              // @ts-ignore
-        : container[FACADE_KEY][prefixKey!];
-      assert(facade[name as keyof T] !== undefined, `key name "${name.toString()}" not found in facade`);
+      const facade = path == undefined  
+        ? container[FACADE_KEY]              
+        : container[FACADE_KEY][path!];
+      assert(facade[name as keyof T] !== undefined, `key name "${path ?? ""}.${name.toString()}" not found in facade`);
       return facade[name as keyof T];
     }
   });
