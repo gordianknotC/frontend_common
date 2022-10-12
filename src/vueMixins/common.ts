@@ -8,7 +8,9 @@ export class CommonMixin {
     this.vModelEvents=new Set();
   }
 
-  asVModelFromProps<R, T extends object=any>(option: {props: Readonly<T>, propName: keyof T, emit: any, onChange: (prev:R, val: R)=>void}): WritableComputedRef<R>{
+  asVModelFromProps<R, T extends object=any>(
+    option: {props: Readonly<T>, propName: keyof T, emit: any, onChange: (prev:R, val: R)=>void}): WritableComputedRef<R>
+  {
     const event = `update:${option.propName}`;
     this.vModelEvents.add(event as any);
     const ret =  computed ({
@@ -27,7 +29,7 @@ export class CommonMixin {
 
 const container = {};
 const FACADE_KEY = Symbol();
-export function injectFacade<T>(providers: Partial<T>){
+export function injectFacade<T>(providers: Partial<T>) {
   //@ts-ignore
   container[FACADE_KEY] ??= {};
   Object.keys(providers).forEach((prop) => {
@@ -36,12 +38,31 @@ export function injectFacade<T>(providers: Partial<T>){
   });
 }
 
-export function IFacade<T extends Object>(mapping?: T): T {
+function getByPath(seg: [string, string[]], obj: any ): any{
+  const first:string = seg[0];
+  const last:string[] = seg[1];
+  if (last.length == 1){
+    return obj[first][last[0]];
+  } else {
+    return getByPath([last[0], last.splice(1) ], obj[first]);
+  }
+}
+
+function pathRoute(path: string, obj: any){
+  const segment = path.split(".");
+  const pathObj: [string, string[]] = [segment[0], segment.splice(1)];
+  return getByPath(pathObj, obj);
+} 
+
+export function IFacade<T extends Object>(mapping?: T, prefixKey?: string ): T {
   return new Proxy<T>({} as T, {
     get: function (target, name) {
       // @ts-ignore
-      const facade = container[FACADE_KEY];
-      assert(facade[name as keyof T] !== undefined, `key name "${name.toString()}" not found in facade`)
+      container[FACADE_KEY] ??= {};
+      const facade = prefixKey == undefined  // @ts-ignore
+        ? container[FACADE_KEY]              // @ts-ignore
+        : container[FACADE_KEY][prefixKey!];
+      assert(facade[name as keyof T] !== undefined, `key name "${name.toString()}" not found in facade`);
       return facade[name as keyof T];
     }
   });

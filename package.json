@@ -1,6 +1,6 @@
 {
   "name": "common_js_util",
-  "version": "v0.1.1+1",
+  "version": "v0.1.1+2",
   "description": "",
   "scripts": {
     "build": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json",
