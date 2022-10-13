@@ -1,6 +1,6 @@
 {
   "name": "common_js_util",
-  "version": "v0.1.1+2",
+  "version": "v0.1.1+3",
   "description": "",
   "scripts": {
     "build": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json",
@@ -26,6 +26,7 @@
     }
   },
   "dependencies": {
+    "merge-anything": "^5.0.4",
     "string-format": "^2.0.0"
   },
   "peerDependencies": {

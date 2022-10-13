@@ -1,4 +1,5 @@
 import {WritableComputedRef}    from "@vue/reactivity";
+import { merge } from "merge-anything";
 import {computed, watch} from "~/base/vueTypes";
 import {assert} from "~/utils/assert";
 
@@ -29,13 +30,21 @@ export class CommonMixin {
 
 const container: any = {};
 const FACADE_KEY = Symbol();
-export function injectFacade<T>(providers: Partial<T>) {
-  //@ts-ignore
+export function injectFacade<T>(providers: Partial<T>, mergeObj: boolean = false) {
   container[FACADE_KEY] ??= {};
-  Object.keys(providers).forEach((prop) => {
-    //@ts-ignore
-    container[FACADE_KEY][prop] = providers[prop];
-  });
+  if (!mergeObj){
+    Object.keys(providers).forEach((prop) => {
+      container[FACADE_KEY][prop] = providers[prop as keyof typeof providers] as any;
+    });
+  } else {
+    Object.keys(providers).forEach((prop) => {
+      if (container[FACADE_KEY][prop]){
+        container[FACADE_KEY][prop] = merge(container[FACADE_KEY][prop], providers[prop as keyof typeof providers] as any)
+      }else{
+        container[FACADE_KEY][prop] = providers[prop as keyof typeof providers] as any;
+      }
+    });
+  }
 }
 
 function getByPath(seg: [string, string[]], obj: any ): any{
@@ -54,15 +63,13 @@ function pathRoute(path: string, obj: any){
   return getByPath(pathObj, obj);
 } 
 
-export function IFacade<T extends Object>(mapping?: T, path?: string ): T {
+export function IFacade<T extends Object>(): T {
   return new Proxy<T>({} as T, {
     get: function (target, name) {
       container[FACADE_KEY] ??= {};
-      const facade = path == undefined  
-        ? container[FACADE_KEY]              
-        : container[FACADE_KEY][path!];
-      assert(facade[name as keyof T] !== undefined, `key name "${path ?? ""}.${name.toString()}" not found in facade`);
-      return facade[name as keyof T];
+      const facade = container[FACADE_KEY];
+        assert(facade[name as keyof T] !== undefined, `key name "${name.toString()}" not found in facade`);
+        return facade[name as keyof T];
     }
   });
 }
