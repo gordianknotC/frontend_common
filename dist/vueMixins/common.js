@@ -23,46 +23,57 @@ export class CommonMixin {
 }
 const container = {};
 const FACADE_KEY = Symbol();
-export function provideFacade(providers, mergeObj = false) {
+export function provideFacade(providers, mergeObj = false, ident = FACADE_KEY) {
     var _a;
-    (_a = container[FACADE_KEY]) !== null && _a !== void 0 ? _a : (container[FACADE_KEY] = {});
+    (_a = container[ident]) !== null && _a !== void 0 ? _a : (container[ident] = {});
     if (!mergeObj) {
         Object.keys(providers).forEach((prop) => {
-            container[FACADE_KEY][prop] = providers[prop];
+            container[ident][prop] = providers[prop];
         });
     }
     else {
         Object.keys(providers).forEach((prop) => {
-            if (container[FACADE_KEY][prop]) {
-                container[FACADE_KEY][prop] = merge(container[FACADE_KEY][prop], providers[prop]);
+            if (container[ident][prop]) {
+                container[ident][prop] = merge(container[ident][prop], providers[prop]);
             }
             else {
-                container[FACADE_KEY][prop] = providers[prop];
+                container[ident][prop] = providers[prop];
             }
         });
     }
 }
-function getByPath(seg, obj) {
+export function injectDependency(pathOrName, ident = FACADE_KEY) {
+    if (pathOrName.contains(".")) {
+        return accessByPath(pathOrName, container[ident]);
+    }
+    else {
+        return container[ident][pathOrName];
+    }
+}
+export function injectFacade(ident = FACADE_KEY) {
+    return container[ident];
+}
+function routeObjectByPath(seg, obj) {
     const first = seg[0];
     const last = seg[1];
     if (last.length == 1) {
         return obj[first][last[0]];
     }
     else {
-        return getByPath([last[0], last.splice(1)], obj[first]);
+        return routeObjectByPath([last[0], last.splice(1)], obj[first]);
     }
 }
-function pathRoute(path, obj) {
+function accessByPath(path, obj) {
     const segment = path.split(".");
     const pathObj = [segment[0], segment.splice(1)];
-    return getByPath(pathObj, obj);
+    return routeObjectByPath(pathObj, obj);
 }
-export function IFacade() {
+export function IFacade(ident = FACADE_KEY) {
     return new Proxy({}, {
         get: function (target, name) {
             var _a;
-            (_a = container[FACADE_KEY]) !== null && _a !== void 0 ? _a : (container[FACADE_KEY] = {});
-            const facade = container[FACADE_KEY];
+            (_a = container[ident]) !== null && _a !== void 0 ? _a : (container[ident] = {});
+            const facade = container[ident];
             assert(facade[name] !== undefined, `key name "${name.toString()}" not found in facade`);
             return facade[name];
         }

@@ -35,6 +35,8 @@ export type {
 } from "~/utils/typeInferernce";
 
 
+
+
 /**
  *        M I X I N S
  *
@@ -44,4 +46,5 @@ export {useBuiltIn, Obj, Arr} from "~/base/builtinTypes";
 export {assertMsg} from "~/utils/assert";
 export {is} from "~/utils/typeInferernce";
 
-export {IFacade, provideFacade, CommonMixin, injectDependency, injectFacade} from "~/vueMixins/common";
+
+export {IFacade, provideFacade, CommonMixin} from "~/vueMixins/common";

@@ -9,5 +9,7 @@ export declare class CommonMixin {
         onChange: (prev: R, val: R) => void;
     }): WritableComputedRef<R>;
 }
-export declare function provideFacade<T>(providers: Partial<T>, mergeObj?: boolean): void;
-export declare function IFacade<T extends Object>(): T;
+export declare function provideFacade<T>(providers: Partial<T>, mergeObj?: boolean, ident?: symbol): void;
+export declare function injectDependency<T>(pathOrName: string, ident?: symbol): T;
+export declare function injectFacade<T>(ident?: symbol): T;
+export declare function IFacade<T extends Object>(ident?: symbol): T;

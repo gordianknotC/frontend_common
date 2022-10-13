@@ -48,16 +48,8 @@ export function provideFacade<T>(providers: Partial<T>, mergeObj: boolean = fals
   }
 }
 
-export function injectDependency<T>(pathOrName: string, ident=FACADE_KEY): T{
-  if (pathOrName.contains(".")){
-    return accessByPath(pathOrName, container[ident]) as T;
-  }else{
-    return container[ident][pathOrName] as T;
-  }
-}
-
-export function injectFacade<T>(ident=FACADE_KEY): T {
-  return container[ident] as T;
+export function inject<T>(name: string, ident=FACADE_KEY): T{
+  return container[ident][name];
 }
 
 function routeObjectByPath(seg: [string, string[]], obj: any ): any{
@@ -70,7 +62,7 @@ function routeObjectByPath(seg: [string, string[]], obj: any ): any{
   }
 }
 
-function accessByPath(path: string, obj: any){
+function pathRoute(path: string, obj: any){
   const segment = path.split(".");
   const pathObj: [string, string[]] = [segment[0], segment.splice(1)];
   return routeObjectByPath(pathObj, obj);
