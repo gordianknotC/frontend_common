@@ -1,6 +1,6 @@
 {
   "name": "common_js_util",
-  "version": "v0.2.0",
+  "version": "v0.2.0+1",
   "description": "",
   "scripts": {
     "build": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json",
@@ -8,10 +8,11 @@
     "build:watch": "concurrently --kill-others \"tsc -w\" \"tsc-alias -w\""
   },
   "files": [
-    "dist/",
+    "dist",
     "tsconfig.json"
   ],
-  "main": "dist/index.ts",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "publishConfig": {
     "access": "public"
