@@ -23,7 +23,7 @@ export class CommonMixin {
 }
 const container = {};
 const FACADE_KEY = Symbol();
-export function injectFacade(providers, mergeObj = false) {
+export function provideFacade(providers, mergeObj = false) {
     var _a;
     (_a = container[FACADE_KEY]) !== null && _a !== void 0 ? _a : (container[FACADE_KEY] = {});
     if (!mergeObj) {

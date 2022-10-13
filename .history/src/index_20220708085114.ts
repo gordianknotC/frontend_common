@@ -47,4 +47,4 @@ export {assertMsg} from "~/utils/assert";
 export {is} from "~/utils/typeInferernce";
 
 
-export {IFacade, provideFacade, CommonMixin} from "~/vueMixins/common";
+export {IFacade, injectFacade, CommonMixin} from "~/vueMixins/common";

@@ -30,8 +30,7 @@ export class CommonMixin {
 
 const container: any = {};
 const FACADE_KEY = Symbol();
-
-export function provideFacade<T>(providers: Partial<T>, mergeObj: boolean = false) {
+export function injectFacade<T>(providers: Partial<T>, mergeObj: boolean = false) {
   container[FACADE_KEY] ??= {};
   if (!mergeObj){
     Object.keys(providers).forEach((prop) => {

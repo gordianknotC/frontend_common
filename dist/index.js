@@ -18,5 +18,5 @@ export { isRefImpl, asEnum, getAccessibleProperties, asCascadeClass, asUnWrapped
 export { useBuiltIn, Obj, Arr } from "./base/builtinTypes";
 export { assertMsg } from "./utils/assert";
 export { is } from "./utils/typeInferernce";
-export { IFacade, injectFacade, CommonMixin } from "./vueMixins/common";
+export { IFacade, provideFacade, CommonMixin } from "./vueMixins/common";
 //# sourceMappingURL=index.js.map
