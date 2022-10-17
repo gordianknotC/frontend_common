@@ -36,6 +36,7 @@ export function provideFacade<T>(providers: Partial<T>, mergeObj: boolean = fals
   if (!mergeObj){
     Object.keys(providers).forEach((prop) => {
       container[ident][prop] = providers[prop as keyof typeof providers] as any;
+      
     });
   } else {
     Object.keys(providers).forEach((prop) => {
@@ -76,13 +77,20 @@ function accessByPath(path: string, obj: any){
   return routeObjectByPath(pathObj, obj);
 } 
 
-export function IFacade<T extends Object>(ident=FACADE_KEY): T {
+export function IFacade<T extends Object>(ident=FACADE_KEY, option?: {transformFuncAsGetter: boolean}): T {
   return new Proxy<T>({} as T, {
     get: function (target, name) {
       container[ident] ??= {};
       const facade = container[ident];
-        assert(facade[name as keyof T] !== undefined, `key name "${name.toString()}" not found in facade`);
-        return facade[name as keyof T];
+      const member = facade[name as keyof T];
+      assert(facade[name as keyof T] !== undefined, `key name "${name.toString()}" not found in facade`);
+
+      // note: 當傳入的型別為 function
+      // 則視為傳入參照，以參照處理.
+      if (typeof member === 'function' && (option?.transformFuncAsGetter ?? false)){
+        return member();
+      }
+      return member;
     }
   });
 }

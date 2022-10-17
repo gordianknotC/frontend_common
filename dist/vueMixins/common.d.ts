@@ -12,4 +12,6 @@ export declare class CommonMixin {
 export declare function provideFacade<T>(providers: Partial<T>, mergeObj?: boolean, ident?: symbol): void;
 export declare function injectDependency<T>(pathOrName: string, ident?: symbol): T;
 export declare function injectFacade<T>(ident?: symbol): T;
-export declare function IFacade<T extends Object>(ident?: symbol): T;
+export declare function IFacade<T extends Object>(ident?: symbol, option?: {
+    transformFuncAsGetter: boolean;
+}): T;

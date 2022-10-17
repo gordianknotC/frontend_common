@@ -68,14 +68,20 @@ function accessByPath(path, obj) {
     const pathObj = [segment[0], segment.splice(1)];
     return routeObjectByPath(pathObj, obj);
 }
-export function IFacade(ident = FACADE_KEY) {
+export function IFacade(ident = FACADE_KEY, option) {
     return new Proxy({}, {
         get: function (target, name) {
-            var _a;
+            var _a, _b;
             (_a = container[ident]) !== null && _a !== void 0 ? _a : (container[ident] = {});
             const facade = container[ident];
+            const member = facade[name];
             assert(facade[name] !== undefined, `key name "${name.toString()}" not found in facade`);
-            return facade[name];
+            // note: 當傳入的型別為 function
+            // 則視為傳入參照，以參照處理.
+            if (typeof member === 'function' && ((_b = option === null || option === void 0 ? void 0 : option.transformFuncAsGetter) !== null && _b !== void 0 ? _b : false)) {
+                return member();
+            }
+            return member;
         }
     });
 }
