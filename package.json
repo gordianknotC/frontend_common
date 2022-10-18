@@ -1,11 +1,13 @@
 {
   "name": "js_util_for_vue_project",
-  "version": "v0.2.0+5",
+  "version": "0.2.2",
   "description": "",
   "scripts": {
     "build": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json",
     "serve": "vue-cli-service serve",
-    "build:watch": "concurrently --kill-others \"tsc -w\" \"tsc-alias -w\""
+    "build:watch": "concurrently --kill-others \"tsc -w\" \"tsc-alias -w\"",
+    "login": "npm login",
+    "pulish": "npm publish"
   },
   "files": [
     "dist",

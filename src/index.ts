@@ -13,7 +13,6 @@ export {
 
 
 
-
 /***
  *
  *    E X T E N D
@@ -45,3 +44,5 @@ export {assertMsg} from "~/utils/assert";
 export {is} from "~/utils/typeInferernce";
 
 export {IFacade, provideFacade, CommonMixin, injectDependency, injectFacade} from "~/vueMixins/common";
+
+export { LazyHolder } from "./utils/lazy";
