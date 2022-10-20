@@ -28,5 +28,5 @@ export declare const CRUD: <T extends {
     add(payload: T): Promise<TSuccessResponse>;
     del(payload: T): Promise<TSuccessResponse>;
     edit(payload: T): Promise<TSuccessResponse>;
-    get(payload?: TPagerPayload | undefined): Promise<TDataResponse<any[]>>;
+    get(payload?: TPagerPayload): Promise<TDataResponse<any[]>>;
 };

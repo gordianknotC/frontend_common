@@ -1,6 +1,6 @@
 import { merge } from "merge-anything";
-import { computed, watch } from "~/base/vueTypes";
-import { assert } from "~/utils/assert";
+import { computed, watch } from "../base/vueTypes";
+import { assert } from "../utils/assert";
 export class CommonMixin {
     constructor() {
         this.vModelEvents = new Set();
