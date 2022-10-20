@@ -1,5 +1,5 @@
 import {is} from "~/utils/typeInferernce";
-import format from "string-format";
+import {format} from "~/base/stringFormat";
 
 type ConditionCallback<T> = (x: T) => boolean;
 

@@ -1,5 +1,5 @@
-import { is } from "../utils/typeInferernce";
-import format from "string-format";
+import { is } from "~/utils/typeInferernce";
+import { format } from "~/base/stringFormat";
 // 以下改寫入 common, 以 patch 的方式實作
 //
 Object.defineProperty(Array.prototype, "first", {

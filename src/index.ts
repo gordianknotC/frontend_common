@@ -1,17 +1,13 @@
+"use strict"
 /**
  *      B A S E
  *
  * */
 
-
-
-
 export {
   UnCaughtCondition, UncaughtEnumType, NotImplementedError,
   TypeMismatchError, InvalidUsage, UnExpectedRole
 } from "~/base/baseExceptions"
-
-
 
 /***
  *
@@ -33,7 +29,6 @@ export type {
   TUnWrapVueRef, InterfaceIs,
 } from "~/utils/typeInferernce";
 
-
 /**
  *        M I X I N S
  *
@@ -44,5 +39,4 @@ export {assertMsg} from "~/utils/assert";
 export {is} from "~/utils/typeInferernce";
 
 export {IFacade, provideFacade, CommonMixin, injectDependency, injectFacade} from "~/vueMixins/common";
-
 export { LazyHolder } from "./utils/lazy";
