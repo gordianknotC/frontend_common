@@ -20,7 +20,7 @@ export {
 } from "~/utils/assert";
 
 export {
-  isRefImpl, asEnum, getAccessibleProperties, asCascadeClass,
+  isRefImpl, asEnum, getAccessibleProperties, flattenInstance,
   asUnWrappedVueRefMap, UnWrappedVueRef,
   addStringMappingFromNumEnum, Is,
 } from "~/utils/typeInferernce";

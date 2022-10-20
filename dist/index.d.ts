@@ -9,7 +9,7 @@ export { UnCaughtCondition, UncaughtEnumType, NotImplementedError, TypeMismatchE
  *    B A S E
  * */
 export { AssertMsg, AssertionError, assert, } from "./utils/assert";
-export { isRefImpl, asEnum, getAccessibleProperties, asCascadeClass, asUnWrappedVueRefMap, UnWrappedVueRef, addStringMappingFromNumEnum, Is, } from "./utils/typeInferernce";
+export { isRefImpl, asEnum, getAccessibleProperties, flattenInstance, asUnWrappedVueRefMap, UnWrappedVueRef, addStringMappingFromNumEnum, Is, } from "./utils/typeInferernce";
 export type { TUnWrapVueRef, InterfaceIs, } from "./utils/typeInferernce";
 /**
  *        M I X I N S

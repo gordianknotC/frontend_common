@@ -1,6 +1,6 @@
 {
   "name": "js_util_for_vue_project",
-  "version": "0.2.5",
+  "version": "0.3",
   "description": "",
   "scripts": {
     "build": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json",

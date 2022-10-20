@@ -75,38 +75,49 @@ export function asEnum<T extends (number | string), K extends string>(obj: { [ke
   return result;
 }
 
-export function getAccessibleProperties(obj: any, results?: Set<string>): Set<string> {
+export function getAccessibleProperties(obj: any, isAvailable: (name: string)=>boolean, results?: Set<string>): Set<string> {
   results ??= new Set();
   let prototype = Object.getPrototypeOf(obj);
-  let isRoot = false;
   Object.getOwnPropertyNames(prototype).forEach((_k) => {
-    if (_k == "constructor")
-      return;
-    results!.add(_k);
+    if (isAvailable(_k))
+      results!.add(_k);
   });
 
+  // 底層
   if (Object.getPrototypeOf(prototype).constructor.name == "Object") {
     return results;
   }
-  return getAccessibleProperties(prototype, results);
+  return getAccessibleProperties(prototype, isAvailable, results);
 }
 
 /**
  *  vue 若傳入有繼承關係的類別（class)，其繼承關係會消失
- *  平面化 class，用於 vue 寫 OOP
+ *  因為 vue 不會讀取 prototype 層的內容
+ *  flattenInstance 平面化 class，用於 vue 寫 OOP
  *
- *  如 A extends Base
- *  Base 有 methodBase, propBase, propX
- *  而 A 有 propA, methodA, propX
- *  vue 會無視 methodBase, propBase
+ *  如 A extends Base, 而 
+ *  - Base 有 methodBase, propBase, propX
+ *  - A 有 propA, methodA, propX
+ *  當我們將 instance A 傳給 vue 物件化後
+ *  vue 會無視 methodBase, propBase, 因為 methodBase/propBase 
+ *  在 A 的 prototype 層
  *
- *  asCascadeClass 作用為將可存取的所有 methods / property
- *  寫入當前的 class, 使得 A 繼承至 Base 的
- *  methodBase, propBase 平面化至 A
+ *  flattenInstance 作用為將可存取的所有 methods / property
+ *  寫入當前的 class, 使得 A 繼承至 Base 的 methodBase, propBase 平面化至 A
  *
+ *  @param rule 平面化規則，預設為 
+ *              constructor 不考慮
+ *              method name 開頭為 "_" 不考慮
  * */
-export function asCascadeClass(obj: any) {
-  const properties = getAccessibleProperties(obj);
+export function flattenInstance(obj: any, rule?: (name: string) => boolean) {
+  rule ??= (name) => { 
+    if (name == "constructor")
+      return false;
+    if (name.startsWith("_"))
+      return false;
+    return true;
+  }
+  const properties = getAccessibleProperties(obj, rule);
   properties.forEach((property) => {
     const val = obj[property];
     if (typeof val == "function") {

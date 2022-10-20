@@ -1,6 +1,6 @@
 // @ts-nocheck
 
-const global = window;
+const _window = window;
 //  ValueError :: String -> Error
 function ValueError(message) {
   var err = new Error(message);
@@ -79,7 +79,7 @@ format.extend = function(prototype, transformers) {
   prototype.format = function() {
     var args = Array.prototype.slice.call(arguments);
     args.unshift(this);
-    return $format.apply(global, args);
+    return $format.apply(_window, args);
   };
 };
 
@@ -89,6 +89,5 @@ if (typeof module !== 'undefined') {
 } else if (typeof define === 'function' && define.amd) {
   define(function() { return format; });
 } else {
-  global.format = format;
+  _window.format = format;
 }
-
