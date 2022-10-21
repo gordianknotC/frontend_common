@@ -9,8 +9,8 @@ export { UnCaughtCondition, UncaughtEnumType, NotImplementedError, TypeMismatchE
  *    B A S E
  * */
 export { AssertMsg, AssertionError, assert, } from "./utils/assert";
-export { isRefImpl, asEnum, getAccessibleProperties, flattenInstance, asUnWrappedVueRefMap, UnWrappedVueRef, addStringMappingFromNumEnum, Is, } from "./utils/typeInferernce";
-export type { TUnWrapVueRef, InterfaceIs, } from "./utils/typeInferernce";
+export { isRefImpl, asEnum, getAccessibleProperties, flattenInstance, asUnWrappedVueRefMap, UnWrappedVueRef, addStringMappingFromNumEnum, Is, } from "./utils/typeInference";
+export type { TUnWrapVueRef, InterfaceIs, } from "./utils/typeInference";
 /**
  *        M I X I N S
  *
@@ -18,6 +18,6 @@ export type { TUnWrapVueRef, InterfaceIs, } from "./utils/typeInferernce";
  * */
 export { useBuiltIn, Obj, Arr } from "./base/builtinTypes";
 export { assertMsg } from "./utils/assert";
-export { is } from "./utils/typeInferernce";
+export { is } from "./utils/typeInference";
 export { IFacade, provideFacade, CommonMixin, injectDependency, injectFacade } from "./vueMixins/common";
 export { LazyHolder } from "./utils/lazy";

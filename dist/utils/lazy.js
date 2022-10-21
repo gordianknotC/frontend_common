@@ -1,3 +1,4 @@
+/** 用 Proxy 來實作 lazyLoading */
 export function LazyHolder(initializer) {
     let instance;
     return new Proxy({}, {

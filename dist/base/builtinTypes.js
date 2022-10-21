@@ -1,4 +1,4 @@
-import { is } from "../utils/typeInferernce";
+import { is } from "../utils/typeInference";
 //@ts-ignore   
 import format from "../base/stringFormat";
 // 以下改寫入 common, 以 patch 的方式實作
