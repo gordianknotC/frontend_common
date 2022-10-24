@@ -112,11 +112,16 @@ export function flattenInstance(obj, rule) {
     const properties = getAccessibleProperties(obj, rule);
     properties.forEach((property) => {
         const val = obj[property];
-        if (typeof val == "function") {
-            obj[property] = val.bind(obj);
+        try {
+            if (typeof val == "function") {
+                obj[property] = val.bind(obj);
+            }
+            else {
+                obj[property] = val;
+            }
         }
-        else {
-            obj[property] = val;
+        catch (e) {
+            console.warn(e);
         }
     });
 }
