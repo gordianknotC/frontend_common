@@ -109,7 +109,7 @@ export function getAccessibleProperties(obj: any, isAvailable: (name: string)=>b
  *              constructor 不考慮
  *              method name 開頭為 "_" 不考慮
  * */
-export function flattenInstance(obj: any, rule?: (name: string) => boolean) {
+export function flattenInstance(obj: any, rule?: (name: string) => boolean, onError?: (err: string)=>void) {
   rule ??= (name) => { 
     if (name == "constructor")
       return false;
@@ -127,7 +127,7 @@ export function flattenInstance(obj: any, rule?: (name: string) => boolean) {
         obj[property] = val;
       }
     } catch (e) { 
-      console.warn(e);
+      onError?.call(e);
     }
   })
 }

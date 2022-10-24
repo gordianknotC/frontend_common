@@ -101,7 +101,7 @@ export function getAccessibleProperties(obj, isAvailable, results) {
  *              constructor 不考慮
  *              method name 開頭為 "_" 不考慮
  * */
-export function flattenInstance(obj, rule) {
+export function flattenInstance(obj, rule, onError) {
     rule !== null && rule !== void 0 ? rule : (rule = (name) => {
         if (name == "constructor")
             return false;
@@ -121,7 +121,7 @@ export function flattenInstance(obj, rule) {
             }
         }
         catch (e) {
-            console.warn(e);
+            onError === null || onError === void 0 ? void 0 : onError.call(e);
         }
     });
 }

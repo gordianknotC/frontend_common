@@ -72,7 +72,7 @@ export declare function getAccessibleProperties(obj: any, isAvailable: (name: st
  *              constructor 不考慮
  *              method name 開頭為 "_" 不考慮
  * */
-export declare function flattenInstance(obj: any, rule?: (name: string) => boolean): void;
+export declare function flattenInstance(obj: any, rule?: (name: string) => boolean, onError?: (err: string) => void): void;
 export declare function getOmitsBy<T>(payload: T, omits: Partial<keyof T>[]): Partial<T>;
 declare type TRefsOfObj<T> = {
     [K in keyof T]: ComputedRef<T[K]> | T[K];
