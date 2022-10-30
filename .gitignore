@@ -18,8 +18,11 @@ pnpm-debug.log*
 # Editor directories and files
 .idea
 .vscode
+.history
+.husky
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+

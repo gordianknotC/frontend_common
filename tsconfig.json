@@ -44,29 +44,28 @@
     },
     "skipLibCheck": true,
     "sourceMap": true,
-    /** strict mode ...*/
-    //    "noImplicitUseStrict": true,
-    // "strict": true,
-    // "strictBindCallApply": true,/**/
-    // "strictFunctionTypes": true,
-    // "strictNullChecks": true,              /* Enable strict null checks. */
-    // "strictPropertyInitialization": true,
     "typeRoots": [
       "node_modules/@types"
     ],
     "types": [
-      "node"
+      "node",
+      "jest"
     ]
   },
   "include": [
     "src",
     "src/**/*.ts",
-    "tests/**/*.ts",
-    "tests/**/*.tsx",
-    "src/index.ts"
+    "__tests__/**/*.ts",
+    "__tests__/**/*.tsx",
+    "__tests__/*.tsx",
+    "__tests__/*.ts",
+    "src/index.ts",
+    "jest.d.ts"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "dist",
+    "__tests__"
   ],
   "compileOnSave": false,
   "buildOnSave": false
