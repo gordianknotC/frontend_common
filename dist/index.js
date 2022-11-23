@@ -22,4 +22,5 @@ export { assertMsg } from "./utils/assert";
 export { is } from "./utils/typeInference";
 export { IFacade, provideFacade, CommonMixin, injectDependency, injectFacade } from "./vueMixins/common";
 export { LazyHolder, CallableDelegate as Callable } from "./utils/lazy";
+export { setupComputed, setupRef, setupWatch, setupReactive } from "./extension/extension_setup";
 //# sourceMappingURL=index.js.map
