@@ -18,6 +18,8 @@ export enum ELevel{
   error,
 }
 
+// fixme:
+// untested:
 export
 class Logger {
   static allowedModules: Set<string> = new Set();

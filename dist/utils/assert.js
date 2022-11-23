@@ -42,6 +42,11 @@ export class AssertionError extends Error {
         Object.setPrototypeOf(this, Error.prototype);
     }
 }
+/**
+ *
+ * @param condition
+ * @param message
+ */
 export function assert(condition, message) {
     if (!condition) {
         throw new AssertionError(message !== null && message !== void 0 ? message : "");

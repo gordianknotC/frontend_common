@@ -23,6 +23,43 @@ export class CommonMixin {
 }
 const container = {};
 const FACADE_KEY = Symbol();
+const DEP_KEY = Symbol();
+/**
+ *  Dependency Provider
+ *  provide 方法，將 dependency以 ident 作為 key 植入 container
+ *
+ *  @params providers 物件值鍵對
+ *  @params mergeObj 是否對 provider 所提併的值鍵對進與 container 進行合併
+ *  @params ident 用以識別 container 取值所需要的 key
+ *
+ *  @example
+ *  ```ts
+ *  const mergeObj = true;
+ *  provideFacade({
+ *    source: {
+ *      a: 1
+ *    }
+ *  }, mergeObj)
+ *
+ *  provideFacade({
+ *    source: {
+ *      b: 2
+ *    },
+ *    override: {a: 1}
+ *  }, mergeObj);
+ *
+ *  // 覆寫整個 override
+ *  provideFacade({
+ *    override: {b: 2}
+ *  }, false)
+ *
+ *  const facade = injectFacade();
+ *  assert(facade.source.a == 1);
+ *  assert(facade.source.b == 2);
+ *  assert(facade.override.a == undefined);
+ *  assert(facade.override.b == 2);
+ *  ```
+ */
 export function provideFacade(providers, mergeObj = false, ident = FACADE_KEY) {
     var _a;
     (_a = container[ident]) !== null && _a !== void 0 ? _a : (container[ident] = {});
@@ -42,7 +79,28 @@ export function provideFacade(providers, mergeObj = false, ident = FACADE_KEY) {
         });
     }
 }
-export function injectDependency(pathOrName, ident = FACADE_KEY) {
+/**
+*  Dependency Provider
+ * provide 方法，將 dependency以 ident 作為 key 植入 container
+ * @see {@link provideFacade}
+ * */
+export const provideDependency = ((...args) => {
+    var _a;
+    return provideFacade(args[0], args[1], (_a = args[2]) !== null && _a !== void 0 ? _a : DEP_KEY);
+});
+/**
+ * Dependency Injector
+ * @param pathOrName 可以 dot 作為 property accessor 如 "source.propA"
+ * @param ident
+ * @returns
+ *
+ * @example
+ * ```ts
+ *  provideDependency({source: {a: 1}});
+ *  const a = injectDependency("source.a");
+ * ```
+ */
+export function injectDependency(pathOrName, ident = DEP_KEY) {
     if (pathOrName.contains(".")) {
         return accessByPath(pathOrName, container[ident]);
     }
@@ -50,6 +108,22 @@ export function injectDependency(pathOrName, ident = FACADE_KEY) {
         return container[ident][pathOrName];
     }
 }
+/**
+ * Dependency Injector
+ * 注入 IFacade interface, 對應 provideFacade
+ * @param ident
+ * @returns
+ *
+ * @example
+ * ```ts
+ *  provideFacade({a: 1}, true);
+ *  provideFacade({b: 2}, true);
+ *
+ * const Facade = injectFacade();
+ * assert(Facade.a == 1);
+ * assert(Facade.b == 2);
+ * ```
+ */
 export function injectFacade(ident = FACADE_KEY) {
     return container[ident];
 }
@@ -68,6 +142,27 @@ function accessByPath(path, obj) {
     const pathObj = [segment[0], segment.splice(1)];
     return routeObjectByPath(pathObj, obj);
 }
+/**
+ *  Facade Interface
+ *
+ * @example
+ * ```ts
+ * // main.ts
+ * export type AppFacade =
+ * FacadeMappers &
+ * FacadeDateSource &
+ * FacadeRepository &
+ * FacadePresentationStore &
+ * FacadeDomainService;
+ *
+ * // 此時 facade 內容尚未 provide
+ * export const facade = IFacade<AppFacade>();
+ * assert(facade.data == undefined) // throw: key name "data" not found in facade
+ *
+ * provideFacade({data: {a: 1}});
+ * assert(facade.data.a == 1);
+ * ```
+ **/
 export function IFacade(ident = FACADE_KEY, option) {
     return new Proxy({}, {
         get: function (target, name) {

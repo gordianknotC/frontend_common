@@ -10,7 +10,7 @@ export { UnCaughtCondition, UncaughtEnumType, NotImplementedError, TypeMismatchE
  *
  * */
 export { AssertMsg, AssertionError, assert, } from "./utils/assert";
-export { isRefImpl, asEnum, getAccessibleProperties, flattenInstance, asUnWrappedVueRefMap, UnWrappedVueRef, addStringMappingFromNumEnum, Is, getOmitsBy } from "./utils/typeInference";
+export { isRefImpl, asEnum, getAccessibleProperties, flattenInstance, asUnWrappedVueRefMap, UnWrappedVueRef, asMapFromNumberedEnum as addStringMappingFromNumEnum, Is, getOmitsBy } from "./utils/typeInference";
 export type { TUnWrapVueRef, InterfaceIs, } from "./utils/typeInference";
 /**
  *
@@ -20,6 +20,6 @@ export type { TUnWrapVueRef, InterfaceIs, } from "./utils/typeInference";
 export { useBuiltIn, Obj, Arr } from "./base/builtinTypes";
 export { assertMsg } from "./utils/assert";
 export { is } from "./utils/typeInference";
-export { IFacade, provideFacade, CommonMixin, injectDependency, injectFacade } from "./vueMixins/common";
+export { IFacade, provideFacade, CommonMixin, injectDependency, provideDependency, injectFacade } from "./vueMixins/common";
 export { LazyHolder, CallableDelegate as Callable } from "./utils/lazy";
 export { setupComputed, setupRef, setupWatch, setupReactive } from "./extension/extension_setup";

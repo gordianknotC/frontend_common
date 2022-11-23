@@ -13,6 +13,8 @@ export var ELevel;
     ELevel[ELevel["current"] = 3] = "current";
     ELevel[ELevel["error"] = 4] = "error";
 })(ELevel || (ELevel = {}));
+// fixme:
+// untested:
 export class Logger {
     constructor(moduleName) {
         this.moduleName = moduleName;

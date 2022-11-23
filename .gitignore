@@ -3,7 +3,7 @@ node_modules
 /develop
 /production
 /release
-
+/docs
 
 # local env files
 .env.local

@@ -33,6 +33,47 @@ export type TDataResponse<T> = {
 
 
 // fixme: 寫成 OOP
+
+/**
+ * 創建 CRUD api 方法，用於寫測試 
+ * @param dataList 
+ * @param updater 
+ * @param itemGen 
+ * @returns 
+ * 
+ * @example
+ * ```ts
+ * ...CRUD<PredictionsItem>(
+      DB.getPredictionList!,
+      data => {
+        DB.getPredictionList!.data = data;
+      },
+      idx => {
+        const result: PredictionsItem = {
+          is_publish: true,
+          view_count: range(700, 6000),
+          author: DB.users[range(0, DB.users.length - 1)].username!,
+          content: `${idx} - The Resize Observer API provides a solution to exactly these kinds of problems, and more besides, allowing you to easily observe and respond to changes in the size of an element's content or border box in a performant way. `,
+          view_shift: range(150, 2000),
+          create_datetime: `2022-${range(6, 12)}-${range(1, 30)} 01:22`,
+          has_image: false,
+          id: idx,
+          summary: `${idx} - The Resize Observer API provides a solution to exactly these kinds of problems, `,
+          update_datetime: `2022-${range(6, 12)}-${range(1, 30)} 01:22`,
+          admin: {
+            id: idx,
+            role: 0,
+            username: DB.users[range(0, DB.users.length - 1)].username!
+          },
+          like_count: range(60, 300),
+          publish_datetime: `2022-${range(6, 12)}-${range(1, 30)} 01:22`,
+          title: `Loream Ipsum-${idx} dolo sit amet`
+        };
+        return result;
+      }
+    )
+ * ```
+ */
 export
 const CRUD = <T extends {id: string|number}>(
   dataList: TOptional<TDataResponse<any[]>>,

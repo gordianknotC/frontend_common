@@ -51,6 +51,11 @@ class AssertionError extends Error{
     }
 }
 
+/**
+ * 
+ * @param condition 
+ * @param message 
+ */
 export
 function assert(condition: any, message?: string): asserts condition{
     if (!condition){

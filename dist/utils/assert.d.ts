@@ -25,4 +25,9 @@ export declare const assertMsg: AssertMsg;
 export declare class AssertionError extends Error {
     constructor(message: string);
 }
+/**
+ *
+ * @param condition
+ * @param message
+ */
 export declare function assert(condition: any, message?: string): asserts condition;

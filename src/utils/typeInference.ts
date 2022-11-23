@@ -4,11 +4,11 @@ import { computed, ref, reactive } from "~/extension/extension_setup";
 let refImplClassName: string = undefined as any;
 
 /**
- * fixme: 暫時性解法
+ * 判斷是否為 vue RefImpl
+ * note: 暫時性解法
  *
  * - isRefImpl 判斷無法用 obj.constructor.name == RefImpl
  *   since constructor name will be mangled after production build.
- *
  *  - this issue cannot be addressed even if we configure compress option as keep_classname,
  *
  **/
@@ -23,21 +23,23 @@ export function isRefImpl(obj: any) {
 }
 
 /**
- *  description
- *    將 object key 存入 value, value 存入 key
- *    e.g.:
+ * 
+ * Create Enum Object
+ * 將 object key 存入 value, value 存入 key
+ * e.g.:
+ * ```javascript
  *      object = {a: 1, b: 2}
  *      enumObj = asEnum(object)
  *      enumObj == {a: 1, b: 2, '2': 'a', '1': 'b'} // true
  *      Object.keys(object) // ['a', 'b']
  *      Object.keys(enumObj) // ['a','b']
- *
+ * ```
  *
  *    行為與 enum 相同，用於需要分開定義 enum 值與鍵的情境
  *    如同時需要存取 enum 的值，也需要 enum 的 key(label)
  *
  *    以下為與與enum的異同點
- *
+ *  ```ts
  *    enum EA{
  *      a = 1, b = 2
  *    }
@@ -45,7 +47,7 @@ export function isRefImpl(obj: any) {
  *    const EB = asEnum({
  *      a: 1, b: 2
  *    })
- *
+ * ```
  *    ------------------------
  *    同:
  *      EA.a == EA.b == 1 // true
@@ -95,9 +97,9 @@ export function getAccessibleProperties(obj: any, isAvailable?: (name: string)=>
 }
 
 /**
+ *  flattenInstance 平面化 class，用於 vue 寫 OOP
  *  vue 若傳入有繼承關係的類別（class)，其繼承關係會消失
  *  因為 vue 不會讀取 prototype 層的內容
- *  flattenInstance 平面化 class，用於 vue 寫 OOP
  *
  *  如 A extends Base, 而 
  *  - Base 有 methodBase, propBase, propX
@@ -146,6 +148,17 @@ export function flattenInstance(obj: any, overrideReadonly: boolean = false, rul
   });
 }
 
+/**
+ * 同 lodash omitsBy
+ * @param payload 輪入物件
+ * @param omits 欲從輸入物件移除的 key
+ * @returns  
+ * 
+ * @example
+ * ```javascript
+ * getOmitsBy({a:1, b:2}, ["a"])
+ * ```
+ */
 export function getOmitsBy<T>(payload: T, omits: Partial<keyof T>[]): Partial<T>{
   const result = {...payload}
   omits.forEach((e)=>{
@@ -204,6 +217,7 @@ const SYMBOLS: Record<string | symbol, string | symbol> = {};
 /**
  *   UnWrap 物件內所有的 RefImpl,將其真正的 getter setter
  *   轉發至 Symbol 中
+ *  @see {@link asUnWrappedVueRefMap}
  **/
 export function UnWrappedVueRef<T extends Object>(obj: T, keys?: Partial<keyof T>[]) {
   const properties: Partial<keyof T>[] = is.undefined(keys)
@@ -233,7 +247,7 @@ export function UnWrappedVueRef<T extends Object>(obj: T, keys?: Partial<keyof T
  *     number enum 附予 string mapping 功能
  *     ex:
  *
- *     ENum = addStringMappingFromNumEnum(enum {
+ *     ENum = asMapFromNumberedEnum(enum {
  *         a = 1,
  *         b = 2,
  *     })
@@ -247,7 +261,7 @@ export function UnWrappedVueRef<T extends Object>(obj: T, keys?: Partial<keyof T
  *     > 'a'
  *
  * */
-export function addStringMappingFromNumEnum<N extends number,
+export function asMapFromNumberedEnum<N extends number,
   S extends string,
   K extends string>(
   numberEnum: { [Key in K]: N }
@@ -274,18 +288,6 @@ const axiosKeys = ["data", "status", "statusText", "headers", "config"];
 export interface InterfaceIs {
   readonly not: InterfaceIs;
   readonly mobile: boolean;
-
-  /**
-   * 用於 type class, 有 constructor name 無法分辦
-   *   1) generic class
-   *   2) 非 class object (沒有 constructor name者）
-   *      小心使用
-   *   e.g:
-   *    > is.type([], "Object") // false 讀 constructor.name
-   *    > is.type([], "Array")  // true 讀 constructor.name
-   *    > is.type({}, "Object") // true 讀 constructor.name
-   *
-   * */
   type(val: any | null | undefined, name: string): boolean;
   true(val: any): boolean;
   array(val: any): boolean;
@@ -299,18 +301,24 @@ export interface InterfaceIs {
 }
 
 
+
+/**
+ * 
+ */
 export class Is implements InterfaceIs {
   /**
-   * 用於 type class, 有 constructor name 無法分辦
+   * 用於 typed class, 即有 constructor name 者，無法分辦以下情況
    *   1) generic class
    *   2) 非 class object (沒有 constructor name者）
-   *      小心使用
    *   e.g:
    *    > is.type([], "Object") // false 讀 constructor.name
    *    > is.type([], "Array")  // true 讀 constructor.name
    *    > is.type({}, "Object") // true 讀 constructor.name
    *
-   * */
+   * @param val 
+   * @param name 
+   * @returns 
+   */
   type(val: any | null | undefined, name: string): boolean {
     return (val?.constructor?.name == name);
   }
@@ -331,9 +339,12 @@ export class Is implements InterfaceIs {
     return typeof val == "number";
   }
 
-  // @param: countUndefinedString
-  //         考處 string 值為 "undefined" 也算在內
-  //
+  /**
+   * 判斷是否為 undefined, null, "undefined"
+   * @param val 
+   * @param countUndefinedString 是否考處 string 值為 "undefined" 也算在內
+   * @returns 
+   */
   undefined(val: any, countUndefinedString: boolean = false): boolean {
     if (countUndefinedString) {
       return typeof val == undefined || val == "undefined";
@@ -341,31 +352,44 @@ export class Is implements InterfaceIs {
     return val == undefined;
   }
 
-  // @param: countNullString
-  //         考處 string 值為 "null" 也算在內
-  //
+  /**
+   * 判斷是否為 undefined, null, "null"
+   * @param val 
+   * @param countNullString 是否考處 string 值為 "null" 也算在內
+   * @returns 
+   */
   null(val: any, countNullString: boolean = false): boolean {
     if (countNullString)
       return val === "null" || val == null;
     return val == null;
   }
 
-  // 不是 null 也不是 undefined, 己初始化
+  /**
+   * 不是 null 也不是 undefined, 己初始化
+   * @param val 
+   * @returns 
+   */
   initialized(val: any): boolean {
     return !this.null(val) && !this.undefined(val);
   }
 
-  // 是否為空，「不包含」0， true, false
-  // 以下為 empty
-  // - null
-  // - undefined
-  // - NaN
-  // - empty string ("")
-  // - {}
-  // - []
-  // 不包含
-  // - false
-  // - 0
+  
+  /**
+  * 
+  * 是否為空，「不包含」0， true, false
+  * 以下為 empty
+  *  - null
+  *  - undefined
+  *  - NaN
+  *  - empty string ("")
+  *  - {}
+  *  - []
+  *  不包含
+  *  - false
+  *  - 0
+  * @param val 
+  * @returns 
+   */
   empty(val: any): boolean {
     if (val === undefined || val === null) {
       return true;
