@@ -1,13 +1,13 @@
-import { ComputedRef } from "vue";
+import { ComputedRef } from "../base/vueTypes";
 /**
  * fixme: 暫時性解法
  *
- * - isRefImple 判斷無法仗用 obj.constructor.name == RefImpl
+ * - isRefImpl 判斷無法用 obj.constructor.name == RefImpl
  *   since constructor name will be mangled after production build.
  *
  *  - this issue cannot be addressed even if we configure compress option as keep_classname,
  *
- * */
+ **/
 export declare function isRefImpl(obj: any): boolean;
 /**
  *  description
@@ -52,7 +52,7 @@ export declare function asEnum<T extends (number | string), K extends string>(ob
 } & {
     [key in T]: K;
 };
-export declare function getAccessibleProperties(obj: any, isAvailable: (name: string) => boolean, results?: Set<string>): Set<string>;
+export declare function getAccessibleProperties(obj: any, isAvailable?: (name: string) => boolean, results?: Set<string>): Set<string>;
 /**
  *  vue 若傳入有繼承關係的類別（class)，其繼承關係會消失
  *  因為 vue 不會讀取 prototype 層的內容
@@ -72,7 +72,7 @@ export declare function getAccessibleProperties(obj: any, isAvailable: (name: st
  *              constructor 不考慮
  *              method name 開頭為 "_" 不考慮
  * */
-export declare function flattenInstance(obj: any, rule?: (name: string) => boolean, onError?: (err: string) => void): void;
+export declare function flattenInstance(obj: any, overrideReadonly?: boolean, rule?: (name: string) => boolean, onError?: (err: string) => void): void;
 export declare function getOmitsBy<T>(payload: T, omits: Partial<keyof T>[]): Partial<T>;
 declare type TRefsOfObj<T> = {
     [K in keyof T]: ComputedRef<T[K]> | T[K];
@@ -111,7 +111,6 @@ export declare function asUnWrappedVueRefMap<T extends Object>(obj: TRefsOfObj<T
  **/
 export declare function UnWrappedVueRef<T extends Object>(obj: T, keys?: Partial<keyof T>[]): void;
 /**
- *
  *     number enum 附予 string mapping 功能
  *     ex:
  *
@@ -152,7 +151,7 @@ export interface InterfaceIs {
     string(val: any): boolean;
     number(val: any): boolean;
     undefined(val: any, countUndefinedString?: boolean): boolean;
-    null(val: any, countNullString: boolean): boolean;
+    null(val: any, countNullString?: boolean): boolean;
     initialized(val: any): boolean;
     empty(val: any): boolean;
     axiosResponse(e: any): boolean;

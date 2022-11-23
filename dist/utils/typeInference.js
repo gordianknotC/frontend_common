@@ -1,24 +1,23 @@
-import { toRef } from "vue";
+import { ref } from "../extension/extension_setup";
 let refImplClassName = undefined;
 /**
  * fixme: 暫時性解法
  *
- * - isRefImple 判斷無法仗用 obj.constructor.name == RefImpl
+ * - isRefImpl 判斷無法用 obj.constructor.name == RefImpl
  *   since constructor name will be mangled after production build.
  *
  *  - this issue cannot be addressed even if we configure compress option as keep_classname,
  *
- * */
+ **/
 export function isRefImpl(obj) {
     var _a;
     if (obj === null || obj === undefined)
         return false;
     // @ts-ignore
-    refImplClassName !== null && refImplClassName !== void 0 ? refImplClassName : (refImplClassName = toRef("").constructor.name);
+    refImplClassName !== null && refImplClassName !== void 0 ? refImplClassName : (refImplClassName = ref().constructor.name);
     return typeof obj == "object"
         && ((_a = obj === null || obj === void 0 ? void 0 : obj.constructor) === null || _a === void 0 ? void 0 : _a.name) === refImplClassName
-        && Object.keys(obj).length == 1
-        && Object.keys(obj)[0] == "value";
+        && Object.getOwnPropertyNames(Object.getPrototypeOf(obj)).length == 2; // constructor, value
 }
 /**
  *  description
@@ -69,8 +68,16 @@ export function asEnum(obj) {
     });
     return result;
 }
+const defaultAccessibleRule = (name) => {
+    if (name == "constructor")
+        return false;
+    if (name.startsWith("_"))
+        return false;
+    return true;
+};
 export function getAccessibleProperties(obj, isAvailable, results) {
     results !== null && results !== void 0 ? results : (results = new Set());
+    isAvailable !== null && isAvailable !== void 0 ? isAvailable : (isAvailable = defaultAccessibleRule);
     let prototype = Object.getPrototypeOf(obj);
     Object.getOwnPropertyNames(prototype).forEach((_k) => {
         if (isAvailable(_k))
@@ -101,14 +108,8 @@ export function getAccessibleProperties(obj, isAvailable, results) {
  *              constructor 不考慮
  *              method name 開頭為 "_" 不考慮
  * */
-export function flattenInstance(obj, rule, onError) {
-    rule !== null && rule !== void 0 ? rule : (rule = (name) => {
-        if (name == "constructor")
-            return false;
-        if (name.startsWith("_"))
-            return false;
-        return true;
-    });
+export function flattenInstance(obj, overrideReadonly = false, rule, onError) {
+    rule !== null && rule !== void 0 ? rule : (rule = defaultAccessibleRule);
     const properties = getAccessibleProperties(obj, rule);
     properties.forEach((property) => {
         const val = obj[property];
@@ -121,7 +122,25 @@ export function flattenInstance(obj, rule, onError) {
             }
         }
         catch (e) {
-            onError === null || onError === void 0 ? void 0 : onError.call(e);
+            if ((e.toString()).startsWith("TypeError: Cannot set property")) {
+                if (overrideReadonly) {
+                    let temp;
+                    Object.defineProperty(obj, property, {
+                        get() {
+                            return temp !== null && temp !== void 0 ? temp : obj[property];
+                        },
+                        set(v) {
+                            temp = v;
+                        }
+                    });
+                }
+                else {
+                    throw e;
+                }
+            }
+            else {
+                throw e;
+            }
         }
     });
 }
@@ -195,7 +214,6 @@ export function UnWrappedVueRef(obj, keys) {
     });
 }
 /**
- *
  *     number enum 附予 string mapping 功能
  *     ex:
  *
@@ -252,16 +270,7 @@ export class Is {
         return val === true;
     }
     array(val) {
-        if (typeof val === "object") {
-            if (val.length === undefined || val.length === null) {
-                return false;
-            }
-            if (typeof val === "number") {
-                return true;
-            }
-            return false;
-        }
-        return false;
+        return Array.isArray(val);
     }
     string(val) {
         return typeof val == "string";

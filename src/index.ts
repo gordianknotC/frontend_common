@@ -1,6 +1,9 @@
 "use strict"
+
+
 /**
- *      B A S E
+ * 
+ *      B A S E types
  *
  * */
 
@@ -11,8 +14,8 @@ export {
 
 /***
  *
- *    E X T E N D
- *    B A S E
+ *    B A S E EXT
+ * 
  * */
 
 export {
@@ -22,21 +25,23 @@ export {
 export {
   isRefImpl, asEnum, getAccessibleProperties, flattenInstance,
   asUnWrappedVueRefMap, UnWrappedVueRef,
-  addStringMappingFromNumEnum, Is,
+  addStringMappingFromNumEnum, Is, getOmitsBy
 } from "~/utils/typeInference";
 
 export type {
   TUnWrapVueRef, InterfaceIs,
 } from "~/utils/typeInference";
 
+
+
 /**
- *        M I X I N S
- *
+ * 
+ *        C O R E
  *
  * */
 export {useBuiltIn, Obj, Arr} from "~/base/builtinTypes";
 export {assertMsg} from "~/utils/assert";
 export {is} from "~/utils/typeInference";
-
 export {IFacade, provideFacade, CommonMixin, injectDependency, injectFacade} from "~/vueMixins/common";
-export { LazyHolder } from "./utils/lazy";
+export { LazyHolder, CallableDelegate as Callable } from "./utils/lazy";
+import { setupComputed, setupRef, setupWatch, setupReactive } from "./extension/extension_setup";

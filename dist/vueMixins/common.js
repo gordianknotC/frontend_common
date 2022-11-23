@@ -1,5 +1,5 @@
 import { merge } from "merge-anything";
-import { computed, watch } from "../base/vueTypes";
+import { computed, watch } from "../extension/extension_setup";
 import { assert } from "../utils/assert";
 export class CommonMixin {
     constructor() {

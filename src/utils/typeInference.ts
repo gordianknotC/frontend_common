@@ -1,29 +1,26 @@
-import {ComputedRef, toRef} from "vue";
+import { ComputedRef } from "~/base/vueTypes";
+import { computed, ref, reactive } from "~/extension/extension_setup";
 
 let refImplClassName: string = undefined as any;
 
 /**
  * fixme: 暫時性解法
  *
- * - isRefImple 判斷無法仗用 obj.constructor.name == RefImpl
+ * - isRefImpl 判斷無法用 obj.constructor.name == RefImpl
  *   since constructor name will be mangled after production build.
  *
  *  - this issue cannot be addressed even if we configure compress option as keep_classname,
  *
- * */
+ **/
 export function isRefImpl(obj: any) {
   if (obj === null || obj === undefined)
     return false;
-
-  // @ts-ignore
-  refImplClassName ??= toRef("").constructor.name;
-
+    // @ts-ignore
+  refImplClassName ??= ref().constructor.name;
   return typeof obj == "object"
     && obj?.constructor?.name === refImplClassName
-    && Object.keys(obj).length == 1
-    && Object.keys(obj)[0] == "value";
+    && Object.getOwnPropertyNames(Object.getPrototypeOf(obj)).length == 2; // constructor, value
 }
-
 
 /**
  *  description
@@ -74,15 +71,22 @@ export function asEnum<T extends (number | string), K extends string>(obj: { [ke
   })
   return result;
 }
+const defaultAccessibleRule = (name: string): boolean => { 
+  if (name == "constructor")
+    return false;
+  if (name.startsWith("_"))
+    return false;
+  return true;
+}
 
-export function getAccessibleProperties(obj: any, isAvailable: (name: string)=>boolean, results?: Set<string>): Set<string> {
+export function getAccessibleProperties(obj: any, isAvailable?: (name: string)=>boolean , results?: Set<string>): Set<string> {
   results ??= new Set();
+  isAvailable ??= defaultAccessibleRule;
   let prototype = Object.getPrototypeOf(obj);
   Object.getOwnPropertyNames(prototype).forEach((_k) => {
     if (isAvailable(_k))
       results!.add(_k);
   });
-
   // 底層
   if (Object.getPrototypeOf(prototype).constructor.name == "Object") {
     return results;
@@ -109,27 +113,37 @@ export function getAccessibleProperties(obj: any, isAvailable: (name: string)=>b
  *              constructor 不考慮
  *              method name 開頭為 "_" 不考慮
  * */
-export function flattenInstance(obj: any, rule?: (name: string) => boolean, onError?: (err: string)=>void) {
-  rule ??= (name) => { 
-    if (name == "constructor")
-      return false;
-    if (name.startsWith("_"))
-      return false;
-    return true;
-  }
+export function flattenInstance(obj: any, overrideReadonly: boolean = false, rule?: (name: string) => boolean, onError?: (err: string)=>void) {
+  rule ??= defaultAccessibleRule;
   const properties = getAccessibleProperties(obj, rule);
   properties.forEach((property) => {
     const val = obj[property];
     try {
       if (typeof val == "function") {
-            obj[property] = val.bind(obj);
+        obj[property] = val.bind(obj);
       } else {
         obj[property] = val;
       }
     } catch (e) { 
-      onError?.call(e);
+      if ((e.toString()).startsWith("TypeError: Cannot set property")){
+        if (overrideReadonly){
+          let temp!: any;
+          Object.defineProperty(obj, property, {
+            get(){
+              return temp ?? obj[property];
+            }, 
+            set(v){
+              temp = v;
+            }
+          });
+        }else{
+          throw e;
+        }
+      }else{
+        throw e;
+      }
     }
-  })
+  });
 }
 
 export function getOmitsBy<T>(payload: T, omits: Partial<keyof T>[]): Partial<T>{
@@ -141,7 +155,6 @@ export function getOmitsBy<T>(payload: T, omits: Partial<keyof T>[]): Partial<T>
   return result;
 }
 
-
 type TRefsOfObj<T> = {
   [K in keyof T]: ComputedRef<T[K]> | T[K]
 }
@@ -149,7 +162,6 @@ type TRefsOfObj<T> = {
 type TWrappedRefsOfObj<T> = {
   [K in keyof T]: T[K]
 }
-
 
 export type TUnWrapVueRef<T> = T;
 
@@ -187,7 +199,6 @@ export function asUnWrappedVueRefMap<T extends Object>(obj: TRefsOfObj<T>, keys:
   })
 }
 
-
 const SYMBOLS: Record<string | symbol, string | symbol> = {};
 
 /**
@@ -219,7 +230,6 @@ export function UnWrappedVueRef<T extends Object>(obj: T, keys?: Partial<keyof T
 }
 
 /**
- *
  *     number enum 附予 string mapping 功能
  *     ex:
  *
@@ -282,7 +292,7 @@ export interface InterfaceIs {
   string(val: any): boolean;
   number(val: any): boolean;
   undefined(val: any, countUndefinedString?: boolean): boolean;
-  null(val: any, countNullString: boolean): boolean;
+  null(val: any, countNullString?: boolean): boolean;
   initialized(val: any): boolean;
   empty(val: any): boolean;
   axiosResponse(e: any): boolean;
@@ -310,16 +320,7 @@ export class Is implements InterfaceIs {
   }
 
   array(val: any): boolean {
-    if (typeof val === "object") {
-      if (val.length === undefined || val.length === null) {
-        return false;
-      }
-      if (typeof val === "number") {
-        return true;
-      }
-      return false;
-    }
-    return false;
+    return Array.isArray(val);
   }
 
   string(val: any): boolean {

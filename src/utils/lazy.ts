@@ -11,3 +11,16 @@ export function LazyHolder<T extends object>(initializer: () => T): T {
     }
   }) as T;
 }
+
+
+
+export class CallableDelegate<CALLABLE extends Function> extends Function {
+  constructor(
+    public delegate: CALLABLE
+  ) {
+    super()    
+    return new Proxy(this, {
+      apply: (target, thisArg, args) => this.delegate(...args)
+    })
+  }
+}

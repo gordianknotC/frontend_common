@@ -9,4 +9,13 @@ export function LazyHolder(initializer) {
         }
     });
 }
+export class CallableDelegate extends Function {
+    constructor(delegate) {
+        super();
+        this.delegate = delegate;
+        return new Proxy(this, {
+            apply: (target, thisArg, args) => this.delegate(...args)
+        });
+    }
+}
 //# sourceMappingURL=lazy.js.map

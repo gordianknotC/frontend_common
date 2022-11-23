@@ -1,3 +1,2 @@
-const forWebpackReloadingTypescript = "";
-export { watch, reactive, computed, toRef, toRefs, ref, defineComponent, defineAsyncComponent, defineProps, onMounted, nextTick, watchEffect } from "vue";
+export {};
 //# sourceMappingURL=vueTypes.js.map
