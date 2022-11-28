@@ -1,18 +1,5 @@
 declare type ConditionCallback<T> = (x: T) => boolean;
 declare global {
-    interface Array<T> {
-        contains(val: T): boolean;
-        remove(val: T): void;
-        any(val: ConditionCallback<T>): boolean;
-        where(val: ConditionCallback<T>): Array<T>;
-        firstWhere(val: ConditionCallback<T>, orElse?: () => T): T | null;
-        fold(initialValue: T, cb: (acc: T, current: T) => T): T;
-        add(val: T): number;
-        addAll(val: T[]): T[];
-        clear(): void;
-        readonly first: T;
-        readonly last: T;
-    }
     interface Number {
         asInt(): number;
     }
@@ -92,18 +79,31 @@ declare global {
         zalgo: string;
     }
 }
-declare class _Obj<T extends object> {
+declare class _ObjDelegate<T extends object> {
     delegate: T;
     constructor(delegate: T);
     omitBy(condition: (key: keyof T, val: T[keyof T]) => boolean): Partial<T>;
     stripEmptyProperties<E extends Array<string>>(props: E): Omit<T, E[number]>;
     pick(elements: Array<Partial<keyof T>>): Partial<T>;
 }
-declare class _Arr<S, T extends Array<S>> {
+export declare type ObjDelegate<T extends object> = _ObjDelegate<T> & Object;
+declare class _ArrDelegate<S, T extends Array<S>> {
     delegate: T;
     constructor(delegate: T);
+    contains(val: S): boolean;
+    add(val: S): number;
+    addAll(val: S[]): S[];
+    remove(val: S): void;
+    clear(): void;
+    where(condition: ConditionCallback<S>): Array<S>;
+    any(condition: ConditionCallback<S>): boolean;
+    fold(initialValue: S, cb: (acc: S, current: S) => S): S;
+    firstWhere(condition: ConditionCallback<S>, orElse?: () => S): S | null;
+    get first(): S;
+    get last(): S;
 }
-export declare const Obj: <T extends object>(obj: T) => _Obj<T>;
-export declare const Arr: <S, T extends S[]>(obj: T) => _Arr<S, T>;
+export declare type ArrayDelegate<S, T extends Array<S>> = _ArrDelegate<S, T> & Array<S>;
+export declare const Obj: <T extends object>(obj: T) => ObjDelegate<T>;
+export declare const Arr: <S, T extends S[]>(obj: T) => ArrayDelegate<S, T>;
 export declare function useBuiltIn(): void;
 export {};

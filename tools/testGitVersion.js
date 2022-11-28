@@ -75,7 +75,7 @@ function getCurrentBuildCommitInfo(){
   }
 }
 
-function echoCurentBuild(){
+function echoCurrentBuild(){
   // shell.echo("current build commit:".bgGrey, getCurrentBuildCommitInfo());
   // shell.echo("current branch:".bgGrey, getCurrentBranch().toString().bgBlue);
 }
@@ -102,5 +102,5 @@ function echoOutdateInfo(){
 }
 
 showHelp();
-echoCurentBuild();
+echoCurrentBuild();
 echoOutdateInfo();

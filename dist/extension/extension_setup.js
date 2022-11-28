@@ -15,16 +15,32 @@ export const computed = computedMethod;
 export const watch = watchMethod;
 export const reactive = reactiveMethod;
 export const ref = refMethod;
-export function setupRef(obj) {
-    refMethod.delegate = obj;
+/**
+ * 用於外部注入 vue RefImpl constructor
+ * @param refConstructor RefImpl
+ */
+export function setupRef(refConstructor) {
+    refMethod.delegate = refConstructor;
 }
-export function setupComputed(obj) {
-    computedMethod.delegate = obj;
+/**
+ * 用於外部注入 vue ComputedRef constructor
+ * @param computedConstructor ComputedRef
+ */
+export function setupComputed(computedConstructor) {
+    computedMethod.delegate = computedConstructor;
 }
-export function setupReactive(obj) {
-    reactiveMethod.delegate = obj;
+/**
+ * 用於外部注入 vue UnWrappedRef constructor
+ * @param reactiveConstructor UnWrappedRef
+ */
+export function setupReactive(reactiveConstructor) {
+    reactiveMethod.delegate = reactiveConstructor;
 }
-export function setupWatch(obj) {
-    watchMethod.delegate = obj;
+/**
+ * 用於外部注入 vue watch constructor
+ * @param watchConstructor UnWrappedRef
+ */
+export function setupWatch(watchConstructor) {
+    watchMethod.delegate = watchConstructor;
 }
 //# sourceMappingURL=extension_setup.js.map

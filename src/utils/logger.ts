@@ -1,5 +1,5 @@
 
-function message(msg: any[], traceBack: number = 2, stackNumber: number = 5){
+function message (msg: any[], traceBack: number = 2, stackNumber: number = 5){
   const lines = new Error().stack!.split("\n");
   const maxLines = lines.length;
   const stacks = lines.splice(

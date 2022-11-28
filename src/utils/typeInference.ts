@@ -204,7 +204,7 @@ export type TUnWrapVueRef<T> = T;
 export function asUnWrappedVueRefMap<T extends Object>(obj: TRefsOfObj<T>, keys: string[]): TWrappedRefsOfObj<T> {
   return new Proxy<T>({} as TWrappedRefsOfObj<T>, {
     get: function (target, name) {
-      if (keys.contains(name as string)){
+      if (keys.includes(name as string)){
         return (obj[name as keyof typeof obj] as any).value;
       }
       return obj[name as keyof typeof obj];
@@ -417,7 +417,7 @@ export class Is implements InterfaceIs {
   axiosResponse(e: any) {
     if (this.initialized(e) && typeof e === "object") {
       const keys = Object.keys(e);
-      return axiosKeys.every((_) => keys.contains(_));
+      return axiosKeys.every((_) => keys.includes(_));
     }
     return false;
   }
