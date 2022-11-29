@@ -1,5 +1,5 @@
 
-
+<!--#-->
 
 # Provider Pattern  
 1) 提供 Dependency Provider design pattern，將 dependency以 ident 作為 key 植入 container

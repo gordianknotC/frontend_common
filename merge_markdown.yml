@@ -1,0 +1,9 @@
+
+input:
+ pages/facade.md:  {noYAML: true, doctoc: true, replace: {<!--#-->: "# Facade:"}}
+ pages/lazyloading.md:  {noYAML: true, doctoc: true, replace: {<!--#-->: "# Lazy Loading:"}}
+output: 
+  name: README.md
+  doctoc:
+    title: "table of content"
+    all: true
