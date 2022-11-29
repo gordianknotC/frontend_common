@@ -17,7 +17,6 @@
  * console.log(lazy.value) // undefined
  * initialize();
  * console.log(lazy.value) // 1;
- *
  * ```
  */
 export function LazyHolder(initializer) {

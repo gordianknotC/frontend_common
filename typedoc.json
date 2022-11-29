@@ -25,11 +25,15 @@
     "pluginPages": {
         "pages": [
             {
-                "title": "Getting started",
+                "title": "Facade Interface Segregation",
                 "source": "facade.md",
             },
             {
-                "title": "Additional",
+                "title": "Lazy Loading",
+                "source": "lazyloading.md",
+            },
+            {
+                "title": "Lazy Loading",
                 "childrenDir": "additional-resources",
                 "children": []
             },

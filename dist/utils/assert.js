@@ -1,3 +1,4 @@
+import { currentEnv } from "../extension/extension_setup";
 export class AssertMsg {
     constructor() {
         this.idNotSpecified = "id not Specified";
@@ -48,7 +49,7 @@ export class AssertionError extends Error {
  * @param message
  */
 export function assert(condition, message) {
-    if (!condition) {
+    if (currentEnv.value == "develop" && !condition) {
         throw new AssertionError(message !== null && message !== void 0 ? message : "");
     }
 }

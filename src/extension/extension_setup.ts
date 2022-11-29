@@ -1,5 +1,8 @@
+import { AssertionError } from "assert";
+import { assert } from "console";
 import { NotImplementedError } from "~/base/baseExceptions";
 import { CallableDelegate, LazyHolder } from "~/utils/lazy";
+import { assertMsg } from "..";
 
 
 export type ExtSetupOption = {
@@ -20,10 +23,19 @@ let watchMethod=new CallableDelegate(()=>{
     throw new Error("watch method used before setup");
 });
 
+type TEnv = "develop" | "production" | "release";
+let _env: {value: TEnv | undefined} = {value: undefined};
+
 export const computed = computedMethod;
 export const watch = watchMethod;
 export const reactive = reactiveMethod;
 export const ref = refMethod;
+export const currentEnv = LazyHolder(()=>{
+    if (_env.value == undefined){
+        throw new Error("currentEnv not specified");
+    }
+    return _env;
+});
 
 
 /**
@@ -55,3 +67,6 @@ export function setupWatch(watchConstructor: any){
     watchMethod.delegate = watchConstructor;
 }
 
+export function setupCurrentEnv(env: "develop" | "production" | "release"){
+    _env.value = env;
+} 

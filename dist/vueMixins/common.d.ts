@@ -9,14 +9,18 @@ export declare class CommonMixin {
         onChange: (prev: R, val: R) => void;
     }): WritableComputedRef<R>;
 }
+declare type ProviderParams<T> = {
+    deps: Partial<T>;
+    merge?: boolean;
+    ident?: string | symbol;
+};
 /**
  *  Dependency Provider
  *  provide 方法，將 dependency以 ident 作為 key 植入 container
  *
- *  @params providers 物件值鍵對
+ *  @params deps 物件值鍵對
  *  @params mergeObj 是否對 provider 所提併的值鍵對進與 container 進行合併
  *  @params ident 用以識別 container 取值所需要的 key
- *
  *  @example
  *  ```ts
  *  const mergeObj = true;
@@ -45,7 +49,7 @@ export declare class CommonMixin {
  *  assert(facade.override.b == 2);
  *  ```
  */
-export declare function provideFacade<T>(providers: Partial<T>, mergeObj?: boolean, ident?: symbol): void;
+export declare function provideFacade<T>(option: ProviderParams<T>): void;
 /**
 *  Dependency Provider
  * provide 方法，將 dependency以 ident 作為 key 植入 container
@@ -54,6 +58,7 @@ export declare function provideFacade<T>(providers: Partial<T>, mergeObj?: boole
 export declare const provideDependency: typeof provideFacade;
 /**
  * Dependency Injector
+ * @see {@link provideDependency}
  * @param pathOrName 可以 dot 作為 property accessor 如 "source.propA"
  * @param ident
  * @returns
@@ -68,9 +73,8 @@ export declare function injectDependency<T>(pathOrName: string, ident?: symbol):
 /**
  * Dependency Injector
  * 注入 IFacade interface, 對應 provideFacade
+ * @see {@link provideFacade}
  * @param ident
- * @returns
- *
  * @example
  * ```ts
  *  provideFacade({a: 1}, true);
@@ -106,3 +110,4 @@ export declare function injectFacade<T>(ident?: symbol): T;
 export declare function IFacade<T extends Object>(ident?: symbol, option?: {
     transformFuncAsGetter: boolean;
 }): T;
+export {};

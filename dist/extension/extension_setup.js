@@ -1,4 +1,4 @@
-import { CallableDelegate } from "../utils/lazy";
+import { CallableDelegate, LazyHolder } from "../utils/lazy";
 let computedMethod = new CallableDelegate(() => {
     throw new Error("computed method used before setup");
 });
@@ -11,10 +11,17 @@ let refMethod = new CallableDelegate(() => {
 let watchMethod = new CallableDelegate(() => {
     throw new Error("watch method used before setup");
 });
+let _env = { value: undefined };
 export const computed = computedMethod;
 export const watch = watchMethod;
 export const reactive = reactiveMethod;
 export const ref = refMethod;
+export const currentEnv = LazyHolder(() => {
+    if (_env.value == undefined) {
+        throw new Error("currentEnv not specified");
+    }
+    return _env;
+});
 /**
  * 用於外部注入 vue RefImpl constructor
  * @param refConstructor RefImpl
@@ -42,5 +49,8 @@ export function setupReactive(reactiveConstructor) {
  */
 export function setupWatch(watchConstructor) {
     watchMethod.delegate = watchConstructor;
+}
+export function setupCurrentEnv(env) {
+    _env.value = env;
 }
 //# sourceMappingURL=extension_setup.js.map

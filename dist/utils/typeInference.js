@@ -191,7 +191,7 @@ export function getOmitsBy(payload, omits) {
 export function asUnWrappedVueRefMap(obj, keys) {
     return new Proxy({}, {
         get: function (target, name) {
-            if (keys.contains(name)) {
+            if (keys.includes(name)) {
                 return obj[name].value;
             }
             return obj[name];
@@ -369,7 +369,7 @@ export class Is {
     axiosResponse(e) {
         if (this.initialized(e) && typeof e === "object") {
             const keys = Object.keys(e);
-            return axiosKeys.every((_) => keys.contains(_));
+            return axiosKeys.every((_) => keys.includes(_));
         }
         return false;
     }

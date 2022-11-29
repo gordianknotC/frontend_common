@@ -32,14 +32,14 @@ const container: any = {};
 const FACADE_KEY = Symbol();
 const DEP_KEY = Symbol();
 
+type ProviderParams<T> = {deps: Partial<T>, merge?: boolean, ident?: string | symbol};
 /**
  *  Dependency Provider
  *  provide 方法，將 dependency以 ident 作為 key 植入 container
  * 
- *  @params providers 物件值鍵對
+ *  @params deps 物件值鍵對
  *  @params mergeObj 是否對 provider 所提併的值鍵對進與 container 進行合併 
  *  @params ident 用以識別 container 取值所需要的 key
- * 
  *  @example
  *  ```ts
  *  const mergeObj = true;
@@ -68,19 +68,24 @@ const DEP_KEY = Symbol();
  *  assert(facade.override.b == 2);
  *  ```
  */
-export function provideFacade<T>(providers: Partial<T>, mergeObj: boolean = false, ident=FACADE_KEY) {
+export function provideFacade<T>(option: ProviderParams<T>) {
+  const {deps, merge: mergeObj, ident} = Object.assign({
+    mergeObj: false, 
+    ident: FACADE_KEY
+  }, option);
+
   container[ident] ??= {};
   if (!mergeObj){
-    Object.keys(providers).forEach((prop) => {
-      container[ident][prop] = providers[prop as keyof typeof providers] as any;
+    Object.keys(deps).forEach((prop) => {
+      container[ident][prop] = deps[prop as keyof typeof deps] as any;
       
     });
   } else {
-    Object.keys(providers).forEach((prop) => {
+    Object.keys(deps).forEach((prop) => {
       if (container[ident][prop]){
-        container[ident][prop] = merge(container[ident][prop], providers[prop as keyof typeof providers] as any)
+        container[ident][prop] = merge(container[ident][prop], deps[prop as keyof typeof deps] as any)
       }else{
-        container[ident][prop] = providers[prop as keyof typeof providers] as any;
+        container[ident][prop] = deps[prop as keyof typeof deps] as any;
       }
     });
   }
@@ -91,12 +96,14 @@ export function provideFacade<T>(providers: Partial<T>, mergeObj: boolean = fals
  * provide 方法，將 dependency以 ident 作為 key 植入 container
  * @see {@link provideFacade}
  * */
-export const provideDependency = ((...args: any[])=>{
-  return provideFacade(args[0], args[1], args[2] ?? DEP_KEY);
+export const provideDependency = (<T>(option: ProviderParams<T>)=>{
+  option.ident ??= DEP_KEY;
+  return provideFacade(option);
 }) as typeof provideFacade;
 
 /**
  * Dependency Injector
+ * @see {@link provideDependency}
  * @param pathOrName 可以 dot 作為 property accessor 如 "source.propA"
  * @param ident 
  * @returns 
@@ -118,9 +125,8 @@ export function injectDependency<T>(pathOrName: string, ident=DEP_KEY): T{
 /**
  * Dependency Injector
  * 注入 IFacade interface, 對應 provideFacade
+ * @see {@link provideFacade}
  * @param ident 
- * @returns 
- * 
  * @example
  * ```ts
  *  provideFacade({a: 1}, true);

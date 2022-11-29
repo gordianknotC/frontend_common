@@ -1,5 +1,6 @@
 import {
   setupComputed,
+  setupCurrentEnv,
   setupReactive,
   setupRef,
   setupWatch,
@@ -26,6 +27,7 @@ describe("type inference tests", () => {
     setupReactive(reactive);
     setupWatch(watch);
     setupComputed(computed);
+    setupCurrentEnv("develop");
   });
 
 
