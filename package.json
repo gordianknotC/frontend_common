@@ -1,7 +1,7 @@
 {
   "name": "@gdknot/frontend_common",
-  "version": "0.1.0",
-  "description": "",
+  "version": "0.1.1",
+  "description": "common js util for frontend development",
   "scripts": {
     "build": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json",
     "serve": "vue-cli-service serve",
