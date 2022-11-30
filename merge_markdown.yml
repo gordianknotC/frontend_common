@@ -1,5 +1,6 @@
 
 input:
+ pages/readme.md:  {noYAML: true, doctoc: true, replace: {<!--#-->: "# 前端常用工具:"}}
  pages/facade.md:  {noYAML: true, doctoc: true, replace: {<!--#-->: "# Facade:"}}
  pages/lazyloading.md:  {noYAML: true, doctoc: true, replace: {<!--#-->: "# Lazy Loading:"}}
  pages/apiTestUtil_CRUD.md:  {noYAML: true, doctoc: true, replace: {<!--#-->: "# Writing pseudo code for api - 測試API工具:"}}

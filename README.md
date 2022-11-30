@@ -1,5 +1,19 @@
 
+# 前端常用工具:
 
+## 安裝
+```bash
+yarn add @gdknot/frontend_common
+```
+## Feature
+- facade
+- provider
+- injector
+- declare lazy loading object
+- declare lazy loading function
+- a CRUD function for writing pseudo code api
+
+# Table of Content
 - [Facade:](#facade)
 - [Provider Pattern](#provider-pattern)
   - [Facade Provider (對應Facade Injector)](#facade-provider-對應facade-injector)
@@ -11,7 +25,7 @@
 - [Injector Pattern](#injector-pattern)
     - [InjectDependency](#injectdependency)
     - [InjectFacade](#injectfacade)
-- [實際 App 上的使用](#實際-app-上的使用)
+  - [應用於 App 上開發](#應用於-app-上開發)
 - [Lazy Loading:](#lazy-loading)
   - [lazyHolder - lazy loading for objects except function](#lazyholder---lazy-loading-for-objects-except-function)
     - [description](#description)
@@ -22,6 +36,9 @@
 - [Writing pseudo code for api - 測試API工具](#writing-pseudo-code-for-api---測試api工具-1)
   - [CRUD](#crud)
     - [Example](#example)
+
+
+
 
 # Facade:
 
@@ -160,7 +177,7 @@ export function injectFacade<T>(ident=FACADE_KEY): T
 
 
 
-# 實際 App 上的使用
+## 應用於 App 上開發
 > 以 Domain Driven Design 為架構的 App 為例
 
 **main.ts**

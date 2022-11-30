@@ -25,11 +25,15 @@
     "pluginPages": {
         "pages": [
             {
-                "title": "Facade Interface Segregation",
+                "title": "前端常用工具",
+                "source": "readme.md",
+            },
+            {
+                "title": "Facade - 介面分離",
                 "source": "facade.md",
             },
             {
-                "title": "Lazy Loading",
+                "title": "懶加載",
                 "source": "lazyloading.md",
             },
             {
