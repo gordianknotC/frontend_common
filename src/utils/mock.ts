@@ -31,15 +31,13 @@ export type TDataResponse<T> = {
 
 
 
-
 // fixme: 寫成 OOP
 
 /**
  * 創建 CRUD api 方法，用於寫測試 
- * @param dataList 
- * @param updater 
- * @param itemGen 
- * @returns 
+ * @param dataList 取得該列表所有資料
+ * @param updater  更新該列表所有資料 
+ * @param itemGen 依 identity 由列表資料取得該 item
  * 
  * @example
  * ```ts
@@ -78,7 +76,12 @@ export
 const CRUD = <T extends {id: string|number}>(
   dataList: TOptional<TDataResponse<any[]>>,
   updater:(data: any[])=>void,
-  itemGen: (idx: number)=>T)=>{
+  itemGen: (idx: number)=>T) : {
+    add: (payload: T)=>Promise<TSuccessResponse>,
+    del: (payload: T)=>Promise<TSuccessResponse>,
+    edit: (payload: T)=>Promise<TSuccessResponse>,
+    get: (payload?: TPagerPayload)=>Promise<TDataResponse<any[]>>,
+  }=>{
     return {
         add(payload: T): Promise<TSuccessResponse>{
             let id = dataList!.data.length;

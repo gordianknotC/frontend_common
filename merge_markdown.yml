@@ -2,6 +2,8 @@
 input:
  pages/facade.md:  {noYAML: true, doctoc: true, replace: {<!--#-->: "# Facade:"}}
  pages/lazyloading.md:  {noYAML: true, doctoc: true, replace: {<!--#-->: "# Lazy Loading:"}}
+ pages/apiTestUtil_CRUD.md:  {noYAML: true, doctoc: true, replace: {<!--#-->: "# Writing pseudo code for api - 測試API工具:"}}
+ pages/common_util.md:  {noYAML: true, doctoc: true, replace: {<!--#-->: "# Common Utils:"}}
 output: 
   name: README.md
   doctoc:

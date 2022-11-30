@@ -10,7 +10,7 @@
     "publish": "npm publish",
     "config:test": "ts-nest config:init",
     "test": "jest",
-    "serve:doc": "typedoc src/index.ts && serve docs"
+    "serve:doc": "merge-markdown -m merge_markdown.yml && typedoc src/index.ts && serve docs"
   },
   "files": [
     "dist",
@@ -25,7 +25,6 @@
   "notes": {
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
-    "reference": "https://github.com/tomchen/example-typescript-package",
     "repository": {
       "type": "git",
       "url": "git+https://github.com/gordianknotC/commonJSBuiltin.git"
@@ -38,6 +37,7 @@
     "colors": "^1.4.0"
   },
   "devDependencies": {
+    "@knennigtri/merge-markdown": "^1.1.0",
     "@knodes/typedoc-plugin-pages": "^0.23.1",
     "@types/colors": "^1.2.1",
     "@types/debounce": "^1.2.1",

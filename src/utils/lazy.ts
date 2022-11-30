@@ -33,7 +33,6 @@ export function LazyHolder<T extends object>(initializer: () => T): T {
 }
 
 
-
 /**
  * design pattern for Callable Object
  * 
