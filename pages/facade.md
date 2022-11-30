@@ -136,7 +136,7 @@ export function injectFacade<T>(ident=FACADE_KEY): T
 
 
 
-# 實際 App 上的使用
+## 應用於 App 上開發
 > 以 Domain Driven Design 為架構的 App 為例
 
 **main.ts**

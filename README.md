@@ -23,7 +23,6 @@
   - [CRUD](#crud)
     - [Example](#example)
 
-
 # Facade:
 
 # Provider Pattern  
