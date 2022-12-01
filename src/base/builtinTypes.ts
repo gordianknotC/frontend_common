@@ -140,8 +140,8 @@ extendExceptConstructor(Object, _ObjDelegate);
 
 export type ObjDelegate<T extends object> = _ObjDelegate<T> & Object;
 
-class _ArrDelegate<S, T extends Array<S>> {
-  constructor(public delegate: T) {  }
+class _ArrDelegate<S> {
+  constructor(public delegate: Array<S>) {  }
   contains (val: S): boolean{
     return this.delegate.includes(val);
   }
@@ -198,14 +198,14 @@ class _ArrDelegate<S, T extends Array<S>> {
 
 extendExceptConstructor(Array, _ArrDelegate);
 
-export type ArrayDelegate<S, T extends Array<S>> = _ArrDelegate<S, T> & Array<S>;
+export type ArrayDelegate<S, T extends Array<S>> = _ArrDelegate<S> & Array<S>;
 
 export const Obj = <T extends object>(obj: T): ObjDelegate<T> => {
   return new _ObjDelegate<T>(obj) as ObjDelegate<T>;
 };
 
 export const Arr = <S, T extends Array<S>>(obj: T): ArrayDelegate<S, T> => {
-  return new _ArrDelegate<S, T>(obj) as ArrayDelegate<S, T>;
+  return new _ArrDelegate<S>(obj) as ArrayDelegate<S, T>;
 };
 
 

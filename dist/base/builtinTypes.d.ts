@@ -87,9 +87,9 @@ declare class _ObjDelegate<T extends object> {
     pick(elements: Array<Partial<keyof T>>): Partial<T>;
 }
 export declare type ObjDelegate<T extends object> = _ObjDelegate<T> & Object;
-declare class _ArrDelegate<S, T extends Array<S>> {
-    delegate: T;
-    constructor(delegate: T);
+declare class _ArrDelegate<S> {
+    delegate: Array<S>;
+    constructor(delegate: Array<S>);
     contains(val: S): boolean;
     add(val: S): number;
     addAll(val: S[]): S[];
@@ -102,7 +102,7 @@ declare class _ArrDelegate<S, T extends Array<S>> {
     get first(): S;
     get last(): S;
 }
-export declare type ArrayDelegate<S, T extends Array<S>> = _ArrDelegate<S, T> & Array<S>;
+export declare type ArrayDelegate<S, T extends Array<S>> = _ArrDelegate<S> & Array<S>;
 export declare const Obj: <T extends object>(obj: T) => ObjDelegate<T>;
 export declare const Arr: <S, T extends S[]>(obj: T) => ArrayDelegate<S, T>;
 export {};
