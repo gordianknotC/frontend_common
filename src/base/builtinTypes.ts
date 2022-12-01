@@ -211,10 +211,9 @@ export const Obj = <T extends object>(obj: T): ObjDelegate<T> => {
   return new _ObjDelegate<T>(obj) as ObjDelegate<T>;
 };
 
-export const Arr = <S, T extends Array<S>>(obj: T): ArrayDelegate<S> => {
+export const Arr = <S>(obj: Array<S>): ArrayDelegate<S> => {
   return new _ArrDelegate<S>(obj) as ArrayDelegate<S>;
 };
-
 
 function removeItem<T>(arr: Array<T>, value: T): Array<T> {
   const index = arr.indexOf(value);

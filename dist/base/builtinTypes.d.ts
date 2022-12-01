@@ -102,5 +102,5 @@ declare class _ArrDelegate<S> extends Array<S> {
 }
 export declare type ArrayDelegate<S> = _ArrDelegate<S> & Array<S>;
 export declare const Obj: <T extends object>(obj: T) => ObjDelegate<T>;
-export declare const Arr: <S, T extends S[]>(obj: T) => ArrayDelegate<S>;
+export declare const Arr: <S>(obj: S[]) => ArrayDelegate<S>;
 export {};
