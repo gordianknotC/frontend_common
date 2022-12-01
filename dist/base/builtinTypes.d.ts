@@ -79,16 +79,14 @@ declare global {
         zalgo: string;
     }
 }
-declare class _ObjDelegate<T extends object> {
-    delegate: T;
+declare class _ObjDelegate<T extends object> extends Object {
     constructor(delegate: T);
     omitBy(condition: (key: keyof T, val: T[keyof T]) => boolean): Partial<T>;
     stripEmptyProperties<E extends Array<string>>(props: E): Omit<T, E[number]>;
     pick(elements: Array<Partial<keyof T>>): Partial<T>;
 }
 export declare type ObjDelegate<T extends object> = _ObjDelegate<T> & Object;
-declare class _ArrDelegate<S> {
-    delegate: Array<S>;
+declare class _ArrDelegate<S> extends Array<S> {
     constructor(delegate: Array<S>);
     contains(val: S): boolean;
     add(val: S): number;
@@ -102,7 +100,7 @@ declare class _ArrDelegate<S> {
     get first(): S;
     get last(): S;
 }
-export declare type ArrayDelegate<S, T extends Array<S>> = _ArrDelegate<S> & Array<S>;
+export declare type ArrayDelegate<S> = _ArrDelegate<S> & Array<S>;
 export declare const Obj: <T extends object>(obj: T) => ObjDelegate<T>;
-export declare const Arr: <S, T extends S[]>(obj: T) => ArrayDelegate<S, T>;
+export declare const Arr: <S, T extends S[]>(obj: T) => ArrayDelegate<S>;
 export {};

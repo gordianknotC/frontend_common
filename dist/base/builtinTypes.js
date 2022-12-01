@@ -10,13 +10,14 @@ function extendExceptConstructor(master, slave) {
         }
     });
 }
-class _ObjDelegate {
+class _ObjDelegate extends Object {
     constructor(delegate) {
-        this.delegate = delegate;
+        super(delegate);
+        Object.assign(this, delegate);
     }
     omitBy(condition) {
-        const delegate = { ...this.delegate };
-        const entries = Object.entries(this.delegate);
+        const delegate = { ...this };
+        const entries = Object.entries(this);
         for (let i = 0; i < entries.length; i++) {
             const [key, val] = entries[i];
             if (condition(key, val)) {
@@ -31,43 +32,47 @@ class _ObjDelegate {
     pick(elements) {
         const result = {};
         elements.forEach((_) => {
-            result[_] = this.delegate[_];
+            result[_] = this[_];
         });
         return result;
     }
 }
 extendExceptConstructor(Object, _ObjDelegate);
-class _ArrDelegate {
+class _ArrDelegate extends Array {
     constructor(delegate) {
-        this.delegate = delegate;
+        super(delegate.length);
+        for (let index = 0; index < delegate.length; index++) {
+            const element = delegate[index];
+            this[index] = element;
+        }
     }
     contains(val) {
-        return this.delegate.includes(val);
+        return this.includes(val);
     }
     add(val) {
-        return this.delegate.push(val);
+        return this.push(val);
     }
     addAll(val) {
         const l = val.length;
         for (let i = 0; i < l; i++) {
-            this.delegate.push(val[i]);
+            this.push(val[i]);
         }
-        return this.delegate;
+        return this;
     }
     remove(val) {
-        removeItem(this.delegate, val);
+        removeItem(this, val);
     }
     ;
     clear() {
-        this.delegate.length = 0;
+        this.length = 0;
     }
     where(condition) {
-        return this.delegate.filter((v) => condition(v));
+        return this.filter((v) => condition(v));
     }
     ;
     any(condition) {
-        for (let i = 0; i < this.delegate.length; i++) {
-            const elt = this.delegate[i];
+        for (let i = 0; i < this.length; i++) {
+            const elt = this[i];
             if (condition(elt))
                 return true;
         }
@@ -75,14 +80,14 @@ class _ArrDelegate {
     }
     ;
     fold(initialValue, cb) {
-        return this.delegate.reduce((prev, current, cidx, arr) => {
+        return this.reduce((prev, current, currentId, arr) => {
             return cb(prev, current);
         }, initialValue);
     }
     ;
     firstWhere(condition, orElse) {
-        for (let i = 0; i < this.delegate.length; i++) {
-            const elt = this.delegate[i];
+        for (let i = 0; i < this.length; i++) {
+            const elt = this[i];
             if (condition(elt)) {
                 return elt;
             }
@@ -93,10 +98,10 @@ class _ArrDelegate {
     }
     ;
     get first() {
-        return this.delegate[0];
+        return this[0];
     }
     get last() {
-        return this.delegate[this.delegate.length - 1];
+        return this[this.length - 1];
     }
 }
 extendExceptConstructor(Array, _ArrDelegate);
@@ -130,14 +135,14 @@ String.prototype.toAsciiArray = function () {
     const utf8 = [];
     const val = this;
     for (let i = 0; i < val.length; i++) {
-        let charcode = val.charCodeAt(i);
-        if (charcode < 0x80)
-            utf8.push(charcode);
-        else if (charcode < 0x800) {
-            utf8.push(0xc0 | (charcode >> 6), 0x80 | (charcode & 0x3f));
+        let charCode = val.charCodeAt(i);
+        if (charCode < 0x80)
+            utf8.push(charCode);
+        else if (charCode < 0x800) {
+            utf8.push(0xc0 | (charCode >> 6), 0x80 | (charCode & 0x3f));
         }
-        else if (charcode < 0xd800 || charcode >= 0xe000) {
-            utf8.push(0xe0 | (charcode >> 12), 0x80 | ((charcode >> 6) & 0x3f), 0x80 | (charcode & 0x3f));
+        else if (charCode < 0xd800 || charCode >= 0xe000) {
+            utf8.push(0xe0 | (charCode >> 12), 0x80 | ((charCode >> 6) & 0x3f), 0x80 | (charCode & 0x3f));
         }
         // surrogate pair
         else {
@@ -145,9 +150,9 @@ String.prototype.toAsciiArray = function () {
             // UTF-16 encodes 0x10000-0x10FFFF by
             // subtracting 0x10000 and splitting the
             // 20 bits of 0x0-0xFFFFF into two halves
-            charcode =
-                0x10000 + (((charcode & 0x3ff) << 10) | (val.charCodeAt(i) & 0x3ff));
-            utf8.push(0xf0 | (charcode >> 18), 0x80 | ((charcode >> 12) & 0x3f), 0x80 | ((charcode >> 6) & 0x3f), 0x80 | (charcode & 0x3f));
+            charCode =
+                0x10000 + (((charCode & 0x3ff) << 10) | (val.charCodeAt(i) & 0x3ff));
+            utf8.push(0xf0 | (charCode >> 18), 0x80 | ((charCode >> 12) & 0x3f), 0x80 | ((charCode >> 6) & 0x3f), 0x80 | (charCode & 0x3f));
         }
     }
     return utf8;

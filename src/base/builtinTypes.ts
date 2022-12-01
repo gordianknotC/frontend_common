@@ -94,8 +94,6 @@ declare global {
   }
 }
 
-
-
 function extendExceptConstructor(master: any, slave: any){
   Object.keys(master.prototype).forEach((key)=>{
     type slaveKey = keyof typeof slave.prototype;
@@ -108,11 +106,14 @@ function extendExceptConstructor(master: any, slave: any){
   });
 }
 
-class _ObjDelegate<T extends object> {
-  constructor(public delegate: T) {}
+class _ObjDelegate<T extends object> extends Object {
+  constructor(delegate: T) {
+    super(delegate);
+    Object.assign(this, delegate);
+  }
   omitBy(condition: (key: keyof T, val: T[keyof T]) => boolean): Partial<T> {
-    const delegate = { ...this.delegate };
-    const entries = Object.entries(this.delegate);
+    const delegate = { ...this } as any as Partial<T>;
+    const entries = Object.entries(this);
     for (let i = 0; i < entries.length; i++) {
       const [key, val] = entries[i] as [keyof T, T[keyof T]];
       if (condition(key, val)) {
@@ -130,7 +131,7 @@ class _ObjDelegate<T extends object> {
   pick(elements: Array<Partial<keyof T>>): Partial<T> {
     const result: Partial<T> = {};
     elements.forEach((_) => {
-      result[_] = this.delegate[_];
+      result[_] = this[_ as any as keyof typeof this] as any;
     });
     return result;
   }
@@ -140,47 +141,53 @@ extendExceptConstructor(Object, _ObjDelegate);
 
 export type ObjDelegate<T extends object> = _ObjDelegate<T> & Object;
 
-class _ArrDelegate<S> {
-  constructor(public delegate: Array<S>) {  }
+class _ArrDelegate<S> extends Array<S> {
+  constructor(delegate: Array<S>) { 
+    super(delegate.length);
+    for (let index = 0; index < delegate.length; index++) {
+      const element = delegate[index];
+      this[index] = element;
+    }
+   }
   contains (val: S): boolean{
-    return this.delegate.includes(val);
+    return this.includes(val);
   }
   add (val: S): number{
-    return this.delegate.push(val);
+    return this.push(val);
   }
   addAll(val: S[]): S[]{
     const l = val.length;
     for (let i = 0; i < l; i++) {
-      this.delegate.push(val[i]);
+      this.push(val[i]);
     }
-    return this.delegate;
+    return this;
   }
   remove (val: S): void {
-    removeItem(this.delegate, val);
+    removeItem(this, val);
   };
 
   clear(): void{
-    this.delegate.length = 0;
+    this.length = 0;
   }
   where(condition: ConditionCallback<S>): Array<S> {
-    return this.delegate.filter((v) => condition(v));
+    return this.filter((v) => condition(v));
   };
 
   any(condition: ConditionCallback<S>): boolean {
-    for (let i = 0; i < this.delegate.length; i++) {
-      const elt = this.delegate[i];
+    for (let i = 0; i < this.length; i++) {
+      const elt = this[i];
       if (condition(elt)) return true;
     }
     return false;
   };
   fold(initialValue: S, cb: (acc: S, current: S) => S): S {
-    return this.delegate.reduce((prev, current, cidx, arr) => {
+    return this.reduce((prev, current, currentId, arr) => {
       return cb(prev, current);
     }, initialValue);
   };
   firstWhere(condition: ConditionCallback<S>,orElse?: () => S): S | null {
-    for (let i = 0; i < this.delegate.length; i++) {
-      const elt = this.delegate[i];
+    for (let i = 0; i < this.length; i++) {
+      const elt = this[i];
       if (condition(elt)) {
         return elt;
       }
@@ -189,23 +196,23 @@ class _ArrDelegate<S> {
     return orElse!();
   };
   get first(){
-    return this.delegate[0];
+    return this[0];
   }
   get last(){
-    return this.delegate[this.delegate.length -1];
+    return this[this.length -1];
   }
 }
 
 extendExceptConstructor(Array, _ArrDelegate);
 
-export type ArrayDelegate<S, T extends Array<S>> = _ArrDelegate<S> & Array<S>;
+export type ArrayDelegate<S> = _ArrDelegate<S> & Array<S>;
 
 export const Obj = <T extends object>(obj: T): ObjDelegate<T> => {
   return new _ObjDelegate<T>(obj) as ObjDelegate<T>;
 };
 
-export const Arr = <S, T extends Array<S>>(obj: T): ArrayDelegate<S, T> => {
-  return new _ArrDelegate<S>(obj) as ArrayDelegate<S, T>;
+export const Arr = <S, T extends Array<S>>(obj: T): ArrayDelegate<S> => {
+  return new _ArrDelegate<S>(obj) as ArrayDelegate<S>;
 };
 
 
@@ -237,15 +244,15 @@ String.prototype.toAsciiArray = function (): number[] {
   const utf8 = [];
   const val = this;
   for (let i = 0; i < val.length; i++) {
-    let charcode = val.charCodeAt(i);
-    if (charcode < 0x80) utf8.push(charcode);
-    else if (charcode < 0x800) {
-      utf8.push(0xc0 | (charcode >> 6), 0x80 | (charcode & 0x3f));
-    } else if (charcode < 0xd800 || charcode >= 0xe000) {
+    let charCode = val.charCodeAt(i);
+    if (charCode < 0x80) utf8.push(charCode);
+    else if (charCode < 0x800) {
+      utf8.push(0xc0 | (charCode >> 6), 0x80 | (charCode & 0x3f));
+    } else if (charCode < 0xd800 || charCode >= 0xe000) {
       utf8.push(
-        0xe0 | (charcode >> 12),
-        0x80 | ((charcode >> 6) & 0x3f),
-        0x80 | (charcode & 0x3f)
+        0xe0 | (charCode >> 12),
+        0x80 | ((charCode >> 6) & 0x3f),
+        0x80 | (charCode & 0x3f)
       );
     }
     // surrogate pair
@@ -254,13 +261,13 @@ String.prototype.toAsciiArray = function (): number[] {
       // UTF-16 encodes 0x10000-0x10FFFF by
       // subtracting 0x10000 and splitting the
       // 20 bits of 0x0-0xFFFFF into two halves
-      charcode =
-        0x10000 + (((charcode & 0x3ff) << 10) | (val.charCodeAt(i) & 0x3ff));
+      charCode =
+        0x10000 + (((charCode & 0x3ff) << 10) | (val.charCodeAt(i) & 0x3ff));
       utf8.push(
-        0xf0 | (charcode >> 18),
-        0x80 | ((charcode >> 12) & 0x3f),
-        0x80 | ((charcode >> 6) & 0x3f),
-        0x80 | (charcode & 0x3f)
+        0xf0 | (charCode >> 18),
+        0x80 | ((charCode >> 12) & 0x3f),
+        0x80 | ((charCode >> 6) & 0x3f),
+        0x80 | (charCode & 0x3f)
       );
     }
   }
