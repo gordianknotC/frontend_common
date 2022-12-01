@@ -155,7 +155,4 @@ String.prototype.toAsciiArray = function () {
 Number.prototype.asInt = function () {
     return Math.floor(this);
 };
-export function useBuiltIn() {
-    console.log("builtin initialized");
-}
 //# sourceMappingURL=builtinTypes.js.map

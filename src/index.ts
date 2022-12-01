@@ -37,7 +37,7 @@ export type {
  *        C O R E
  *
  * */
-export {useBuiltIn, Obj, Arr} from "~/base/builtinTypes";
+export {Obj, Arr, ArrayDelegate, ObjDelegate} from "~/base/builtinTypes";
 export {assertMsg} from "~/utils/assert";
 export {is} from "~/utils/typeInference";
 export {IFacade, provideFacade, CommonMixin, injectDependency, provideDependency,  injectFacade} from "~/vueMixins/common";

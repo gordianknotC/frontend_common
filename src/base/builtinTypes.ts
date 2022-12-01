@@ -270,7 +270,4 @@ String.prototype.toAsciiArray = function (): number[] {
 Number.prototype.asInt = function (): number {
   return Math.floor(this as number);
 };
-
-export function useBuiltIn() {
-  console.log("builtin initialized");
-}
+ 

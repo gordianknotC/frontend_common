@@ -5,6 +5,10 @@
 ```bash
 yarn add @gdknot/frontend_common
 ```
+## documentation
+```bash
+yarn serve:doc
+```
 ## Feature
 - facade
 - provider
@@ -42,11 +46,11 @@ yarn add @gdknot/frontend_common
 
 # Facade:
 
-# Provider Pattern  
+## Provider Pattern  
 1) 提供 Dependency Provider design pattern，將 dependency以 ident 作為 key 植入 container
 2) 提供 Facade Provider design pattern，將 dependency 以 FACADE_KEY 作為 key 植入 container, 為App開發時提供一個入口，以存取所需的一切資料. 
 3) 
-## Facade Provider (對應Facade Injector)
+### Facade Provider (對應Facade Injector)
 ```ts
 type ProviderParams<T> = {
     deps: Partial<T>, 
@@ -61,7 +65,7 @@ type ProviderParams<T> = {
 function function provideFacade<T>(option: ProviderParams<T>)
 ```
 
-### 不合併 provide 物件 
+#### 不合併 provide 物件 
 ```ts
 const merge = false;
 provideFacade({
@@ -85,7 +89,7 @@ const facade = injectFacade();
 assert(facade.source.a == undefined);
 assert(facade.source.b == 2);
 ```
-### 合併 provide 物件
+#### 合併 provide 物件
 
 ```ts
 const merge = true;
@@ -111,7 +115,7 @@ assert(facade.source.b == 2);
 assert(facade.appended.a == 1);
 ```
 
-## Dependency Provider(對應 dependency injector)
+### Dependency Provider(對應 dependency injector)
 ```ts
 type ProviderParams<T> = {
     deps: Partial<T>, 
@@ -123,7 +127,7 @@ type ProviderParams<T> = {
  *  */
 function provideDependency<T>(option: ProviderParams<T>)
 ```
-### 不指定 Ident
+#### 不指定 Ident
 ```ts
 const merge = true;
 provideDependency({deps: {a: 1, source: {a: 2}}, merge});
@@ -137,7 +141,7 @@ assert(b == 3);
 assert(aOfSource == 2);
 assert(bOfSource == 4);
 ```
-### 指定 Ident
+#### 指定 Ident
 ```ts
 provideDependency({deps: {a: 1, source: {a: 2}}, ident: "a"});
 provideDependency({deps: {b: 3, source: {b: 4}}, ident: "b"});
@@ -152,7 +156,7 @@ assert(bOfSource == undefined);
 
 ```
 
-# Injector Pattern
+## Injector Pattern
 ### InjectDependency
 ```ts
 /**

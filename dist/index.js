@@ -17,7 +17,7 @@ export { isRefImpl, asEnum, getAccessibleProperties, flattenInstance, asUnWrappe
  *        C O R E
  *
  * */
-export { useBuiltIn, Obj, Arr } from "./base/builtinTypes";
+export { Obj, Arr } from "./base/builtinTypes";
 export { assertMsg } from "./utils/assert";
 export { is } from "./utils/typeInference";
 export { IFacade, provideFacade, CommonMixin, injectDependency, provideDependency, injectFacade } from "./vueMixins/common";

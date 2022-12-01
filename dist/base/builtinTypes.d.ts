@@ -105,5 +105,4 @@ declare class _ArrDelegate<S, T extends Array<S>> {
 export declare type ArrayDelegate<S, T extends Array<S>> = _ArrDelegate<S, T> & Array<S>;
 export declare const Obj: <T extends object>(obj: T) => ObjDelegate<T>;
 export declare const Arr: <S, T extends S[]>(obj: T) => ArrayDelegate<S, T>;
-export declare function useBuiltIn(): void;
 export {};

@@ -5,6 +5,10 @@
 ```bash
 yarn add @gdknot/frontend_common
 ```
+## documentation
+```bash
+yarn serve:doc
+```
 ## Feature
 - facade
 - provider

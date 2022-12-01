@@ -1,49 +1,51 @@
 {
+  "buildOnSave": false,
+  "compileOnSave": false,
   "compilerOptions": {
     "allowJs": true,
     "allowSyntheticDefaultImports": true,
-    "declaration": true, /* Generates corresponding '.d.ts' file. */
+    "baseUrl": "src",
+    "declaration": true /* Generates corresponding '.d.ts' file. */,
     "diagnostics": true,
-    "emitDecoratorMetadata": true, /* Enables experimental support for emitting type metadata for decorators. */
+    "emitDecoratorMetadata": true /* Enables experimental support for emitting type metadata for decorators. */,
     "esModuleInterop": true,
     "experimentalDecorators": true,
     "importHelpers": true,
     "jsx": "preserve",
-    "jsxFactory": "h", /* Specify the JSX factory function to use when targeting react JSX emit, e.g. React.createElement or h. */
+    "jsxFactory": "h" /* Specify the JSX factory function to use when targeting react JSX emit, e.g. React.createElement or h. */,
     "lib": [
       "esnext",
       "dom"
     ],
-    "module": "ESNext",
+
     "moduleResolution": "node",
     /**
     You shouldn't use "noEmit": true in your tsconfig.json if you compile with tsc.
     From compiler options description --noEmit - Do not emit outputs.*/
     "noEmit": false,
-    "noImplicitAny": true, /* Raise error on expressions and declarations with an implied 'any' type. */
-    "noImplicitReturns": true, /* Report error when not all code paths in function return a value. */
-    "noImplicitThis": true, /* Raise error on 'this' expressions with an implied 'any' type. */
-    "outDir": "dist", /* Redirect output structure to the directory. */
+    "noImplicitAny": true /* Raise error on expressions and declarations with an implied 'any' type. */,
+    "noImplicitReturns": true /* Report error when not all code paths in function return a value. */,
+    "noImplicitThis": true /* Raise error on 'this' expressions with an implied 'any' type. */,
+    "outDir": "dist" /* Redirect output structure to the directory. */,
+    "paths": {
+      "@/*": [
+        "*"
+      ],
+      /*
+       *     A L I A S   P A T H
+       *     需要同時設置 vue.config.js - alias
+       **/
+      "~/*": [
+        "*"
+      ]
+    },
     "rootDirs": [
       "src",
       "dist"
     ],
-    "baseUrl": "src",
-    "target": "ES2018",
-    "paths": {
-      /*
-      *     A L I A S   P A T H
-      *     需要同時設置 vue.config.js - alias
-      **/
-      "~/*": [
-        "*"
-      ],
-      "@/*": [
-        "*"
-      ]
-    },
     "skipLibCheck": true,
     "sourceMap": true,
+    "target": "ES2018",
     "typeRoots": [
       "node_modules/@types"
     ],
@@ -52,6 +54,11 @@
       "jest"
     ]
   },
+  "exclude": [
+    "node_modules",
+    "dist",
+    "__tests__"
+  ],
   "include": [
     "src",
     "src/**/*.ts",
@@ -61,12 +68,5 @@
     "__tests__/*.ts",
     "src/index.ts",
     "jest.d.ts"
-  ],
-  "exclude": [
-    "node_modules",
-    "dist",
-    "__tests__"
-  ],
-  "compileOnSave": false,
-  "buildOnSave": false
+  ]
 }
