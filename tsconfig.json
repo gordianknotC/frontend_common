@@ -57,9 +57,11 @@
   "exclude": [
     "node_modules",
     "dist",
-    "__tests__"
+    "__tests__",
+    "storybook-static"
   ],
   "include": [
+    "@types",
     "src",
     "src/**/*.ts",
     "__tests__/**/*.ts",

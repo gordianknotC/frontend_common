@@ -1,23 +1,24 @@
+import { ComputedRef, Ref, UnwrapNestedRefs } from "@/base/vueTypes";
 import { AssertionError } from "assert";
 import { assert } from "console";
+
 import { NotImplementedError } from "~/base/baseExceptions";
 import { CallableDelegate, LazyHolder } from "~/utils/lazy";
 import { assertMsg } from "..";
-
 
 export type ExtSetupOption = {
     reactive: any,
     computed: any,
     ref: any,
 }
-let computedMethod = new CallableDelegate(()=>{
+let computedMethod = new CallableDelegate<<T>()=>ComputedRef<T>>(()=>{
     throw new Error("computed method used before setup");
 });
-let reactiveMethod = new CallableDelegate(()=>{
+let reactiveMethod = new CallableDelegate<<T>(arg: T)=> UnwrapNestedRefs<T>>(()=>{
     throw new Error("reactive method used before setup");
 });
-let refMethod = new CallableDelegate(()=>{
-    throw new Error("ref method used before setup");
+let refMethod = new CallableDelegate<<T>(arg?: T)=>Ref<T>>(()=>{
+    throw new Error("reactive method used before setup");
 });
 let watchMethod=new CallableDelegate(()=>{
     throw new Error("watch method used before setup");

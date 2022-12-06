@@ -1,9 +1,8 @@
 
-
-
 export type {
   UnwrapRef, PropType, Prop , ComponentPropsOptions,
-  Ref, ComputedRef, ToRefs, ReactiveEffect,
+  Ref, ComputedRef, ToRefs, ReactiveEffect, UnwrapNestedRefs, ShallowUnwrapRef,
+  WatchOptions, WatchCallback
 } from "vue";
 
 

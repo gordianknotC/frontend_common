@@ -1,3 +1,4 @@
+import { ComputedRef, Ref, UnwrapNestedRefs } from "../base/vueTypes";
 import { CallableDelegate } from "../utils/lazy";
 export declare type ExtSetupOption = {
     reactive: any;
@@ -5,10 +6,10 @@ export declare type ExtSetupOption = {
     ref: any;
 };
 declare type TEnv = "develop" | "production" | "release";
-export declare const computed: CallableDelegate<() => never>;
+export declare const computed: CallableDelegate<(<T>() => ComputedRef<T>)>;
 export declare const watch: CallableDelegate<() => never>;
-export declare const reactive: CallableDelegate<() => never>;
-export declare const ref: CallableDelegate<() => never>;
+export declare const reactive: CallableDelegate<(<T>(arg: T) => UnwrapNestedRefs<T>)>;
+export declare const ref: CallableDelegate<(<T>(arg?: T) => Ref<T>)>;
 export declare const currentEnv: {
     value: TEnv | undefined;
 };

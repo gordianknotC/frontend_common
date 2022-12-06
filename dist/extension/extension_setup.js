@@ -6,7 +6,7 @@ let reactiveMethod = new CallableDelegate(() => {
     throw new Error("reactive method used before setup");
 });
 let refMethod = new CallableDelegate(() => {
-    throw new Error("ref method used before setup");
+    throw new Error("reactive method used before setup");
 });
 let watchMethod = new CallableDelegate(() => {
     throw new Error("watch method used before setup");
