@@ -1,6 +1,16 @@
 "use strict"
 
+
 export { computed, ref, reactive, watch } from "./extension/extension_setup";
+export type { 
+  UnwrapRef, PropType, Prop , ComponentPropsOptions,
+  Ref, ComputedRef, ToRefs, ReactiveEffect, UnwrapNestedRefs, ShallowUnwrapRef,
+  WatchOptions, WatchCallback,
+
+  RouteLocation, Router, RouterOptions,
+  RouteRecord, RouteComponent, RouteMeta, RouteParams,
+  AtLeastOne
+} from "./base/vueTypes";
 
 
 /**
