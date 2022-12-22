@@ -1,6 +1,10 @@
-import { is } from "../utils/typeInference";
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Arr = exports.Obj = void 0;
+const tslib_1 = require("tslib");
+const typeInference_1 = require("../utils/typeInference");
 //@ts-ignore
-import format from "../base/stringFormat";
+const stringFormat_1 = tslib_1.__importDefault(require("../base/stringFormat"));
 function extendExceptConstructor(master, slave) {
     Object.keys(master.prototype).forEach((key) => {
         if (key != "constructor") {
@@ -19,7 +23,7 @@ class _ObjDelegate extends Object {
      * {@link OmitCondition}
      */
     omitBy(condition) {
-        const delegate = Object.assign({}, this);
+        const delegate = { ...this };
         const entries = Object.entries(this);
         for (let i = 0; i < entries.length; i++) {
             const [key, val] = entries[i];
@@ -95,7 +99,7 @@ class _ArrDelegate extends Array {
                 return elt;
             }
         }
-        if (is.not.initialized(orElse))
+        if (typeInference_1.is.not.initialized(orElse))
             return null;
         return orElse();
     }
@@ -108,12 +112,14 @@ class _ArrDelegate extends Array {
     }
 }
 extendExceptConstructor(Array, _ArrDelegate);
-export const Obj = (obj) => {
+const Obj = (obj) => {
     return new _ObjDelegate(obj);
 };
-export const Arr = (obj) => {
+exports.Obj = Obj;
+const Arr = (obj) => {
     return new _ArrDelegate(obj);
 };
+exports.Arr = Arr;
 function removeItem(arr, value) {
     const index = arr.indexOf(value);
     if (index > -1) {
@@ -132,7 +138,7 @@ String.prototype.contains = function (val) {
     return this.includes(val);
 };
 String.prototype.format = function (option) {
-    return format(this, option);
+    return (0, stringFormat_1.default)(this, option);
 };
 String.prototype.toAsciiArray = function () {
     const utf8 = [];

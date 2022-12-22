@@ -1,4 +1,7 @@
-import { ref } from "../extension/extension_setup";
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.isnot = exports.is = exports.Is = exports.asMapFromNumberedEnum = exports.UnWrappedVueRef = exports.asUnWrappedVueRefMap = exports.getOmitsBy = exports.flattenInstance = exports.getAccessibleProperties = exports.asEnum = exports.isRefImpl = void 0;
+const extension_setup_1 = require("../extension/extension_setup");
 let refImplClassName = undefined;
 /**
  * 判斷是否為 vue RefImpl
@@ -9,16 +12,17 @@ let refImplClassName = undefined;
  *  - this issue cannot be addressed even if we configure compress option as keep_classname,
  *
  **/
-export function isRefImpl(obj) {
+function isRefImpl(obj) {
     var _a;
     if (obj === null || obj === undefined)
         return false;
     // @ts-ignore
-    refImplClassName !== null && refImplClassName !== void 0 ? refImplClassName : (refImplClassName = ref().constructor.name);
+    refImplClassName !== null && refImplClassName !== void 0 ? refImplClassName : (refImplClassName = (0, extension_setup_1.ref)().constructor.name);
     return typeof obj == "object"
         && ((_a = obj === null || obj === void 0 ? void 0 : obj.constructor) === null || _a === void 0 ? void 0 : _a.name) === refImplClassName
         && Object.getOwnPropertyNames(Object.getPrototypeOf(obj)).length == 2; // constructor, value
 }
+exports.isRefImpl = isRefImpl;
 /**
  *
  * Create Enum Object
@@ -57,7 +61,7 @@ export function isRefImpl(obj) {
  *      Object.keys(EB) // ['a', 'b']
  *
  * */
-export function asEnum(obj) {
+function asEnum(obj) {
     let result = Object.create({});
     let prototype = Object.getPrototypeOf(result);
     Object.keys(obj).forEach((_k) => {
@@ -70,6 +74,7 @@ export function asEnum(obj) {
     });
     return result;
 }
+exports.asEnum = asEnum;
 const defaultAccessibleRule = (name) => {
     if (name == "constructor")
         return false;
@@ -77,7 +82,7 @@ const defaultAccessibleRule = (name) => {
         return false;
     return true;
 };
-export function getAccessibleProperties(obj, isAvailable, results) {
+function getAccessibleProperties(obj, isAvailable, results) {
     results !== null && results !== void 0 ? results : (results = new Set());
     isAvailable !== null && isAvailable !== void 0 ? isAvailable : (isAvailable = defaultAccessibleRule);
     let prototype = Object.getPrototypeOf(obj);
@@ -91,6 +96,7 @@ export function getAccessibleProperties(obj, isAvailable, results) {
     }
     return getAccessibleProperties(prototype, isAvailable, results);
 }
+exports.getAccessibleProperties = getAccessibleProperties;
 /**
  *  flattenInstance 平面化 class，用於 vue 寫 OOP
  *  vue 若傳入有繼承關係的類別（class)，其繼承關係會消失
@@ -110,7 +116,7 @@ export function getAccessibleProperties(obj, isAvailable, results) {
  *              constructor 不考慮
  *              method name 開頭為 "_" 不考慮
  * */
-export function flattenInstance(obj, overrideReadonly = false, rule, onError) {
+function flattenInstance(obj, overrideReadonly = false, rule, onError) {
     rule !== null && rule !== void 0 ? rule : (rule = defaultAccessibleRule);
     const properties = getAccessibleProperties(obj, rule);
     properties.forEach((property) => {
@@ -146,6 +152,7 @@ export function flattenInstance(obj, overrideReadonly = false, rule, onError) {
         }
     });
 }
+exports.flattenInstance = flattenInstance;
 /**
  * 同 lodash omitsBy
  * @param payload 輪入物件
@@ -157,14 +164,15 @@ export function flattenInstance(obj, overrideReadonly = false, rule, onError) {
  * getOmitsBy({a:1, b:2}, ["a"])
  * ```
  */
-export function getOmitsBy(payload, omits) {
-    const result = Object.assign({}, payload);
+function getOmitsBy(payload, omits) {
+    const result = { ...payload };
     omits.forEach((e) => {
         //@ts-ignore
         delete result[e];
     });
     return result;
 }
+exports.getOmitsBy = getOmitsBy;
 /**
  *  將 RefImpl (vue ref object) Map 轉為一般型別
  *  避免 template 與  script 使用上的不一致，如
@@ -188,7 +196,7 @@ export function getOmitsBy(payload, omits) {
  *  asUnWrappedVueRefMap 用於將 整個 Map 物件中的所有 RefImpl
  *  轉為 Proxy, 適用於整個 Map 都是 readonly computed
  * */
-export function asUnWrappedVueRefMap(obj, keys) {
+function asUnWrappedVueRefMap(obj, keys) {
     return new Proxy({}, {
         get: function (target, name) {
             if (keys.includes(name)) {
@@ -198,13 +206,14 @@ export function asUnWrappedVueRefMap(obj, keys) {
         }
     });
 }
+exports.asUnWrappedVueRefMap = asUnWrappedVueRefMap;
 const SYMBOLS = {};
 /**
  *   UnWrap 物件內所有的 RefImpl,將其真正的 getter setter
  *   轉發至 Symbol 中
  *  @see {@link asUnWrappedVueRefMap}
  **/
-export function UnWrappedVueRef(obj, keys) {
+function UnWrappedVueRef(obj, keys) {
     const properties = is.undefined(keys)
         ? Object.keys(obj)
         : keys;
@@ -227,6 +236,7 @@ export function UnWrappedVueRef(obj, keys) {
         }
     });
 }
+exports.UnWrappedVueRef = UnWrappedVueRef;
 /**
  *     number enum 附予 string mapping 功能
  *     ex:
@@ -245,7 +255,7 @@ export function UnWrappedVueRef(obj, keys) {
  *     > 'a'
  *
  * */
-export function asMapFromNumberedEnum(numberEnum) {
+function asMapFromNumberedEnum(numberEnum) {
     let result = Object.create({});
     let prototype = Object.getPrototypeOf(result);
     Object.keys(numberEnum).forEach((_k) => {
@@ -263,11 +273,12 @@ export function asMapFromNumberedEnum(numberEnum) {
     });
     return result;
 }
+exports.asMapFromNumberedEnum = asMapFromNumberedEnum;
 const axiosKeys = ["data", "status", "statusText", "headers", "config"];
 /**
  *
  */
-export class Is {
+class Is {
     /**
      * 用於 typed class, 即有 constructor name 者，無法分辦以下情況
      *   1) generic class
@@ -382,7 +393,9 @@ export class Is {
         return (_a = Is._mobile) !== null && _a !== void 0 ? _a : (Is._mobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
     }
 }
+exports.Is = Is;
 const is = new Is();
+exports.is = is;
 class IsNot {
     constructor() {
         this.not = is;
@@ -422,5 +435,5 @@ class IsNot {
     }
 }
 const isnot = new IsNot();
-export { is, isnot };
+exports.isnot = isnot;
 //# sourceMappingURL=typeInference.js.map

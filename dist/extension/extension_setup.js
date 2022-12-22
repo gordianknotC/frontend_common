@@ -1,22 +1,25 @@
-import { CallableDelegate, LazyHolder } from "../utils/lazy";
-let computedMethod = new CallableDelegate(() => {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.setupCurrentEnv = exports.setupWatch = exports.setupReactive = exports.setupComputed = exports.setupRef = exports.currentEnv = exports.ref = exports.reactive = exports.watch = exports.computed = void 0;
+const lazy_1 = require("../utils/lazy");
+let computedMethod = new lazy_1.CallableDelegate(() => {
     throw new Error("computed method used before setup");
 });
-let reactiveMethod = new CallableDelegate(() => {
+let reactiveMethod = new lazy_1.CallableDelegate(() => {
     throw new Error("reactive method used before setup");
 });
-let refMethod = new CallableDelegate(() => {
+let refMethod = new lazy_1.CallableDelegate(() => {
     throw new Error("reactive method used before setup");
 });
-let watchMethod = new CallableDelegate(() => {
+let watchMethod = new lazy_1.CallableDelegate(() => {
     throw new Error("watch method used before setup");
 });
 let _env = { value: undefined };
-export const computed = computedMethod;
-export const watch = watchMethod;
-export const reactive = reactiveMethod;
-export const ref = refMethod;
-export const currentEnv = LazyHolder(() => {
+exports.computed = computedMethod;
+exports.watch = watchMethod;
+exports.reactive = reactiveMethod;
+exports.ref = refMethod;
+exports.currentEnv = (0, lazy_1.LazyHolder)(() => {
     if (_env.value == undefined) {
         throw new Error("currentEnv not specified");
     }
@@ -26,31 +29,36 @@ export const currentEnv = LazyHolder(() => {
  * 用於外部注入 vue RefImpl constructor
  * @param refConstructor RefImpl
  */
-export function setupRef(refConstructor) {
+function setupRef(refConstructor) {
     refMethod.delegate = refConstructor;
 }
+exports.setupRef = setupRef;
 /**
  * 用於外部注入 vue ComputedRef constructor
  * @param computedConstructor ComputedRef
  */
-export function setupComputed(computedConstructor) {
+function setupComputed(computedConstructor) {
     computedMethod.delegate = computedConstructor;
 }
+exports.setupComputed = setupComputed;
 /**
  * 用於外部注入 vue UnWrappedRef constructor
  * @param reactiveConstructor UnWrappedRef
  */
-export function setupReactive(reactiveConstructor) {
+function setupReactive(reactiveConstructor) {
     reactiveMethod.delegate = reactiveConstructor;
 }
+exports.setupReactive = setupReactive;
 /**
  * 用於外部注入 vue watch constructor
  * @param watchConstructor UnWrappedRef
  */
-export function setupWatch(watchConstructor) {
+function setupWatch(watchConstructor) {
     watchMethod.delegate = watchConstructor;
 }
-export function setupCurrentEnv(env) {
+exports.setupWatch = setupWatch;
+function setupCurrentEnv(env) {
     _env.value = env;
 }
+exports.setupCurrentEnv = setupCurrentEnv;
 //# sourceMappingURL=extension_setup.js.map

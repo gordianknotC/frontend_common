@@ -1,3 +1,6 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.CRUD = void 0;
 // fixme: 寫成 OOP
 /**
  * 創建 CRUD api 方法，用於寫測試
@@ -38,7 +41,7 @@
     )
  * ```
  */
-export const CRUD = (dataList, updater, itemGen) => {
+const CRUD = (dataList, updater, itemGen) => {
     return {
         add(payload) {
             let id = dataList.data.length;
@@ -95,4 +98,5 @@ export const CRUD = (dataList, updater, itemGen) => {
         },
     };
 };
+exports.CRUD = CRUD;
 //# sourceMappingURL=mock.js.map

@@ -1,8 +1,12 @@
-import colors from "colors";
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.useColors = void 0;
+const tslib_1 = require("tslib");
+const colors_1 = tslib_1.__importDefault(require("colors"));
 const forWebpackReloadingTypescript = "";
-export function useColors() {
-    colors.enable();
-    colors.setTheme({
+function useColors() {
+    colors_1.default.enable();
+    colors_1.default.setTheme({
         silly: "rainbow",
         input: "grey",
         verbose: "cyan",
@@ -15,4 +19,5 @@ export function useColors() {
         error: "red"
     });
 }
+exports.useColors = useColors;
 //# sourceMappingURL=colorsPlugin.js.map

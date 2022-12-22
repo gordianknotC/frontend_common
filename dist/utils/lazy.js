@@ -1,3 +1,6 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.CallableDelegate = exports.LazyHolder = void 0;
 /**
  * 用 Proxy 實作 lazyLoading
  * @param initializer
@@ -19,7 +22,7 @@
  * console.log(lazy.value) // 1;
  * ```
  */
-export function LazyHolder(initializer) {
+function LazyHolder(initializer) {
     let instance;
     return new Proxy({}, {
         get: function (target, name) {
@@ -29,6 +32,7 @@ export function LazyHolder(initializer) {
         }
     });
 }
+exports.LazyHolder = LazyHolder;
 /**
  * design pattern for Callable Object
  *
@@ -41,7 +45,7 @@ export function LazyHolder(initializer) {
  * ```
  *
  */
-export class CallableDelegate extends Function {
+class CallableDelegate extends Function {
     constructor(delegate) {
         super();
         this.delegate = delegate;
@@ -50,4 +54,5 @@ export class CallableDelegate extends Function {
         });
     }
 }
+exports.CallableDelegate = CallableDelegate;
 //# sourceMappingURL=lazy.js.map

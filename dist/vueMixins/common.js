@@ -1,14 +1,17 @@
-import { merge } from "merge-anything";
-import { computed, watch } from "../extension/extension_setup";
-import { assert } from "../utils/assert";
-export class CommonMixin {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.IFacade = exports.injectFacade = exports.injectDependency = exports.provideDependency = exports.provideFacade = exports.CommonMixin = void 0;
+const merge_anything_1 = require("merge-anything");
+const extension_setup_1 = require("../extension/extension_setup");
+const assert_1 = require("../utils/assert");
+class CommonMixin {
     constructor() {
         this.vModelEvents = new Set();
     }
     asVModelFromProps(option) {
         const event = `update:${option.propName}`;
         this.vModelEvents.add(event);
-        const ret = computed({
+        const ret = (0, extension_setup_1.computed)({
             get() {
                 return option.props[option.propName];
             },
@@ -17,10 +20,11 @@ export class CommonMixin {
                 option.emit(event, v);
             }
         });
-        watch(() => option.props[option.propName], option.onChange);
+        (0, extension_setup_1.watch)(() => option.props[option.propName], option.onChange);
         return ret;
     }
 }
+exports.CommonMixin = CommonMixin;
 const container = {};
 const FACADE_KEY = Symbol();
 const DEP_KEY = Symbol();
@@ -59,7 +63,7 @@ const DEP_KEY = Symbol();
  *  assert(facade.override.b == 2);
  *  ```
  */
-export function provideFacade(option) {
+function provideFacade(option) {
     var _a;
     const { deps, merge: mergeObj, ident } = Object.assign({
         mergeObj: false,
@@ -74,7 +78,7 @@ export function provideFacade(option) {
     else {
         Object.keys(deps).forEach((prop) => {
             if (container[ident][prop]) {
-                container[ident][prop] = merge(container[ident][prop], deps[prop]);
+                container[ident][prop] = (0, merge_anything_1.merge)(container[ident][prop], deps[prop]);
             }
             else {
                 container[ident][prop] = deps[prop];
@@ -82,12 +86,13 @@ export function provideFacade(option) {
         });
     }
 }
+exports.provideFacade = provideFacade;
 /**
 *  Dependency Provider
  * provide 方法，將 dependency以 ident 作為 key 植入 container
  * @see {@link provideFacade}
  * */
-export const provideDependency = ((option) => {
+exports.provideDependency = ((option) => {
     var _a;
     (_a = option.ident) !== null && _a !== void 0 ? _a : (option.ident = DEP_KEY);
     return provideFacade(option);
@@ -105,7 +110,7 @@ export const provideDependency = ((option) => {
  *  const a = injectDependency("source.a");
  * ```
  */
-export function injectDependency(pathOrName, ident = DEP_KEY) {
+function injectDependency(pathOrName, ident = DEP_KEY) {
     if (pathOrName.contains(".")) {
         return accessByPath(pathOrName, container[ident]);
     }
@@ -113,6 +118,7 @@ export function injectDependency(pathOrName, ident = DEP_KEY) {
         return container[ident][pathOrName];
     }
 }
+exports.injectDependency = injectDependency;
 /**
  * Dependency Injector
  * 注入 IFacade interface, 對應 provideFacade
@@ -128,9 +134,10 @@ export function injectDependency(pathOrName, ident = DEP_KEY) {
  * assert(Facade.b == 2);
  * ```
  */
-export function injectFacade(ident = FACADE_KEY) {
+function injectFacade(ident = FACADE_KEY) {
     return container[ident];
 }
+exports.injectFacade = injectFacade;
 function routeObjectByPath(seg, obj) {
     const first = seg[0];
     const last = seg[1];
@@ -167,14 +174,14 @@ function accessByPath(path, obj) {
  * assert(facade.data.a == 1);
  * ```
  **/
-export function IFacade(ident = FACADE_KEY, option) {
+function IFacade(ident = FACADE_KEY, option) {
     return new Proxy({}, {
         get: function (target, name) {
             var _a, _b;
             (_a = container[ident]) !== null && _a !== void 0 ? _a : (container[ident] = {});
             const facade = container[ident];
             const member = facade[name];
-            assert(facade[name] !== undefined, `key name "${name.toString()}" not found in facade`);
+            (0, assert_1.assert)(facade[name] !== undefined, `key name "${name.toString()}" not found in facade`);
             // note: 當傳入的型別為 function
             // 則視為傳入參照，以參照處理.
             if (typeof member === 'function' && ((_b = option === null || option === void 0 ? void 0 : option.transformFuncAsGetter) !== null && _b !== void 0 ? _b : false)) {
@@ -184,4 +191,5 @@ export function IFacade(ident = FACADE_KEY, option) {
         }
     });
 }
+exports.IFacade = IFacade;
 //# sourceMappingURL=common.js.map

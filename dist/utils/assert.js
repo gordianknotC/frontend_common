@@ -1,5 +1,8 @@
-import { currentEnv } from "../extension/extension_setup";
-export class AssertMsg {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.assert = exports.AssertionError = exports.assertMsg = exports.AssertMsg = void 0;
+const extension_setup_1 = require("../extension/extension_setup");
+class AssertMsg {
     constructor() {
         this.idNotSpecified = "id not Specified";
         this.coutryCodeNotSpecified = "country code not Specified";
@@ -36,21 +39,24 @@ export class AssertMsg {
         return `found duplicated configuration in dependency injector, configName: ${name}`;
     }
 }
-export const assertMsg = new AssertMsg();
-export class AssertionError extends Error {
+exports.AssertMsg = AssertMsg;
+exports.assertMsg = new AssertMsg();
+class AssertionError extends Error {
     constructor(message) {
         super(`assert error: ${message}`);
         Object.setPrototypeOf(this, Error.prototype);
     }
 }
+exports.AssertionError = AssertionError;
 /**
  *
  * @param condition
  * @param message
  */
-export function assert(condition, message) {
-    if (currentEnv.value == "develop" && !condition) {
+function assert(condition, message) {
+    if (extension_setup_1.currentEnv.value == "develop" && !condition) {
         throw new AssertionError(message !== null && message !== void 0 ? message : "");
     }
 }
+exports.assert = assert;
 //# sourceMappingURL=assert.js.map
