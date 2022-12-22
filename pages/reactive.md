@@ -1,6 +1,5 @@
 
 <!--#-->
-
 ## Inject Reactive Method
 設計上希望能夠不相依於任何一個 ui framework, 因此需由外部注入相應的 reactive 方法，否則會出現 **InvalidUsageError:** 錯誤。
 

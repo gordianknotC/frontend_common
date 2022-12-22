@@ -18,18 +18,31 @@ yarn serve:doc
 - a CRUD function for writing pseudo code api
 
 # Table of Content
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+table of content
+
+- [前端常用工具:](#前端常用工具)
+  - [安裝](#安裝)
+  - [documentation](#documentation)
+  - [Feature](#feature)
+- [Table of Content](#table-of-content)
 - [Facade:](#facade)
-- [Provider Pattern](#provider-pattern)
-  - [Facade Provider (對應Facade Injector)](#facade-provider-對應facade-injector)
-    - [不合併 provide 物件](#不合併-provide-物件)
-    - [合併 provide 物件](#合併-provide-物件)
-  - [Dependency Provider(對應 dependency injector)](#dependency-provider對應-dependency-injector)
-    - [不指定 Ident](#不指定-ident)
-    - [指定 Ident](#指定-ident)
-- [Injector Pattern](#injector-pattern)
+  - [Provider Pattern](#provider-pattern)
+    - [Facade Provider (對應Facade Injector)](#facade-provider-對應facade-injector)
+      - [不合併 provide 物件](#不合併-provide-物件)
+      - [合併 provide 物件](#合併-provide-物件)
+    - [Dependency Provider(對應 dependency injector)](#dependency-provider對應-dependency-injector)
+      - [不指定 Ident](#不指定-ident)
+      - [指定 Ident](#指定-ident)
+  - [Injector Pattern](#injector-pattern)
     - [InjectDependency](#injectdependency)
     - [InjectFacade](#injectfacade)
   - [應用於 App 上開發](#應用於-app-上開發)
+- [注入 ui framework reactive 方法:](#注入-ui-framework-reactive-方法)
+  - [Inject Reactive Method](#inject-reactive-method)
+    - [Vue](#vue)
+    - [React](#react)
 - [Lazy Loading:](#lazy-loading)
   - [lazyHolder - lazy loading for objects except function](#lazyholder---lazy-loading-for-objects-except-function)
     - [description](#description)
@@ -41,6 +54,7 @@ yarn serve:doc
   - [CRUD](#crud)
     - [Example](#example)
 
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 
 
