@@ -106,12 +106,23 @@ function extendExceptConstructor(master: any, slave: any){
   });
 }
 
+
+/** 
+ * @param key - 鍵
+ * @param val - 值
+ * @returns true 省略，false 保留
+ */
+type OmitCondition<T> = (key: keyof T, val: T[keyof T]) => boolean;
+
 class _ObjDelegate<T extends object> extends Object {
   constructor(delegate: T) {
     super(delegate);
     Object.assign(this, delegate);
   }
-  omitBy(condition: (key: keyof T, val: T[keyof T]) => boolean): Partial<T> {
+  /** 透過條件式選擇物件的值／鍵，以進行省略
+   * {@link OmitCondition}
+   */
+  omitBy(condition: OmitCondition<T>): Partial<T> {
     const delegate = { ...this } as any as Partial<T>;
     const entries = Object.entries(this);
     for (let i = 0; i < entries.length; i++) {

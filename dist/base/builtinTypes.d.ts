@@ -79,9 +79,18 @@ declare global {
         zalgo: string;
     }
 }
+/**
+ * @param key - 鍵
+ * @param val - 值
+ * @returns true 省略，false 保留
+ */
+declare type OmitCondition<T> = (key: keyof T, val: T[keyof T]) => boolean;
 declare class _ObjDelegate<T extends object> extends Object {
     constructor(delegate: T);
-    omitBy(condition: (key: keyof T, val: T[keyof T]) => boolean): Partial<T>;
+    /** 透過條件式選擇物件的值／鍵，以進行省略
+     * {@link OmitCondition}
+     */
+    omitBy(condition: OmitCondition<T>): Partial<T>;
     stripEmptyProperties<E extends Array<string>>(props: E): Omit<T, E[number]>;
     pick(elements: Array<Partial<keyof T>>): Partial<T>;
 }

@@ -158,7 +158,7 @@ export function flattenInstance(obj, overrideReadonly = false, rule, onError) {
  * ```
  */
 export function getOmitsBy(payload, omits) {
-    const result = { ...payload };
+    const result = Object.assign({}, payload);
     omits.forEach((e) => {
         //@ts-ignore
         delete result[e];

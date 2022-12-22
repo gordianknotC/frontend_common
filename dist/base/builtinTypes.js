@@ -15,8 +15,11 @@ class _ObjDelegate extends Object {
         super(delegate);
         Object.assign(this, delegate);
     }
+    /** 透過條件式選擇物件的值／鍵，以進行省略
+     * {@link OmitCondition}
+     */
     omitBy(condition) {
-        const delegate = { ...this };
+        const delegate = Object.assign({}, this);
         const entries = Object.entries(this);
         for (let i = 0; i < entries.length; i++) {
             const [key, val] = entries[i];
