@@ -45,9 +45,8 @@
                 "source": "common_utils.md",
             },
             {
-                "title": "Lazy Loading",
-                "childrenDir": "additional-resources",
-                "children": []
+                "title": "注入 ui framework reactive 方法",
+                "source": "reactive.md",
             },
         ]
     }

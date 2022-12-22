@@ -2,6 +2,7 @@
 input:
  pages/readme.md:  {noYAML: true, doctoc: true, replace: {<!--#-->: "# 前端常用工具:"}}
  pages/facade.md:  {noYAML: true, doctoc: true, replace: {<!--#-->: "# Facade:"}}
+ pages/reactive.md:  {noYAML: true, doctoc: true, replace: {<!--#-->: "# 注入 ui framework reactive 方法:"}}
  pages/lazyloading.md:  {noYAML: true, doctoc: true, replace: {<!--#-->: "# Lazy Loading:"}}
  pages/apiTestUtil_CRUD.md:  {noYAML: true, doctoc: true, replace: {<!--#-->: "# Writing pseudo code for api - 測試API工具:"}}
  pages/common_util.md:  {noYAML: true, doctoc: true, replace: {<!--#-->: "# Common Utils:"}}

@@ -3,16 +3,16 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.setupCurrentEnv = exports.setupWatch = exports.setupReactive = exports.setupComputed = exports.setupRef = exports.currentEnv = exports.ref = exports.reactive = exports.watch = exports.computed = void 0;
 const lazy_1 = require("../utils/lazy");
 let computedMethod = new lazy_1.CallableDelegate(() => {
-    throw new Error("computed method used before setup");
+    throw new Error("InvalidUsageError: internal computed method used before setup. Please inject computed method first.");
 });
 let reactiveMethod = new lazy_1.CallableDelegate(() => {
-    throw new Error("reactive method used before setup");
+    throw new Error("InvalidUsageError: internal reactive method used before setup. Please inject reactive method first.");
 });
 let refMethod = new lazy_1.CallableDelegate(() => {
-    throw new Error("reactive method used before setup");
+    throw new Error("InvalidUsageError: ref reactive method used before setup. Please inject ref method first.");
 });
 let watchMethod = new lazy_1.CallableDelegate(() => {
-    throw new Error("watch method used before setup");
+    throw new Error("InvalidUsageError: internal watch method used before setup. Please inject watch method first.p");
 });
 let _env = { value: undefined };
 exports.computed = computedMethod;
