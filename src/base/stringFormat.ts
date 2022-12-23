@@ -1,6 +1,7 @@
 // @ts-nocheck
-
-const _window = window;
+const _window = typeof window == 'undefined' 
+  ? global ?? {}
+  : window ?? {};
 //  ValueError :: String -> Error
 function ValueError(message) {
   var err = new Error(message);
