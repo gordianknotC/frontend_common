@@ -160,8 +160,10 @@ function accessByPath(path: string, obj: any){
 
 /**
  *  Facade Interface 
+ * @param ident - symbol|string － 注入 container 中所代表的 key 
+ * @param option.transformFuncAsGetter - 是否要將注入的 function 轉為 getter method
  * 
- * @example
+ * @example 基本使用
  * ```ts
  * // main.ts
  * export type AppFacade = 
@@ -171,12 +173,25 @@ function accessByPath(path: string, obj: any){
  * FacadePresentationStore &
  * FacadeDomainService;
  * 
- * // 此時 facade 內容尚未 provide
- * export const facade = IFacade<AppFacade>();
+ * export const facade = IFacade<AppFacade>(); // 此時 facade 內容尚未 provide
  * assert(facade.data == undefined) // throw: key name "data" not found in facade
  * 
- * provideFacade({data: {a: 1}});
- * assert(facade.data.a == 1);
+ * provideFacade({data: {a: 1}}); // 將 data: {a: 1} 注入 facade interface
+ * assert(facade.data.a == 1); // pass
+ * ```
+ * 
+ * @example option.transformFuncAsGetter
+ * ```ts
+ * const key1 = "1";
+ * const key2 = "2";
+ * 
+ * const facade = IFacade<AppFacade>(key1, {transformFuncAsGetter: false});
+ * const facade2 = IFacade<AppFacade>(key2, {transformFuncAsGetter, true});
+ * provideFacade({ident: key1, {data: ()=>"key1"}});
+ * provideFacade({ident: key2, {data: ()=>"key2"}});
+ * 
+ * assert(facade.data() == "key1");
+ * assert(facade.data == "key2");
  * ```
  **/
 export function IFacade<T extends Object>(ident=FACADE_KEY, option?: {transformFuncAsGetter: boolean}): T {

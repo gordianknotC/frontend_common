@@ -1,45 +1,25 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.setupCurrentEnv = exports.setupWatch = exports.setupReactive = exports.setupComputed = exports.setupRef = exports._currentEnv = exports._ref = exports._reactive = exports._watch = exports._computed = void 0;
+exports.setupCurrentEnv = exports.setupWatch = exports.setupReactive = exports.setupComputed = exports.setupRef = exports.currentEnv = exports.ref = exports.reactive = exports.watch = exports.computed = void 0;
 const lazy_1 = require("../utils/lazy");
 let computedMethod = new lazy_1.CallableDelegate(() => {
-    throw new Error("computed method used before setup");
+    throw new Error("InvalidUsageError: internal computed method used before setup. Please inject computed method first.");
 });
 let reactiveMethod = new lazy_1.CallableDelegate(() => {
-    throw new Error("reactive method used before setup");
+    throw new Error("InvalidUsageError: internal reactive method used before setup. Please inject reactive method first.");
 });
 let refMethod = new lazy_1.CallableDelegate(() => {
-    throw new Error("reactive method used before setup");
+    throw new Error("InvalidUsageError: ref reactive method used before setup. Please inject ref method first.");
 });
 let watchMethod = new lazy_1.CallableDelegate(() => {
-    throw new Error("watch method used before setup");
+    throw new Error("InvalidUsageError: internal watch method used before setup. Please inject watch method first.p");
 });
 let _env = { value: undefined };
-/**
- * @internal 由外部注入 computed method  - 如 vue 的 computed
- * @see {@link setupComputed}
- */
-exports._computed = computedMethod;
-/**
- * @internal 由外部注入 watch method - 如 vue 的 watch
- * @see {@link setupWatch}
- * */
-exports._watch = watchMethod;
-/**
- * @internal 由外部注入 reactive method - 如 vue 的 reactive
- * @see {@link setupReactive}
- * */
-exports._reactive = reactiveMethod;
-/**
- * @internal 由外部注入 ref method - 如 vue 的 ref
- * @see {@link setupRef}
- * */
-exports._ref = refMethod;
-/**
- * @internal 由外部注入當前 env
- * @see {@link setupCurrentEnv}
- *  */
-exports._currentEnv = (0, lazy_1.LazyHolder)(() => {
+exports.computed = computedMethod;
+exports.watch = watchMethod;
+exports.reactive = reactiveMethod;
+exports.ref = refMethod;
+exports.currentEnv = (0, lazy_1.LazyHolder)(() => {
     if (_env.value == undefined) {
         throw new Error("currentEnv not specified");
     }
