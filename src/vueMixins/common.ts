@@ -1,6 +1,6 @@
 import {WritableComputedRef}    from "@vue/reactivity";
 import { merge } from "merge-anything";
-import { computed, reactive, ref, watch } from "~/extension/extension_setup";
+import { _computed, _reactive, _ref, _watch } from "~/extension/extension_setup";
 import {assert} from "~/utils/assert";
 
 export class CommonMixin {
@@ -14,7 +14,7 @@ export class CommonMixin {
   {
     const event = `update:${option.propName as string}`;
     this.vModelEvents.add(event as any);
-    const ret =  computed ({
+    const ret =  _computed ({
       get(){
         return option.props[option.propName];
       },
@@ -23,7 +23,7 @@ export class CommonMixin {
         option.emit(event, v);
       }
     });
-    watch(()=>option.props[option.propName], option.onChange as any);
+    _watch(()=>option.props[option.propName], option.onChange as any);
     return ret;
   }
 }

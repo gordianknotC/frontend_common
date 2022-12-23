@@ -2,10 +2,10 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.setupCurrentEnv = exports.setupReactive = exports.setupWatch = exports.setupRef = exports.setupComputed = exports.Callable = exports.LazyHolder = exports.injectFacade = exports.provideDependency = exports.injectDependency = exports.CommonMixin = exports.provideFacade = exports.IFacade = exports.is = exports.assertMsg = exports.Arr = exports.Obj = exports.getOmitsBy = exports.Is = exports.addStringMappingFromNumEnum = exports.UnWrappedVueRef = exports.asUnWrappedVueRefMap = exports.flattenInstance = exports.getAccessibleProperties = exports.asEnum = exports.isRefImpl = exports.assert = exports.AssertionError = exports.AssertMsg = exports.UnExpectedRole = exports.InvalidUsage = exports.TypeMismatchError = exports.NotImplementedError = exports.UncaughtEnumType = exports.UnCaughtCondition = exports.watch = exports.reactive = exports.ref = exports.computed = void 0;
 var extension_setup_1 = require("./extension/extension_setup");
-Object.defineProperty(exports, "computed", { enumerable: true, get: function () { return extension_setup_1.computed; } });
-Object.defineProperty(exports, "ref", { enumerable: true, get: function () { return extension_setup_1.ref; } });
-Object.defineProperty(exports, "reactive", { enumerable: true, get: function () { return extension_setup_1.reactive; } });
-Object.defineProperty(exports, "watch", { enumerable: true, get: function () { return extension_setup_1.watch; } });
+Object.defineProperty(exports, "computed", { enumerable: true, get: function () { return extension_setup_1._computed; } });
+Object.defineProperty(exports, "ref", { enumerable: true, get: function () { return extension_setup_1._ref; } });
+Object.defineProperty(exports, "reactive", { enumerable: true, get: function () { return extension_setup_1._reactive; } });
+Object.defineProperty(exports, "watch", { enumerable: true, get: function () { return extension_setup_1._watch; } });
 /**
  *
  *      B A S E types

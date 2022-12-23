@@ -1,5 +1,5 @@
 import { ComputedRef } from "~/base/vueTypes";
-import { computed, ref, reactive } from "~/extension/extension_setup";
+import { _computed, _ref, _reactive } from "~/extension/extension_setup";
 
 let refImplClassName: string = undefined as any;
 
@@ -16,7 +16,7 @@ export function isRefImpl(obj: any) {
   if (obj === null || obj === undefined)
     return false;
     // @ts-ignore
-  refImplClassName ??= ref().constructor.name;
+  refImplClassName ??= _ref().constructor.name;
   return typeof obj == "object"
     && obj?.constructor?.name === refImplClassName
     && Object.getOwnPropertyNames(Object.getPrototypeOf(obj)).length == 2; // constructor, value

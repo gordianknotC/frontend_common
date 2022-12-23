@@ -11,7 +11,7 @@ class CommonMixin {
     asVModelFromProps(option) {
         const event = `update:${option.propName}`;
         this.vModelEvents.add(event);
-        const ret = (0, extension_setup_1.computed)({
+        const ret = (0, extension_setup_1._computed)({
             get() {
                 return option.props[option.propName];
             },
@@ -20,7 +20,7 @@ class CommonMixin {
                 option.emit(event, v);
             }
         });
-        (0, extension_setup_1.watch)(() => option.props[option.propName], option.onChange);
+        (0, extension_setup_1._watch)(() => option.props[option.propName], option.onChange);
         return ret;
     }
 }

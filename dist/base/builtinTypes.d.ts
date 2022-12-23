@@ -89,6 +89,7 @@ declare class _ObjDelegate<T extends object> extends Object {
     constructor(delegate: T);
     /** 透過條件式選擇物件的值／鍵，以進行省略
      * {@link OmitCondition}
+     *
      */
     omitBy(condition: OmitCondition<T>): Partial<T>;
     stripEmptyProperties<E extends Array<string>>(props: E): Omit<T, E[number]>;

@@ -21,6 +21,7 @@ class _ObjDelegate extends Object {
     }
     /** 透過條件式選擇物件的值／鍵，以進行省略
      * {@link OmitCondition}
+     *
      */
     omitBy(condition) {
         const delegate = { ...this };

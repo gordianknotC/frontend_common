@@ -1,6 +1,7 @@
 
 <!--#-->
 ## is - 型別推斷工具
+
 ```ts
 describe("is", () => {
     describe("is.array", () => {

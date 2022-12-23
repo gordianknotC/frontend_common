@@ -17,7 +17,7 @@ function isRefImpl(obj) {
     if (obj === null || obj === undefined)
         return false;
     // @ts-ignore
-    refImplClassName !== null && refImplClassName !== void 0 ? refImplClassName : (refImplClassName = (0, extension_setup_1.ref)().constructor.name);
+    refImplClassName !== null && refImplClassName !== void 0 ? refImplClassName : (refImplClassName = (0, extension_setup_1._ref)().constructor.name);
     return typeof obj == "object"
         && ((_a = obj === null || obj === void 0 ? void 0 : obj.constructor) === null || _a === void 0 ? void 0 : _a.name) === refImplClassName
         && Object.getOwnPropertyNames(Object.getPrototypeOf(obj)).length == 2; // constructor, value

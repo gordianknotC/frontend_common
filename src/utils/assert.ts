@@ -1,4 +1,4 @@
-import { currentEnv } from "~/extension/extension_setup";
+import { _currentEnv } from "~/extension/extension_setup";
 
 export
 class AssertMsg {
@@ -59,7 +59,7 @@ class AssertionError extends Error{
  */
 export
 function assert(condition: any, message?: string): asserts condition{
-    if (currentEnv.value == "develop" && !condition){
+    if (_currentEnv.value == "develop" && !condition){
         throw new AssertionError(message ?? "");
     }
 }

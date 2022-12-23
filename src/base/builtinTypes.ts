@@ -121,6 +121,7 @@ class _ObjDelegate<T extends object> extends Object {
   }
   /** 透過條件式選擇物件的值／鍵，以進行省略
    * {@link OmitCondition}
+   * 
    */
   omitBy(condition: OmitCondition<T>): Partial<T> {
     const delegate = { ...this } as any as Partial<T>;
