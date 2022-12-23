@@ -1,4 +1,4 @@
-export { _computed as computed, _ref as ref, _reactive as reactive, _watch as watch } from "./extension/extension_setup";
+export { _computed, _ref, _reactive, _watch } from "./extension/extension_setup";
 export type { UnwrapRef, PropType, Prop, ComponentPropsOptions, Ref, ComputedRef, ToRefs, ReactiveEffect, UnwrapNestedRefs, ShallowUnwrapRef, WatchOptions, WatchCallback, RouteLocation, Router, RouterOptions, RouteRecord, RouteComponent, RouteMeta, RouteParams, AtLeastOne } from "./base/vueTypes";
 /**
  *

@@ -9,8 +9,8 @@ class UncaughtEnumType extends Error{
 
 export
 class UnCaughtCondition extends Error{
-  constructor() {
-    super("UnCaughtCondition");
+  constructor(msg?: string) {
+    super(`UnCaughtCondition ${msg ? ":"+String(msg) : ""}`);
     Object.setPrototypeOf(this, Error.prototype);
   }
 }
@@ -26,26 +26,17 @@ class TypeMismatchError extends Error{
 
 export
 class NotImplementedError extends Error{
-  constructor() {
-    super("NotImplementedError");
+  constructor(msg?: string) {
+    super(`NotImplementedError ${msg ? ":"+String(msg) : ""}`);
     Object.setPrototypeOf(this, Error.prototype);
   }
 }
 
 export
 class InvalidUsage extends Error{
-  constructor() {
-    super("InvalidUsage");
+  constructor(msg: string) {
+    super(`InvalidUsage: ${msg}`);
     Object.setPrototypeOf(this, Error.prototype);
   }
 }
-
-export
-class UnExpectedRole extends Error{
-  constructor() {
-    super("UnExpectedRole");
-    Object.setPrototypeOf(this, Error.prototype);
-  }
-}
-
-
+ 
