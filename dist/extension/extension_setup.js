@@ -1,18 +1,19 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.setupCurrentEnv = exports.setupWatch = exports.setupReactive = exports.setupComputed = exports.setupRef = exports._currentEnv = exports._ref = exports._reactive = exports._watch = exports._computed = void 0;
+const baseExceptions_1 = require("../base/baseExceptions");
 const lazy_1 = require("../utils/lazy");
 let computedMethod = new lazy_1.CallableDelegate(() => {
-    throw new Error("computed method used before setup");
+    throw new baseExceptions_1.InvalidUsageError("computed method used before setup. Please inject computed method with setupComputed first!");
 });
 let reactiveMethod = new lazy_1.CallableDelegate(() => {
-    throw new Error("reactive method used before setup");
+    throw new baseExceptions_1.InvalidUsageError("reactive method used before setup. Please inject reactive method with setupReactive first!");
 });
 let refMethod = new lazy_1.CallableDelegate(() => {
-    throw new Error("reactive method used before setup");
+    throw new baseExceptions_1.InvalidUsageError("ref method used before setup. Please inject ref method with setupRef first!");
 });
 let watchMethod = new lazy_1.CallableDelegate(() => {
-    throw new Error("watch method used before setup");
+    throw new baseExceptions_1.InvalidUsageError("watch method used before setup. Please inject watch method with setupWatch first!");
 });
 let _env = { value: undefined };
 /**
@@ -41,7 +42,7 @@ exports._ref = refMethod;
  *  */
 exports._currentEnv = (0, lazy_1.LazyHolder)(() => {
     if (_env.value == undefined) {
-        throw new Error("currentEnv not specified");
+        throw new baseExceptions_1.InvalidUsageError("currentEnv not specified. Please inject env with setupCurrentEnv first!");
     }
     return _env;
 });

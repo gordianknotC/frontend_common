@@ -5,7 +5,7 @@ export type { UnwrapRef, PropType, Prop, ComponentPropsOptions, Ref, ComputedRef
  *      B A S E types
  *
  * */
-export { UnCaughtCondition, UncaughtEnumType, NotImplementedError, TypeMismatchError, InvalidUsage, UnExpectedRole } from "./base/baseExceptions";
+export { UnCaughtCondition, UncaughtEnumType, NotImplementedError, TypeMismatchError, InvalidUsageError as InvalidUsage, UnExpectedError } from "./base/baseExceptions";
 /***
  *
  *    B A S E EXT

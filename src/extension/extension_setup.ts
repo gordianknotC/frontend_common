@@ -2,7 +2,7 @@ import { ComputedRef, Ref, UnwrapNestedRefs } from "@/base/vueTypes";
 import { AssertionError } from "assert";
 import { assert } from "console";
 
-import { InvalidUsage, NotImplementedError } from "~/base/baseExceptions";
+import { InvalidUsageError, NotImplementedError } from "~/base/baseExceptions";
 import { CallableDelegate, LazyHolder } from "~/utils/lazy";
 import { assertMsg } from "..";
 
@@ -12,18 +12,18 @@ export type ExtSetupOption = {
   ref: any;
 };
 let computedMethod = new CallableDelegate<<T>() => ComputedRef<T>>(() => {
-  throw new InvalidUsage("computed method used before setup. Please inject computed method with setupComputed first!");
+  throw new InvalidUsageError("computed method used before setup. Please inject computed method with setupComputed first!");
 });
 let reactiveMethod = new CallableDelegate<<T>(arg: T) => UnwrapNestedRefs<T>>(
   () => {
-    throw new InvalidUsage("reactive method used before setup. Please inject reactive method with setupReactive first!");
+    throw new InvalidUsageError("reactive method used before setup. Please inject reactive method with setupReactive first!");
   }
 );
 let refMethod = new CallableDelegate<<T>(arg?: T) => Ref<T>>(() => {
-  throw new InvalidUsage("ref method used before setup. Please inject ref method with setupRef first!");
+  throw new InvalidUsageError("ref method used before setup. Please inject ref method with setupRef first!");
 });
 let watchMethod = new CallableDelegate(() => {
-  throw new InvalidUsage("watch method used before setup. Please inject watch method with setupWatch first!");
+  throw new InvalidUsageError("watch method used before setup. Please inject watch method with setupWatch first!");
 });
 
 type TEnv = "develop" | "production" | "release";
@@ -59,7 +59,7 @@ export const _ref = refMethod;
  *  */
 export const _currentEnv = LazyHolder(() => {
   if (_env.value == undefined) {
-    throw new InvalidUsage("currentEnv not specified. Please inject env with setupCurrentEnv first!");
+    throw new InvalidUsageError("currentEnv not specified. Please inject env with setupCurrentEnv first!");
   }
   return _env;
 });

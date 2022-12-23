@@ -33,9 +33,17 @@ class NotImplementedError extends Error{
 }
 
 export
-class InvalidUsage extends Error{
+class InvalidUsageError extends Error{
   constructor(msg: string) {
-    super(`InvalidUsage: ${msg}`);
+    super(`InvalidUsageError: ${msg}`);
+    Object.setPrototypeOf(this, Error.prototype);
+  }
+}
+ 
+export
+class UnExpectedError extends Error{
+  constructor(msg: string) {
+    super(`UnExpectedError ${msg ? ":"+String(msg) : ""}`);
     Object.setPrototypeOf(this, Error.prototype);
   }
 }

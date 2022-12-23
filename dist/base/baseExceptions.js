@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UnExpectedRole = exports.InvalidUsage = exports.NotImplementedError = exports.TypeMismatchError = exports.UnCaughtCondition = exports.UncaughtEnumType = void 0;
+exports.UnExpectedError = exports.InvalidUsageError = exports.NotImplementedError = exports.TypeMismatchError = exports.UnCaughtCondition = exports.UncaughtEnumType = void 0;
 class UncaughtEnumType extends Error {
     constructor(val, _enum) {
         super(`UncaughtEnumType ${val}, expect one of ${Object.keys(_enum)}`);
@@ -9,8 +9,8 @@ class UncaughtEnumType extends Error {
 }
 exports.UncaughtEnumType = UncaughtEnumType;
 class UnCaughtCondition extends Error {
-    constructor() {
-        super("UnCaughtCondition");
+    constructor(msg) {
+        super(`UnCaughtCondition ${msg ? ":" + String(msg) : ""}`);
         Object.setPrototypeOf(this, Error.prototype);
     }
 }
@@ -23,24 +23,24 @@ class TypeMismatchError extends Error {
 }
 exports.TypeMismatchError = TypeMismatchError;
 class NotImplementedError extends Error {
-    constructor() {
-        super("NotImplementedError");
+    constructor(msg) {
+        super(`NotImplementedError ${msg ? ":" + String(msg) : ""}`);
         Object.setPrototypeOf(this, Error.prototype);
     }
 }
 exports.NotImplementedError = NotImplementedError;
-class InvalidUsage extends Error {
-    constructor() {
-        super("InvalidUsage");
+class InvalidUsageError extends Error {
+    constructor(msg) {
+        super(`InvalidUsageError: ${msg}`);
         Object.setPrototypeOf(this, Error.prototype);
     }
 }
-exports.InvalidUsage = InvalidUsage;
-class UnExpectedRole extends Error {
-    constructor() {
-        super("UnExpectedRole");
+exports.InvalidUsageError = InvalidUsageError;
+class UnExpectedError extends Error {
+    constructor(msg) {
+        super(`UnExpectedError ${msg ? ":" + String(msg) : ""}`);
         Object.setPrototypeOf(this, Error.prototype);
     }
 }
-exports.UnExpectedRole = UnExpectedRole;
+exports.UnExpectedError = UnExpectedError;
 //# sourceMappingURL=baseExceptions.js.map

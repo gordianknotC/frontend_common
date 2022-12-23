@@ -1,6 +1,5 @@
 
-文件待補...
-
+... 文件待補
 # 前端常用工具:
 
 ## 安裝
@@ -24,35 +23,31 @@ yarn serve:doc
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 table of content
 
-- [前端常用工具:](#前端常用工具)
-  - [安裝](#安裝)
+- [前端常用工具:](#%E5%89%8D%E7%AB%AF%E5%B8%B8%E7%94%A8%E5%B7%A5%E5%85%B7)
+  - [安裝](#%E5%AE%89%E8%A3%9D)
   - [documentation](#documentation)
   - [Feature](#feature)
 - [Table of Content](#table-of-content)
 - [Facade:](#facade)
   - [Provider Pattern](#provider-pattern)
-    - [Facade Provider (對應Facade Injector)](#facade-provider-對應facade-injector)
-      - [不合併 provide 物件](#不合併-provide-物件)
-      - [合併 provide 物件](#合併-provide-物件)
-    - [Dependency Provider(對應 dependency injector)](#dependency-provider對應-dependency-injector)
-      - [不指定 Ident](#不指定-ident)
-      - [指定 Ident](#指定-ident)
+    - [Facade Provider (對應Facade Injector)](#facade-provider-%E5%B0%8D%E6%87%89facade-injector)
+    - [Dependency Provider(對應 dependency injector)](#dependency-provider%E5%B0%8D%E6%87%89-dependency-injector)
   - [Injector Pattern](#injector-pattern)
     - [InjectDependency](#injectdependency)
     - [InjectFacade](#injectfacade)
-  - [應用於 App 上開發](#應用於-app-上開發)
-- [注入 ui framework reactive 方法:](#注入-ui-framework-reactive-方法)
+  - [應用於 App 上開發](#%E6%87%89%E7%94%A8%E6%96%BC-app-%E4%B8%8A%E9%96%8B%E7%99%BC)
+- [注入 ui framework reactive 方法:](#%E6%B3%A8%E5%85%A5-ui-framework-reactive-%E6%96%B9%E6%B3%95)
   - [Inject Reactive Method](#inject-reactive-method)
     - [Vue](#vue)
     - [React](#react)
 - [Lazy Loading:](#lazy-loading)
   - [lazyHolder - lazy loading for objects except function](#lazyholder---lazy-loading-for-objects-except-function)
     - [description](#description)
-    - [以Locale 為例](#以locale-為例)
+    - [以Locale 為例](#%E4%BB%A5locale-%E7%82%BA%E4%BE%8B)
   - [CallableDelegate - lazy loading for functions](#callabledelegate---lazy-loading-for-functions)
-    - [以實作 vue watch method 為例](#以實作-vue-watch-method-為例)
-- [Writing pseudo code for api - 測試API工具:](#writing-pseudo-code-for-api---測試api工具)
-- [Writing pseudo code for api - 測試API工具](#writing-pseudo-code-for-api---測試api工具-1)
+    - [以實作 vue watch method 為例](#%E4%BB%A5%E5%AF%A6%E4%BD%9C-vue-watch-method-%E7%82%BA%E4%BE%8B)
+- [Writing pseudo code for api - 測試API工具:](#writing-pseudo-code-for-api---%E6%B8%AC%E8%A9%A6api%E5%B7%A5%E5%85%B7)
+- [Writing pseudo code for api - 測試API工具](#writing-pseudo-code-for-api---%E6%B8%AC%E8%A9%A6api%E5%B7%A5%E5%85%B7)
   - [CRUD](#crud)
     - [Example](#example)
 

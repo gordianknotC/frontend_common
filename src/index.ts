@@ -21,7 +21,7 @@ export type {
 
 export {
   UnCaughtCondition, UncaughtEnumType, NotImplementedError,
-  TypeMismatchError, InvalidUsage, UnExpectedRole
+  TypeMismatchError, InvalidUsageError as InvalidUsage, UnExpectedError
 } from "~/base/baseExceptions"
 
 /***

@@ -10,6 +10,7 @@
     "publish": "npm publish",
     "config:test": "ts-nest config:init",
     "test": "jest",
+    "config:vscode": "git config --global core.editor 'code --wait'",
     "serve:doc": "merge-markdown -m merge_markdown.yml && typedoc src/index.ts && serve docs"
   },
   "files": [
