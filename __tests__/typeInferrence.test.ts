@@ -15,9 +15,9 @@ import {
 } from "../src/index";
 import { ref, reactive, watch, computed } from "vue";
 import {
-  computed as RComputed,
-  reactive as RReactive,
-  ref as RRef,
+  _computed as RComputed,
+  _reactive as RReactive,
+  _ref as RRef,
 } from "../src/extension/extension_setup";
 
 
