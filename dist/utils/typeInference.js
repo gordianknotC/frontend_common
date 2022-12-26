@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.isnot = exports.is = exports.Is = exports.asMapFromNumberedEnum = exports.UnWrappedVueRef = exports.asUnWrappedVueRefMap = exports.getOmitsBy = exports.flattenInstance = exports.getAccessibleProperties = exports.asEnum = exports.isRefImpl = void 0;
-const extension_setup_1 = require("~/extension/extension_setup");
+const extension_setup_1 = require("../extension/extension_setup");
 let refImplClassName = undefined;
 /**
  * 判斷是否為 vue RefImpl

@@ -1,7 +1,7 @@
 "use strict"
 
 
-export { _computed, _ref, _reactive, _watch } from "./extension/extension_setup";
+export { _computed, _ref, _reactive, _watch } from "~/extension/extension_setup";
 export type { 
   UnwrapRef, PropType, Prop , ComponentPropsOptions,
   Ref, ComputedRef, ToRefs, ReactiveEffect, UnwrapNestedRefs, ShallowUnwrapRef,
@@ -10,7 +10,7 @@ export type {
   RouteLocation, Router, RouterOptions,
   RouteRecord, RouteComponent, RouteMeta, RouteParams,
   AtLeastOne
-} from "./base/vueTypes";
+} from "~/base/vueTypes";
 
 
 /**
@@ -21,7 +21,7 @@ export type {
 
 export {
   UnCaughtCondition, UncaughtEnumType, NotImplementedError,
-  TypeMismatchError, InvalidUsageError as InvalidUsage, UnExpectedError
+  TypeMismatchError, InvalidUsageError, UnExpectedError
 } from "~/base/baseExceptions"
 
 /***
@@ -53,5 +53,5 @@ export {Obj, Arr, ArrayDelegate, ObjDelegate} from "~/base/builtinTypes";
 export {assertMsg} from "~/utils/assert";
 export {is} from "~/utils/typeInference";
 export {IFacade, provideFacade, CommonMixin, injectDependency, provideDependency,  injectFacade} from "~/vueMixins/common";
-export { LazyHolder, CallableDelegate as Callable } from "./utils/lazy";
-export { setupComputed, setupRef, setupWatch, setupReactive, setupCurrentEnv } from "./extension/extension_setup";
+export { LazyHolder, CallableDelegate as Callable } from "~/utils/lazy";
+export { setupComputed, setupRef, setupWatch, setupReactive, setupCurrentEnv } from "~/extension/extension_setup";
