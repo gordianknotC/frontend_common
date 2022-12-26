@@ -27,7 +27,7 @@ let watchMethod = new CallableDelegate(() => {
 });
 
 type TEnv = "develop" | "production" | "release";
-let _env: { value: TEnv | undefined } = { value: undefined };
+let _env: { value: TEnv | undefined } = { value: "develop" };
 
 /**
  * @internal 由外部注入 computed method  - 如 vue 的 computed
