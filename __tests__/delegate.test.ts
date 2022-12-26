@@ -22,6 +22,7 @@ import {
   _reactive as RReactive,
   _ref as RRef,
 } from "../src/extension/extension_setup";
+import { CallableDelegate } from "../src/utils/lazy";
 
 
 describe("Array/Object delegate tests", () => {
@@ -37,7 +38,14 @@ describe("Array/Object delegate tests", () => {
     const obj = Obj({a:1, b:2});
     expect(Object.keys(obj)).toEqual(["a", "b"]);
     expect(Object.values(obj)).toEqual([1, 2]);
-    
     expect(obj.pick(["a"])).toEqual({a: 1});
   });
+
+  test("callable delegate", ()=>{
+    const d = new CallableDelegate<()=>any>(()=>undefined);
+    expect(d()).toBeUndefined();
+
+    d.delegate = ()=>"delegated";
+    expect(d()).toBe("delegated");
+  })
 });

@@ -2,8 +2,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.IFacade = exports.injectFacade = exports.injectDependency = exports.provideDependency = exports.provideFacade = exports.CommonMixin = void 0;
 const merge_anything_1 = require("merge-anything");
-const extension_setup_1 = require("../extension/extension_setup");
-const assert_1 = require("../utils/assert");
+const extension_setup_1 = require("~/extension/extension_setup");
+const assert_1 = require("~/utils/assert");
 class CommonMixin {
     constructor() {
         this.vModelEvents = new Set();

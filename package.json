@@ -4,8 +4,8 @@
   "description": "common js util for frontend development",
   "scripts": {
     "build": "tsc --project tsconfig.build.json && tsc-alias -p tsconfig.build.json",
+    "build:watch": "concurrently --kill-others \"tsc -w --project tsconfig.build.json && tsc-alias -w -p tsconfig.build.json\"",
     "serve": "vue-cli-service serve",
-    "build:watch": "concurrently --kill-others \"tsc -w\" \"tsc-alias -w\"",
     "login": "npm login",
     "publish": "npm publish",
     "config:test": "ts-nest config:init",

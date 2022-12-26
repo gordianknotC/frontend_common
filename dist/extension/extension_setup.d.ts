@@ -1,5 +1,5 @@
-import { ComputedRef, Ref, UnwrapNestedRefs } from "../base/vueTypes";
-import { CallableDelegate } from "../utils/lazy";
+import { ComputedRef, Ref, UnwrapNestedRefs } from "@/base/vueTypes";
+import { CallableDelegate } from "~/utils/lazy";
 export declare type ExtSetupOption = {
     reactive: any;
     computed: any;

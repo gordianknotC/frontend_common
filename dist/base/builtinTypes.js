@@ -2,9 +2,9 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Arr = exports.Obj = void 0;
 const tslib_1 = require("tslib");
-const typeInference_1 = require("../utils/typeInference");
+const typeInference_1 = require("~/utils/typeInference");
 //@ts-ignore
-const stringFormat_1 = tslib_1.__importDefault(require("../base/stringFormat"));
+const stringFormat_1 = tslib_1.__importDefault(require("~/base/stringFormat"));
 function extendExceptConstructor(master, slave) {
     Object.keys(master.prototype).forEach((key) => {
         if (key != "constructor") {

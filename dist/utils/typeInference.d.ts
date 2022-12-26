@@ -1,4 +1,4 @@
-import { ComputedRef } from "../base/vueTypes";
+import { ComputedRef } from "~/base/vueTypes";
 /**
  * 判斷是否為 vue RefImpl
  * note: 暫時性解法

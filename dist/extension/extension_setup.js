@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.setupCurrentEnv = exports.setupWatch = exports.setupReactive = exports.setupComputed = exports.setupRef = exports._currentEnv = exports._ref = exports._reactive = exports._watch = exports._computed = void 0;
-const baseExceptions_1 = require("../base/baseExceptions");
-const lazy_1 = require("../utils/lazy");
+const baseExceptions_1 = require("~/base/baseExceptions");
+const lazy_1 = require("~/utils/lazy");
 let computedMethod = new lazy_1.CallableDelegate(() => {
     throw new baseExceptions_1.InvalidUsageError("computed method used before setup. Please inject computed method with setupComputed first!");
 });
