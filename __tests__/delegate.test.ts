@@ -4,6 +4,10 @@ import {
   setupReactive,
   setupRef,
   setupWatch,
+  _computed,
+  _reactive,
+  _ref,
+  _watch,
 } from "../src/extension/extension_setup";
 import {
   is,
@@ -17,11 +21,6 @@ import {
   Obj,
 } from "../src/index";
 import { ref, reactive, watch, computed } from "vue";
-import {
-  _computed as RComputed,
-  _reactive as RReactive,
-  _ref as RRef,
-} from "../src/extension/extension_setup";
 import { CallableDelegate } from "../src/utils/lazy";
 
 
@@ -48,4 +47,23 @@ describe("Array/Object delegate tests", () => {
     d.delegate = ()=>"delegated";
     expect(d()).toBe("delegated");
   })
+});
+
+describe("Setup Reactive Delegate", ()=>{
+  beforeAll(() => {
+    setupRef(ref);
+    setupReactive(reactive);
+    setupWatch(watch);
+    setupComputed(computed);
+    setupCurrentEnv("develop");
+  });
+  test("computed", ()=>{
+    expect(_computed(()=>"value").value).toBe("value");
+  });
+  test("reactive", ()=>{
+    expect(_reactive({value: "value"}).value).toBe("value");
+  });
+  test("ref", ()=>{
+    expect(_ref("value").value).toBe("value");
+  });
 });
