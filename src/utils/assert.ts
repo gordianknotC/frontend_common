@@ -47,7 +47,7 @@ const assertMsg = new AssertMsg();
 export
 class AssertionError extends Error{
     constructor(message: string){
-        super(`assert error: ${message}`);
+        super(`AssertionError: ${message}`);
         Object.setPrototypeOf(this, Error.prototype);
     }
 }
