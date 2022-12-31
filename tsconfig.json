@@ -17,7 +17,6 @@
       "esnext",
       "dom"
     ],
-
     "moduleResolution": "node",
     /**
     You shouldn't use "noEmit": true in your tsconfig.json if you compile with tsc.
@@ -58,12 +57,13 @@
   "exclude": [
     "node_modules",
     "dist",
-    "__tests__",
-    "storybook-static"
+    ".vite-storybook",
+    "storybook-static",
   ],
   "include": [
     "@types",
     "src",
+    "src/index.ts",
     "src/**/*.ts",
     "__tests__/**/*.ts",
     "__tests__/**/*.tsx",

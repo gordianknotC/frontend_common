@@ -15,7 +15,7 @@ let refMethod = new lazy_1.CallableDelegate(() => {
 let watchMethod = new lazy_1.CallableDelegate(() => {
     throw new baseExceptions_1.InvalidUsageError("watch method used before setup. Please inject watch method with setupWatch first!");
 });
-let _env = { value: undefined };
+let _env = { value: "develop" };
 /**
  * @internal 由外部注入 computed method  - 如 vue 的 computed
  * @see {@link setupComputed}

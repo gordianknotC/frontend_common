@@ -4,7 +4,7 @@ import {
   setupReactive,
   setupRef,
   setupWatch,
-} from "../src/extension/extension_setup";
+} from "@/index";
 import {
   is,
   asEnum,

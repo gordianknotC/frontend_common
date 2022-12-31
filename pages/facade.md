@@ -1,11 +1,113 @@
 
+---
 <!--#-->
+籍用 [Facade design pattern](https://refactoring.guru/design-patterns/facade) 的概念，為App或Framework提供一個入口界面，這個入口界面依循相依分離原則，進一部使界面分離成為可能，其內部基本 design pattern 為一個 provider/injector design pattern 及為 facade 專門化的 provider/injector design pattern
 
-## Provider Pattern  
-1) 提供 Dependency Provider design pattern，將 dependency以 ident 作為 key 植入 container
-2) 提供 Facade Provider design pattern，將 dependency 以 FACADE_KEY 作為 key 植入 container, 為App開發時提供一個入口，以存取所需的一切資料. 
-3) 
+1) 提供 [Dependency Provider](#dependency-provider%E5%B0%8D%E6%87%89-dependency-injector) design pattern，將 dependency以 ident 作為 key 植入 container
+2) 提供 [Facade Provider](#facade-provider-%E5%B0%8D%E6%87%89facade-injector) design pattern，將 dependency 以 FACADE_KEY 作為 key 植入 container, 為App開發時提供一個入口，以存取所需的一切資料. 
+  
+
+## Provider Pattern
+### Dependency Provider(對應 dependency injector)
+#### provideDependency
+[source][s-provideDependency] | 型別定義
+```ts
+type ProviderParams<T> = {
+    deps: Partial<T>, 
+    merge?: boolean, 
+    ident?: string | symbol
+};
+
+/**
+*  Dependency Provider
+ * provide 方法，將 dependency 以 ident 作為 key 植入 container
+ * @param option - {@link ProviderParams}
+ * @see also {@link provideFacade}
+ * */
+function provideDependency<T>(option: ProviderParams<T>)
+```
+#### 不指定 Ident
+```ts
+const merge = true;
+provideDependency({deps: {a: 1, source: {a: 2}}, merge});
+provideDependency({deps: {b: 3, source: {b: 4}}, merge});
+const a = injectDependency("a");
+const aOfSource = injectDependency("source.a");
+const b = injectDependency("b");
+const bOfSource = injectDependency("source.b");
+assert(a == 1);
+assert(b == 3);
+assert(aOfSource == 2);
+assert(bOfSource == 4);
+```
+#### 指定 Ident
+```ts
+provideDependency({deps: {a: 1, source: {a: 2}}, ident: "a"});
+provideDependency({deps: {b: 3, source: {b: 4}}, ident: "b"});
+const a = injectDependency("a", "a");
+const aOfSource = injectDependency("source.a", "a");
+const b = injectDependency("b", "a");
+const bOfSource = injectDependency("source.b", "a");
+assert(a == 1);
+assert(b == undefined);
+assert(aOfSource == 2);
+assert(bOfSource == undefined);
+
+```
+
+#### without enabling merge
+```ts
+test("Simple test without enabling merge", ()=>{
+  provideDependency({
+    deps: {
+      Elton: "Elton",
+      John: "John",
+      users: {
+        EltonJohn: "EltonJohn"
+      }
+    }
+  });
+  const Elton = injectDependency("Elton");
+  const John = injectDependency("John");
+  const EltonJohn = injectDependency("users.EltonJohn");
+  expect(Elton).toBe("Elton");
+  expect(John).toBe("John");
+  expect(EltonJohn).toBe("EltonJohn");
+});
+```
+
+#### with enabling merge
+```ts
+provideDependency({
+  deps: {
+    Elton: "Elton",
+    John: "John",
+    users: {
+      EltonJohn: "EltonJohn"
+    }
+  }
+});
+
+provideDependency({
+  deps: {
+    Curtis: "Curtis"
+  },
+  merge: true
+});
+const Elton = injectDependency("Elton");
+const John = injectDependency("John");
+const EltonJohn = injectDependency("users.EltonJohn");
+const Curtis = injectDependency("Curtis");
+expect(Elton).toBe("Elton");
+expect(John).toBe("John");
+expect(EltonJohn).toBe("EltonJohn");
+expect(Curtis).toBe("Curtis");
+```
+
+
 ### Facade Provider (對應Facade Injector)
+[source][s-provideFacade] | 型別定義
+
 ```ts
 type ProviderParams<T> = {
     deps: Partial<T>, 
@@ -70,46 +172,6 @@ assert(facade.source.b == 2);
 assert(facade.appended.a == 1);
 ```
 
-### Dependency Provider(對應 dependency injector)
-```ts
-type ProviderParams<T> = {
-    deps: Partial<T>, 
-    merge?: boolean, 
-    ident?: string | symbol
-};
-/**
- *  @params ident 用以識別 container 取值所需要的 key
- *  */
-function provideDependency<T>(option: ProviderParams<T>)
-```
-#### 不指定 Ident
-```ts
-const merge = true;
-provideDependency({deps: {a: 1, source: {a: 2}}, merge});
-provideDependency({deps: {b: 3, source: {b: 4}}, merge});
-const a = injectDependency("a");
-const aOfSource = injectDependency("source.a");
-const b = injectDependency("b");
-const bOfSource = injectDependency("source.b");
-assert(a == 1);
-assert(b == 3);
-assert(aOfSource == 2);
-assert(bOfSource == 4);
-```
-#### 指定 Ident
-```ts
-provideDependency({deps: {a: 1, source: {a: 2}}, ident: "a"});
-provideDependency({deps: {b: 3, source: {b: 4}}, ident: "b"});
-const a = injectDependency("a", "a");
-const aOfSource = injectDependency("source.a", "a");
-const b = injectDependency("b", "a");
-const bOfSource = injectDependency("source.b", "a");
-assert(a == 1);
-assert(b == undefined);
-assert(aOfSource == 2);
-assert(bOfSource == undefined);
-
-```
 
 ## Injector Pattern
 ### InjectDependency
@@ -137,7 +199,7 @@ export function injectFacade<T>(ident=FACADE_KEY): T
 
 
 ## 應用於 App 上開發
-> 以 Domain Driven Design 為架構的 App 為例
+### 以 Domain Driven Design 為架構的 App 為例
 
 **main.ts**
 ```ts
@@ -267,3 +329,6 @@ facade....
 
 
 
+
+[s-provideDependency]: ../src/vueMixins/common.ts
+[s-provideFacade]: ../src/vueMixins/common.ts

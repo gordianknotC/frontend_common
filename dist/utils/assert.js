@@ -43,7 +43,7 @@ exports.AssertMsg = AssertMsg;
 exports.assertMsg = new AssertMsg();
 class AssertionError extends Error {
     constructor(message) {
-        super(`assert error: ${message}`);
+        super(`AssertionError: ${message}`);
         Object.setPrototypeOf(this, Error.prototype);
     }
 }

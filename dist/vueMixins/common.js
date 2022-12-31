@@ -89,8 +89,13 @@ function provideFacade(option) {
 exports.provideFacade = provideFacade;
 /**
 *  Dependency Provider
- * provide 方法，將 dependency以 ident 作為 key 植入 container
- * @see {@link provideFacade}
+ * provide 方法，將 dependency 以 ident 作為 key 植入 container
+ * @param option - {@link ProviderParams}
+ * @see also {@link provideFacade}
+ * @example
+    ```ts
+    
+    ```
  * */
 exports.provideDependency = ((option) => {
     var _a;

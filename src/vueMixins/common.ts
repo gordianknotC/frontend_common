@@ -32,6 +32,41 @@ const container: any = {};
 const FACADE_KEY = Symbol();
 const DEP_KEY = Symbol();
 
+/**
+ *  Dependency Provider
+ *  provide 方法，將 dependency以 ident 作為 key 植入 container
+ * 
+ *  @params deps 物件值鍵對
+ *  @params mergeObj 是否對 provider 所提併的值鍵對進與 container 進行合併 
+ *  @params ident 用以識別 container 取值所需要的 key
+ *  @example
+ *  ```ts
+ *  const mergeObj = true;
+ *  provideFacade({
+ *    source: {
+ *      a: 1
+ *    }
+ *  }, mergeObj)
+ * 
+ *  provideFacade({
+ *    source: {
+ *      b: 2
+ *    },
+ *    override: {a: 1}
+ *  }, mergeObj);
+ *  
+ *  // 覆寫整個 override
+ *  provideFacade({
+ *    override: {b: 2} 
+ *  }, false)
+ * 
+ *  const facade = injectFacade();
+ *  assert(facade.source.a == 1);
+ *  assert(facade.source.b == 2);
+ *  assert(facade.override.a == undefined);
+ *  assert(facade.override.b == 2);
+ *  ```
+ */
 type ProviderParams<T> = {deps: Partial<T>, merge?: boolean, ident?: string | symbol};
 /**
  *  Dependency Provider
@@ -93,8 +128,29 @@ export function provideFacade<T>(option: ProviderParams<T>) {
 
 /**
 *  Dependency Provider
- * provide 方法，將 dependency以 ident 作為 key 植入 container
- * @see {@link provideFacade}
+ * provide 方法，將 dependency 以 ident 作為 key 植入 container
+ * @param option - {@link ProviderParams}
+ * @see also {@link provideFacade}
+ * @example
+    ```ts
+    test("Simple test without enabling merge", ()=>{
+      provideDependency({
+        deps: {
+          Elton: "Elton",
+          John: "John",
+          users: {
+            EltonJohn: "EltonJohn"
+          }
+        }
+      });
+      const Elton = injectDependency("Elton");
+      const John = injectDependency("John");
+      const EltonJohn = injectDependency("users.EltonJohn");
+      expect(Elton).toBe("Elton");
+      expect(John).toBe("John");
+      expect(EltonJohn).toBe("EltonJohn");
+    });
+    ```
  * */
 export const provideDependency = (<T>(option: ProviderParams<T>)=>{
   option.ident ??= DEP_KEY;
