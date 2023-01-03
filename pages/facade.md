@@ -329,6 +329,3 @@ facade....
 
 
 
-
-[s-provideDependency]: ../src/vueMixins/common.ts
-[s-provideFacade]: ../src/vueMixins/common.ts

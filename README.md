@@ -40,22 +40,23 @@ table of content
     - [以 Domain Driven Design 為架構的 App 為例](#%E4%BB%A5-domain-driven-design-%E7%82%BA%E6%9E%B6%E6%A7%8B%E7%9A%84-app-%E7%82%BA%E4%BE%8B)
 - [注入 ui framework reactive 方法:](#%E6%B3%A8%E5%85%A5-ui-framework-reactive-%E6%96%B9%E6%B3%95)
   - [Inject Reactive Method](#inject-reactive-method)
-    - [Vue](#vue)
-    - [React](#react)
+    - [Vue 為例](#vue-%E7%82%BA%E4%BE%8B)
+    - [React 為例](#react-%E7%82%BA%E4%BE%8B)
 - [Lazy Loading:](#lazy-loading)
-  - [lazyHolder - lazy loading for objects except function](#lazyholder---lazy-loading-for-objects-except-function)
-    - [description](#description)
-    - [以Locale 為例](#%E4%BB%A5locale-%E7%82%BA%E4%BE%8B)
+  - [lazyHolder - lazy loading for objects](#lazyholder---lazy-loading-for-objects)
+    - [Example: 以Locale 為例](#example-%E4%BB%A5locale-%E7%82%BA%E4%BE%8B)
   - [CallableDelegate - lazy loading for functions](#callabledelegate---lazy-loading-for-functions)
     - [以實作 vue watch method 為例](#%E4%BB%A5%E5%AF%A6%E4%BD%9C-vue-watch-method-%E7%82%BA%E4%BE%8B)
 - [Writing pseudo code for api - 測試API工具:](#writing-pseudo-code-for-api---%E6%B8%AC%E8%A9%A6api%E5%B7%A5%E5%85%B7)
-- [Writing pseudo code for api - 測試API工具](#writing-pseudo-code-for-api---%E6%B8%AC%E8%A9%A6api%E5%B7%A5%E5%85%B7)
   - [CRUD](#crud)
     - [Example](#example)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 
+
+[s-provideDependency]: ../src/vueMixins/common.ts
+[s-provideFacade]: ../src/vueMixins/common.ts
 
 ---
 # Facade:
@@ -388,16 +389,14 @@ facade....
 
 
 
-[s-provideDependency]: ../src/vueMixins/common.ts
-[s-provideFacade]: ../src/vueMixins/common.ts
 
 
 ---
 # 注入 ui framework reactive 方法:
 ## Inject Reactive Method
-設計上希望能夠不相依於任何一個 ui framework, 因此需由外部注入相應的 reactive 方法，否則會出現 **InvalidUsageError:** 錯誤。
+設計上希望能夠不相依於任何一個 ui framework，因此需由外部注入相應的 reactive 方法，再於內部使用這個需要被使用者注入的 reactive 方法作為界面，以達到與 ui framework 相依分離，否於未注入前就使用，則會出現 **InvalidUsageError:** 錯誤。
 
-### Vue
+### Vue 為例
 1) 注入 vue computed method
 2) 注入 vue reactive method
 3) 注入 vue watch method
@@ -443,25 +442,39 @@ describe("ref setup", ()=>{
 ```
 
 
-### React
+### React 為例
 > todo...
 
 
 ---
 # Lazy Loading:
 
-## lazyHolder - lazy loading for objects except function
-### description
-以 proxy實作 物件 lazy loading
+以 proxy實作 lazy loading for objects, 及 lazy loading for functions，用於許多需要相依分離或需要考慮啓動時序問題的情境，其核心類似 Provider/Injector design pattern 及 Delegate design pattern，分為物件LazyHolder 及 Callable Delegate
+- Object lazy holder
+- Callable Delegate  
+
+## lazyHolder - lazy loading for objects
+
+__實作__
 ```ts
-function LazyHolder<T extends object>(initializer: () => T): T 
+export function LazyHolder<T extends object>(initializer: () => T): T {
+  let instance: T;
+  return new Proxy<T>({} as T, {
+    get: function (target, name) {
+      instance ??= initializer();
+      //@ts-ignore
+      return instance[name];
+    }
+  }) as T;
+}
 ```
 
-### 以Locale 為例
+### Example: 以Locale 為例
 以下為例，引用 i18n 時，不用考慮到 createI18n 是否已經初始化，可以在 createI18n 初始化前就引用 i18n, 而不會產生相依問題。
 
 **locale.ts**
 ```ts
+//locale.ts
 const Eng = {
     welcome: "welcome",
 }
@@ -471,12 +484,13 @@ const i18n = lazyHolder<Locale<typeof Eng>>(()=>{
     return _i18n ??= createI18n();
 });
 
-// 當物件取用後(存取相關屬性，以下例而言是 property t)，才袑始化
+// 當物件取用後(存取相關屬性，以下例而言是 property t)，才初始化
 i18n.t("welcome");
 ```
 
 **app_store.ts**
 ```ts
+//app_store.ts
 class AppStore{
     constructor(private i18n);
     get currentLanguage(): string{
@@ -488,11 +502,17 @@ const appStore = new AppStore(i18n);
 
 
 ## CallableDelegate - lazy loading for functions
+__實作__
 ```ts
 export class CallableDelegate<CALLABLE extends Function> extends Function {
   constructor(
     public delegate: CALLABLE
-  );
+  ) {
+    super()    
+    return new Proxy(this, {
+      apply: (target, thisArg, args) => this.delegate(...args)
+    })
+  }
 }
 ```
 ### 以實作 vue watch method 為例
@@ -516,7 +536,6 @@ function setupWatch(watchConstructor: any){
 
 ---
 # Writing pseudo code for api - 測試API工具:
-# Writing pseudo code for api - 測試API工具
 
 ## CRUD
 

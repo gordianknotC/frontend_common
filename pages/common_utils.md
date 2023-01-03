@@ -3,6 +3,7 @@
 <!--#-->
 ## is - 型別推斷工具
 
+__Example__
 ```ts
 describe("is", () => {
     describe("is.array", () => {
@@ -81,7 +82,23 @@ describe("is", () => {
 ```
 
 
-## flattenInstance - 平面化 class，用於 vue 寫 OOP
+## flattenInstance 
+> 平面化 class，用於 class 風格寫 vue
+
+  vue 於 setup 階段若所回傳至 template 的物件，入有繼承關係的類別（class)，其繼承關係會消失因為 vue 不會讀取 prototype 層的內容. 
+
+  如 A extends Base, 而 
+  - Base 有 methodBase, propBase, propX
+  - A 有 propA, methodA, propX
+  當我們將 instance A 傳給 vue 物件化後
+  vue 會無視 methodBase, propBase, 因為 methodBase/propBase 
+  在 A 的 prototype 層
+
+  flattenInstance 作用為將可存取的所有 methods / property
+  寫入當前的 class, 使得 A 繼承至 Base 的 methodBase, propBase 平面化至 A
+
+
+__型別__
 ```ts
 /**
  *  flattenInstance 平面化 class，用於 vue 寫 OOP
@@ -109,6 +126,9 @@ function flattenInstance(
     onError?: (err: string)=>void
 ) 
 ```
+
+
+__Example__
 ```ts
 describe("flattenInstance", () => {
     class BaseCls {
