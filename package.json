@@ -9,7 +9,7 @@
     "test": "jest",
     "---------- DOC ------------": "",
     "doc": "merge-markdown -m merge_markdown.yml && typedoc src/index.ts",
-    "serve:doc": "merge-markdown -m merge_markdown.yml && typedoc src/index.ts && serve docs",
+    "serve:doc": "merge-markdown -m merge_markdown.yml && typedoc src/index.ts && serve docs/build",
     "---------- NPM ------------": "",
     "login": "npm login",
     "publish": "npm publish",

@@ -3,6 +3,7 @@
     "entryPoints": [
         "./src/index.ts"
     ],
+    "out": "docs/build",
     "sort": [
         "source-order"
     ],
@@ -23,6 +24,7 @@
         "API": "https://typedoc.org/api"
     },
     "pluginPages": {
+        "source": "docs",
         "pages": [
             {
                 "title": "前端常用工具",
