@@ -65,7 +65,34 @@ table of content
 
 ---
 # Facade:
-籍用 [Facade design pattern](https://refactoring.guru/design-patterns/facade) 的概念，為App或Framework提供一個入口界面，這個入口界面依循相依分離原則，進一部使界面分離成為可能，其內部基本 design pattern 為一個 provider/injector design pattern 及為 facade 專門化的 provider/injector design pattern
+籍用 [Facade design pattern](https://refactoring.guru/design-patterns/facade) 的概念，為App / Framework提供一個入口界面，這個入口界面依循相依分離原則，進一部使界面分離成為可能，其內部基本 design pattern 為一個 provider/injector design pattern 及為 facade 專門化的 provider/injector design pattern
+
+__example__ 
+```ts
+//宣告 facade 界面
+export type AppFacade = 
+  FacadeMappers &
+  FacadeDateSource &
+  FacadeRepository &
+  FacadePresentationStore &
+  FacadeDomainService;
+
+export const facade = IFacade<AppFacade>();
+
+// inject facade 內容
+provideFacade({
+    deps: {
+      ...mappers,
+      ...dataSource,
+      ...rep,
+      ...presentation,
+      ...services
+    }, 
+});
+```
+
+
+二種 pattern 區分如下：
 
 1) 提供 [Dependency Provider](#dependency-provider%E5%B0%8D%E6%87%89-dependency-injector) design pattern，將 dependency以 ident 作為 key 植入 container
 2) 提供 [Facade Provider](#facade-provider-%E5%B0%8D%E6%87%89facade-injector) design pattern，將 dependency 以 FACADE_KEY 作為 key 植入 container, 為App開發時提供一個入口，以存取所需的一切資料. 
