@@ -2,10 +2,11 @@
 input:
  docs/readme.md:  {noYAML: true, doctoc: true, replace: {<!--#-->: "# 前端常用工具:"}}
  docs/facade.md:  {noYAML: true, doctoc: true, replace: {<!--#-->: "# Facade:"}}
- docs/reactive.md:  {noYAML: true, doctoc: true, replace: {<!--#-->: "# 注入 ui framework reactive 方法:"}}
  docs/lazyloading.md:  {noYAML: true, doctoc: true, replace: {<!--#-->: "# Lazy Loading:"}}
- docs/apiTestUtil_CRUD.md:  {noYAML: true, doctoc: true, replace: {<!--#-->: "# Writing pseudo code for api - 測試API工具:"}}
+ docs/queue.md:  {noYAML: true, doctoc: true, replace: {<!--#-->: "# Queue:"}}
  docs/common_util.md:  {noYAML: true, doctoc: true, replace: {<!--#-->: "# Common Utils:"}}
+ docs/apiTestUtil_CRUD.md:  {noYAML: true, doctoc: true, replace: {<!--#-->: "# Writing pseudo code for api - 測試API工具:"}}
+ docs/reactive.md:  {noYAML: true, doctoc: true, replace: {<!--#-->: "# 注入 ui framework reactive 方法:"}}
 output: 
   name: README.md
   doctoc:

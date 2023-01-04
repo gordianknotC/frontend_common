@@ -39,12 +39,16 @@
                 "source": "lazyloading.md",
             },
             {
-                "title": "Writing pseudo code for api",
-                "source": "apiTestUtil_CRUD.md",
+                "title": "Queue",
+                "source": "queue.md",
             },
             {
                 "title": "Common util for js",
                 "source": "common_utils.md",
+            },
+            {
+                "title": "Writing pseudo code for api",
+                "source": "apiTestUtil_CRUD.md",
             },
             {
                 "title": "注入 ui framework reactive 方法",
