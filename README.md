@@ -17,6 +17,7 @@ yarn serve:doc
 - injector
 - declare lazy loading object
 - declare lazy loading function
+- promise queue
 - a CRUD function for writing pseudo code api
 
 # Table of Content
@@ -38,18 +39,22 @@ table of content
     - [InjectFacade](#injectfacade)
   - [應用於 App 上開發](#%E6%87%89%E7%94%A8%E6%96%BC-app-%E4%B8%8A%E9%96%8B%E7%99%BC)
     - [以 Domain Driven Design 為架構的 App 為例](#%E4%BB%A5-domain-driven-design-%E7%82%BA%E6%9E%B6%E6%A7%8B%E7%9A%84-app-%E7%82%BA%E4%BE%8B)
-- [注入 ui framework reactive 方法:](#%E6%B3%A8%E5%85%A5-ui-framework-reactive-%E6%96%B9%E6%B3%95)
-  - [Inject Reactive Method](#inject-reactive-method)
-    - [Vue 為例](#vue-%E7%82%BA%E4%BE%8B)
-    - [React 為例](#react-%E7%82%BA%E4%BE%8B)
 - [Lazy Loading:](#lazy-loading)
   - [lazyHolder - lazy loading for objects](#lazyholder---lazy-loading-for-objects)
     - [Example: 以Locale 為例](#example-%E4%BB%A5locale-%E7%82%BA%E4%BE%8B)
   - [CallableDelegate - lazy loading for functions](#callabledelegate---lazy-loading-for-functions)
     - [以實作 vue watch method 為例](#%E4%BB%A5%E5%AF%A6%E4%BD%9C-vue-watch-method-%E7%82%BA%E4%BE%8B)
+- [Queue:](#queue)
+    - [enqueue](#enqueue)
+    - [dequeue](#dequeue)
+    - [dequeueByResult](#dequeuebyresult)
 - [Writing pseudo code for api - 測試API工具:](#writing-pseudo-code-for-api---%E6%B8%AC%E8%A9%A6api%E5%B7%A5%E5%85%B7)
   - [CRUD](#crud)
     - [Example](#example)
+- [注入 ui framework reactive 方法:](#%E6%B3%A8%E5%85%A5-ui-framework-reactive-%E6%96%B9%E6%B3%95)
+  - [Inject Reactive Method](#inject-reactive-method)
+    - [Vue 為例](#vue-%E7%82%BA%E4%BE%8B)
+    - [React 為例](#react-%E7%82%BA%E4%BE%8B)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -392,61 +397,6 @@ facade....
 
 
 ---
-# 注入 ui framework reactive 方法:
-## Inject Reactive Method
-設計上希望能夠不相依於任何一個 ui framework，因此需由外部注入相應的 reactive 方法，再於內部使用這個需要被使用者注入的 reactive 方法作為界面，以達到與 ui framework 相依分離，否於未注入前就使用，則會出現 **InvalidUsageError:** 錯誤。
-
-### Vue 為例
-1) 注入 vue computed method
-2) 注入 vue reactive method
-3) 注入 vue watch method
-4) 注入 vue ref method
-  
-**Example:**
-```typescript 
-import {
-  setupComputed,
-  setupCurrentEnv,
-  setupReactive,
-  setupRef,
-  setupWatch,
-} from "../src/extension/extension_setup";
-
-import {
-  computed as RComputed,
-  reactive as RReactive,
-  ref as RRef,
-} from "../src/extension/extension_setup";
-
-import { ref, reactive, watch, computed } from "vue";
-
-describe("ref setup", ()=>{
-  beforeAll(() => {
-    setupRef(ref);
-    setupReactive(reactive);
-    setupWatch(watch);
-    setupComputed(computed);
-    setupCurrentEnv("develop");
-  });
-
-  test("computed", ()=>{
-    expect(RComputed(()=>13).value).toBe(13);
-  });
-  test("ref", ()=>{
-    expect(RRef(13).value).toBe(13);
-  });
-  test("reactive", ()=>{
-    expect(RReactive({value: 13}).value).toBe(13);
-  });
-});
-```
-
-
-### React 為例
-> todo...
-
-
----
 # Lazy Loading:
 
 以 proxy實作 lazy loading for objects, 及 lazy loading for functions，用於許多需要相依分離或需要考慮啓動時序問題的情境，其核心類似 Provider/Injector design pattern 及 Delegate design pattern，分為物件LazyHolder 及 Callable Delegate
@@ -535,6 +485,145 @@ function setupWatch(watchConstructor: any){
 
 
 ---
+# Queue:
+Promise 實作駐列處理
+
+- enqueue
+- dequeue
+- dequeueByResult
+
+__型別__
+```ts
+export abstract class IQueue<T extends QueueItem> {
+  abstract queue: T[];
+  abstract enqueue(
+    id: number,
+    promise: () => Promise<any>,
+    timeout?: number
+  ): Promise<any>;
+  abstract dequeue(option: {id: number, removeQueue: boolean}): Promise<any>;
+  abstract dequeueByResult(option: {id: number, result: any}): Promise<any>;
+}
+```
+
+### enqueue
+> 將請求推到 Queue 裡，並同時執行 QueueItem，直到使用者 [dequeue] 才將 Queued 物件由列表中移除
+  
+__型別__:
+```ts
+/**
+ * 將請求推到 Queue 裡，並同時執行，直到使用者 
+ * {@link dequeue} 才將 Queued 物件由列表中移除
+ * @param id - 請求 ID
+ * @param promise - 處請求邏輯
+ * @param timeout - timeout
+ * @returns 
+ */
+  public enqueue(
+    id: number,
+    promise: () => Promise<any>,
+    timeout: number = 10000,
+  ): Promise<any>
+```
+
+__example__:
+```ts
+  const idC = 3;
+  q.enqueue(idC, async ()=>{
+    return new Promise(async resolve =>{
+      await wait(span);
+      resolve({idC});
+    });
+  });
+  expect(q.queue.length).toBe(1);
+```
+
+### dequeue
+> 執行queue裡的item，並依option.removeQueue決定是否移除queued item
+
+__型別__:
+```ts
+/**
+ * 執行queue裡的item，並依option.removeQueue決定是否移除queued item
+ * 預設 option.removeQueue 為 true
+ * @param option.id - 取得queue的id
+ * @param option.removeQueue - 預設 true
+ * @returns 
+ */
+public async dequeue(option: {id: number, removeQueue?: boolean}): Promise<any>
+```
+
+__example__:
+```ts
+test("expect raise exception while it's queuing", async ()=>{
+    let rA, rB, rC, rD;
+    let [wA, wB, wC, wD] = [100, 200, 600, 800];
+    const t = time();
+    q.enqueue(idA, async ()=>{
+      return new Promise(async resolve =>{
+        await wait(wA);
+        rA = {idA};
+        resolve({idA});
+      });
+    });
+    expect(q.queue.length).toBe(1);
+    q.enqueue(idC, async ()=>{
+      return new Promise(async resolve =>{
+        await wait(wC);
+        rC = {idC}
+        resolve({idC});
+      });
+    });
+    expect(q.queue.length).toBe(2);
+    expect(q.enqueue(idB, async ()=>{
+      return new Promise(async (resolve, reject) =>{
+        await wait(wB);
+        reject("reject...");
+      });
+    })).rejects.toEqual("reject...");
+    expect(q.queue.length).toBe(3);
+
+    const resultA = await q.dequeue({id: idA});
+    expect(resultA).toEqual({idA});
+    expect(q.queue.length).toBe(2);
+    
+    const resultC = await q.dequeue({id: idC});
+    expect(resultC).toEqual({idC});
+    expect(q.queue.length).toBe(1);
+
+    const resultB = await q.dequeue({id: idB});
+    expect(q.queue.length).toBe(0);
+  });
+```
+
+### dequeueByResult
+> 提供 queue item 回傳 promise resolve 的結果，並將 queue item 移除
+
+__型別__:
+```ts
+  /**
+   * 提供 queue item 回傳 promise resolve 的結困，並將 queue item 移除
+   * @param option.id - 取得queue的id
+   * @param option.removeQueue - 預設 true
+   * @returns 
+   */
+  public async dequeueByResult(option: {id: number, result: any}): Promise<any>
+```
+
+__example__:
+```ts
+const pendingId = "idA";
+// 十秒後 timeout
+const pending = q.enqueue(pendingId, async ()=>{
+    return waitForTimeOut(10 * 1000);
+});
+// 覆寫內容於是能將值返回給 pending 
+q.dequeueByResult({id: pendingId, result: {succeed: true}});
+expect(pending).resolves.toEquals({succeed: true});
+```
+
+
+---
 # Writing pseudo code for api - 測試API工具:
 
 ## CRUD
@@ -596,3 +685,58 @@ api.news.del(payload);
 api.news.edit(payload);
 api.news.get(pagerPayload)
 ```
+
+
+---
+# 注入 ui framework reactive 方法:
+## Inject Reactive Method
+設計上希望能夠不相依於任何一個 ui framework，因此需由外部注入相應的 reactive 方法，再於內部使用這個需要被使用者注入的 reactive 方法作為界面，以達到與 ui framework 相依分離，否於未注入前就使用，則會出現 **InvalidUsageError:** 錯誤。
+
+### Vue 為例
+1) 注入 vue computed method
+2) 注入 vue reactive method
+3) 注入 vue watch method
+4) 注入 vue ref method
+  
+**Example:**
+```typescript 
+import {
+  setupComputed,
+  setupCurrentEnv,
+  setupReactive,
+  setupRef,
+  setupWatch,
+} from "../src/extension/extension_setup";
+
+import {
+  computed as RComputed,
+  reactive as RReactive,
+  ref as RRef,
+} from "../src/extension/extension_setup";
+
+import { ref, reactive, watch, computed } from "vue";
+
+describe("ref setup", ()=>{
+  beforeAll(() => {
+    setupRef(ref);
+    setupReactive(reactive);
+    setupWatch(watch);
+    setupComputed(computed);
+    setupCurrentEnv("develop");
+  });
+
+  test("computed", ()=>{
+    expect(RComputed(()=>13).value).toBe(13);
+  });
+  test("ref", ()=>{
+    expect(RRef(13).value).toBe(13);
+  });
+  test("reactive", ()=>{
+    expect(RReactive({value: 13}).value).toBe(13);
+  });
+});
+```
+
+
+### React 為例
+> todo...

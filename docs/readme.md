@@ -17,6 +17,7 @@ yarn serve:doc
 - injector
 - declare lazy loading object
 - declare lazy loading function
+- promise queue
 - a CRUD function for writing pseudo code api
 
 # Table of Content
