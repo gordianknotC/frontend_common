@@ -143,6 +143,24 @@ describe("Services", ()=>{
       expect(time() - t).toBeGreaterThanOrEqual(wD );
     });
 
+    test("dequeueByResult", async ()=>{
+      let rA, rB, rC, rD;
+      let [wA, wB, wC, wD] = [100, 200, 600, 800];
+      const t = time();
+      const pending = q.enqueue(idD, async ()=>{
+        return new Promise(async resolve =>{
+          await wait(10000);
+        });
+      });
+      await wait(wD);
+      q.dequeueByResult({id: idD, result: {
+        succeed: true
+      }});
+
+      expect(pending).resolves.toEqual({
+        succeed: true
+      });
+    })
     test("expect raise exception while it's queuing", async ()=>{
       let rA, rB, rC, rD;
       let [wA, wB, wC, wD] = [100, 200, 600, 800];

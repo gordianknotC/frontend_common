@@ -80,7 +80,7 @@ describe("Provider", () => {
     });
   });
   describe("Facade Provider/Injector", ()=>{
-test("Simple test without enabling merge", ()=>{
+    test("Simple test without enabling merge", ()=>{
       provideFacade({
         deps: {
           Elton: "Elton",
