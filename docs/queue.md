@@ -113,7 +113,7 @@ test("expect raise exception while it's queuing", async ()=>{
 ```
 
 ### dequeueByResult
-> 提供 queue item 回傳 promise resolve 的結果，並將 queue item 移除
+> 提供 queue item 回傳 promise resolve 的結果，並將 queue item 移除 (概念籍用 Dart (Future/Completer))
 
 __型別__:
 ```ts
