@@ -8,12 +8,14 @@ export type { UnwrapRef, PropType, Prop, ComponentPropsOptions, Ref, ComputedRef
 export { UnCaughtCondition, UncaughtEnumType, NotImplementedError, TypeMismatchError, InvalidUsageError, UnExpectedError, } from "./base/baseExceptions";
 /***
  *
- *    B A S E EXT
+ *    U T I L S
  *
  * */
 export { AssertMsg, AssertionError, assert } from "./utils/assert";
 export { isRefImpl, asEnum, getAccessibleProperties, flattenInstance, asUnWrappedVueRefMap, UnWrappedVueRef, asMapFromNumberedEnum as addStringMappingFromNumEnum, Is, getOmitsBy, } from "./utils/typeInference";
 export type { TUnWrapVueRef, InterfaceIs } from "./utils/typeInference";
+export type { QueueItem, IQueue } from "./utils/queue";
+export { Queue } from "./utils/queue";
 /**
  *
  *        C O R E

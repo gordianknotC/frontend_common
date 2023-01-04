@@ -92,7 +92,23 @@ export declare function provideFacade<T>(option: ProviderParams<T>): void;
  * @see also {@link provideFacade}
  * @example
     ```ts
-    
+    test("Simple test without enabling merge", ()=>{
+      provideDependency({
+        deps: {
+          Elton: "Elton",
+          John: "John",
+          users: {
+            EltonJohn: "EltonJohn"
+          }
+        }
+      });
+      const Elton = injectDependency("Elton");
+      const John = injectDependency("John");
+      const EltonJohn = injectDependency("users.EltonJohn");
+      expect(Elton).toBe("Elton");
+      expect(John).toBe("John");
+      expect(EltonJohn).toBe("EltonJohn");
+    });
     ```
  * */
 export declare const provideDependency: typeof provideFacade;
