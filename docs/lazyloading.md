@@ -69,7 +69,7 @@ export class CallableDelegate<CALLABLE extends Function> extends Function {
   }
 }
 ```
-### 以實作 vue watch method 為例
+### 以注入 vue watch method 為例
 ```ts
 // 這裡只宣告 watchMethod 的介面，及空的 instance，內容還沒有注入
 // 因此會報錯 "watch method used before initialized"

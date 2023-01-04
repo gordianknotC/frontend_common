@@ -43,7 +43,7 @@ table of content
   - [lazyHolder - lazy loading for objects](#lazyholder---lazy-loading-for-objects)
     - [Example: 以Locale 為例](#example-%E4%BB%A5locale-%E7%82%BA%E4%BE%8B)
   - [CallableDelegate - lazy loading for functions](#callabledelegate---lazy-loading-for-functions)
-    - [以實作 vue watch method 為例](#%E4%BB%A5%E5%AF%A6%E4%BD%9C-vue-watch-method-%E7%82%BA%E4%BE%8B)
+    - [以注入 vue watch method 為例](#%E4%BB%A5%E6%B3%A8%E5%85%A5-vue-watch-method-%E7%82%BA%E4%BE%8B)
 - [Queue:](#queue)
     - [enqueue](#enqueue)
     - [dequeue](#dequeue)
@@ -492,7 +492,7 @@ export class CallableDelegate<CALLABLE extends Function> extends Function {
   }
 }
 ```
-### 以實作 vue watch method 為例
+### 以注入 vue watch method 為例
 ```ts
 // 這裡只宣告 watchMethod 的介面，及空的 instance，內容還沒有注入
 // 因此會報錯 "watch method used before initialized"
