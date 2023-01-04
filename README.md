@@ -58,10 +58,10 @@ table of content
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-
-
-[s-provideDependency]: ../src/vueMixins/common.ts
-[s-provideFacade]: ../src/vueMixins/common.ts
+[s-provideDependency]: src/vueMixins/common.ts
+[s-provideFacade]: src/vueMixins/common.ts
+[s-queue]: src/utils/queue.ts
+[s-test-queue]: __tests__/queue.test.ts
 
 ---
 # Facade:
@@ -492,7 +492,7 @@ Promise 實作駐列處理
 - dequeue
 - dequeueByResult
 
-__型別__
+__型別__ | [source][s-queue]
 ```ts
 export abstract class IQueue<T extends QueueItem> {
   abstract queue: T[];
@@ -526,7 +526,7 @@ __型別__:
   ): Promise<any>
 ```
 
-__example__:
+__example__ | [source][s-test-queue]:
 ```ts
   const idC = 3;
   q.enqueue(idC, async ()=>{
@@ -553,7 +553,7 @@ __型別__:
 public async dequeue(option: {id: number, removeQueue?: boolean}): Promise<any>
 ```
 
-__example__:
+__example__ | [source][s-test-queue]:
 ```ts
 test("expect raise exception while it's queuing", async ()=>{
     let rA, rB, rC, rD;
@@ -610,7 +610,7 @@ __型別__:
   public async dequeueByResult(option: {id: number, result: any}): Promise<any>
 ```
 
-__example__:
+__example__ | [source][s-test-queue]:
 ```ts
 const pendingId = "idA";
 // 十秒後 timeout

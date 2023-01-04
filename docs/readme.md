@@ -24,7 +24,7 @@ yarn serve:doc
 <!-- START doctoc -->
 <!-- END doctoc -->
 
-
-
-[s-provideDependency]: ../src/vueMixins/common.ts
-[s-provideFacade]: ../src/vueMixins/common.ts
+[s-provideDependency]: src/vueMixins/common.ts
+[s-provideFacade]: src/vueMixins/common.ts
+[s-queue]: src/utils/queue.ts
+[s-test-queue]: __tests__/queue.test.ts
