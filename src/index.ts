@@ -46,7 +46,7 @@ export {
 
 /***
  *
- *    B A S E EXT
+ *    U T I L S
  *
  * */
 
@@ -65,6 +65,8 @@ export {
 } from "~/utils/typeInference";
 
 export type { TUnWrapVueRef, InterfaceIs } from "~/utils/typeInference";
+export type { QueueItem, IQueue } from "~/utils/queue";
+export { Queue } from "~/utils/queue";
 
 /**
  *
