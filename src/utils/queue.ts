@@ -13,6 +13,7 @@ export type QueueItem<M=any> = {
 
 export abstract class IQueue<T extends QueueItem> {
   abstract queue: ArrayDelegate<T>;
+  abstract get isEmpty(): boolean;
   abstract enqueue(
     id: number|string,
     promise: () => Promise<any>,
@@ -85,6 +86,10 @@ export abstract class IQueueConsumer<T extends QueueItem> {
  */
 export class Queue implements IQueue<QueueItem> {
   queue: ArrayDelegate<QueueItem> = Arr([]);
+  /** 判斷 {@link queue} 是否為空 */
+  get isEmpty(){
+    return this.queue.length == 0;
+  }
   constructor(
     public timeoutErrorObj: any = {
       error_code: "timeout",
