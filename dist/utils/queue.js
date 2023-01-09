@@ -133,6 +133,13 @@ class Queue {
         this.queue.remove(item);
         console.log("remove:", item.id);
     }
+    /**清除 {@link queue} */
+    clearQueue() {
+        for (let index = 0; index < this.queue.length; index++) {
+            const item = this.queue[index];
+            this.remove(item);
+        }
+    }
     /**
      * 提供 queue item 回傳 promise resolve 的結困，並將 queue item 移除
      * @param option.id - 取得queue的id

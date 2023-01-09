@@ -21,6 +21,7 @@ export declare abstract class IQueue<T extends QueueItem> {
         id: number | string;
         result: any;
     }): Promise<any>;
+    abstract clearQueue(): void;
 }
 export declare abstract class IQueueConsumer<T extends QueueItem> {
     abstract queue: IQueue<T>;
@@ -112,6 +113,8 @@ export declare class Queue implements IQueue<QueueItem> {
     private _getId;
     private onTimeout;
     private remove;
+    /**清除 {@link queue} */
+    clearQueue(): void;
     /**
      * 提供 queue item 回傳 promise resolve 的結困，並將 queue item 移除
      * @param option.id - 取得queue的id

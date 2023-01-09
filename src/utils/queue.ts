@@ -21,6 +21,7 @@ export abstract class IQueue<T extends QueueItem> {
   ): Promise<any>;
   abstract dequeue(option: {id: number|string, removeQueue: boolean}): Promise<any>;
   abstract dequeueByResult(option: {id: number|string, result: any}): Promise<any>;
+  abstract clearQueue(): void;
 }
 
 
@@ -169,6 +170,15 @@ export class Queue implements IQueue<QueueItem> {
     this.queue.remove(item);
     console.log("remove:", item.id);
   }
+
+  /**清除 {@link queue} */
+  public clearQueue(): void {
+    for (let index = 0; index < this.queue.length; index++) {
+      const item = this.queue[index];
+      this.remove(item);
+    }
+  }
+
 
   /**
    * 提供 queue item 回傳 promise resolve 的結困，並將 queue item 移除
