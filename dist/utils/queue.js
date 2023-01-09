@@ -1,10 +1,14 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Queue = exports.IQueue = void 0;
+exports.SequencedQueueConsumer = exports.Queue = exports.IQueueConsumer = exports.IQueue = void 0;
+const crypto_1 = require("crypto");
 const __1 = require("..");
 class IQueue {
 }
 exports.IQueue = IQueue;
+class IQueueConsumer {
+}
+exports.IQueueConsumer = IQueueConsumer;
 /**
  * 應用如 api client 處理需籍由 websocket 傳送出去的請求, 將請求暫存於 queue 以後，待收到 socket
  * 資料，再由 queue 裡的 promise resolve 返回值， resolve 後無論成功失敗，移除該筆 queue
@@ -85,12 +89,13 @@ class Queue {
         });
         ```
      */
-    enqueue(id, promise, timeout = 10000) {
+    enqueue(id, promise, timeout = 10000, meta = {}, dequeueImmediately = true) {
         const timestamp = new Date().getTime();
         return new Promise((resolve, reject) => {
             this.queue.push({
                 id,
                 timestamp,
+                meta,
                 timeout: setTimeout(() => {
                     this.onTimeout(id);
                 }, timeout),
@@ -98,8 +103,17 @@ class Queue {
                 resolve,
                 reject
             });
-            this.dequeue({ id, removeQueue: false });
+            if (dequeueImmediately)
+                this.dequeue({ id, removeQueue: false });
         });
+    }
+    enqueueWithNoId(promise) {
+        this.enqueue(this._getId(), promise);
+        const item = this.queue.last;
+        return item;
+    }
+    _getId() {
+        return (0, crypto_1.randomUUID)();
     }
     onTimeout(id) {
         const item = this.queue.firstWhere(_ => _.id == id);
@@ -127,6 +141,26 @@ class Queue {
       // 覆寫內容於是能將值返回給 pending
       q.dequeueByResult({id: pendingId, result: {succeed: true}});
       expect(pending).resolves.toEquals({succeed: true});
+     ```
+  
+     @example - refreshToken 換發
+     ```ts
+      const pendingId = "idA";
+      // 十秒後 timeout
+      const pendingRequest = q.enqueue(pendingId, async ()=>{
+          const response = await axios.get(...);
+          const isAuthExpired = ...;
+          if (isAuthExpired){
+            const waiting =  waitForTimeOut(10, 1000);
+            refreshAuth().then(async (_)=>{
+              await result = await fetchAgain();
+              q.dequeueByResult({id: pendingId, result});
+            });
+            return waiting;
+          }else{
+            return response;
+          }
+      });
      ```
      */
     async dequeueByResult(option) {
@@ -178,4 +212,24 @@ class Queue {
     }
 }
 exports.Queue = Queue;
+class SequencedQueueConsumer {
+    constructor(queue) {
+        this.queue = queue;
+    }
+    _getId() {
+        return (0, crypto_1.randomUUID)();
+    }
+    feedRequest(request) {
+        this.queue.enqueue(this._getId(), request);
+        const item = this.queue.queue.last;
+        return item;
+    }
+    consumeAll() {
+        throw new Error("Method not implemented.");
+    }
+    consumeAllWhen(condition) {
+        throw new Error("Method not implemented.");
+    }
+}
+exports.SequencedQueueConsumer = SequencedQueueConsumer;
 //# sourceMappingURL=queue.js.map

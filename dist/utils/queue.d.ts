@@ -1,7 +1,8 @@
 /// <reference types="node" />
 import { ArrayDelegate } from "..";
-export declare type QueueItem = {
-    id: number;
+export declare type QueueItem<M = any> = {
+    id: number | string;
+    meta?: M;
     promise: () => Promise<any>;
     resolve: any;
     reject: any;
@@ -9,16 +10,22 @@ export declare type QueueItem = {
     timeout: NodeJS.Timeout;
 };
 export declare abstract class IQueue<T extends QueueItem> {
-    abstract queue: T[];
-    abstract enqueue(id: number, promise: () => Promise<any>, timeout?: number): Promise<any>;
+    abstract queue: ArrayDelegate<T>;
+    abstract enqueue(id: number | string, promise: () => Promise<any>, timeout?: number): Promise<any>;
     abstract dequeue(option: {
-        id: number;
+        id: number | string;
         removeQueue: boolean;
     }): Promise<any>;
     abstract dequeueByResult(option: {
-        id: number;
+        id: number | string;
         result: any;
     }): Promise<any>;
+}
+export declare abstract class IQueueConsumer<T extends QueueItem> {
+    abstract queue: IQueue<T>;
+    abstract feedRequest(request: () => Promise<any>): QueueItem;
+    abstract consumeAll(): Promise<any>;
+    abstract consumeAllWhen(condition: (item: QueueItem) => boolean): Promise<any>;
 }
 /**
  * 應用如 api client 處理需籍由 websocket 傳送出去的請求, 將請求暫存於 queue 以後，待收到 socket
@@ -94,7 +101,9 @@ export declare class Queue implements IQueue<QueueItem> {
         });
         ```
      */
-    enqueue(id: number, promise: () => Promise<any>, timeout?: number): Promise<any>;
+    enqueue(id: number | string, promise: () => Promise<any>, timeout?: number, meta?: any, dequeueImmediately?: boolean): Promise<any>;
+    enqueueWithNoId(promise: () => Promise<any>): QueueItem<any>;
+    private _getId;
     private onTimeout;
     private remove;
     /**
@@ -113,9 +122,29 @@ export declare class Queue implements IQueue<QueueItem> {
       q.dequeueByResult({id: pendingId, result: {succeed: true}});
       expect(pending).resolves.toEquals({succeed: true});
      ```
+  
+     @example - refreshToken 換發
+     ```ts
+      const pendingId = "idA";
+      // 十秒後 timeout
+      const pendingRequest = q.enqueue(pendingId, async ()=>{
+          const response = await axios.get(...);
+          const isAuthExpired = ...;
+          if (isAuthExpired){
+            const waiting =  waitForTimeOut(10, 1000);
+            refreshAuth().then(async (_)=>{
+              await result = await fetchAgain();
+              q.dequeueByResult({id: pendingId, result});
+            });
+            return waiting;
+          }else{
+            return response;
+          }
+      });
+     ```
      */
     dequeueByResult(option: {
-        id: number;
+        id: number | string;
         result: any;
     }): Promise<any>;
     /**
@@ -126,7 +155,15 @@ export declare class Queue implements IQueue<QueueItem> {
      * @returns
      */
     dequeue(option: {
-        id: number;
+        id: number | string;
         removeQueue?: boolean;
     }): Promise<any>;
+}
+export declare class SequencedQueueConsumer implements IQueueConsumer<QueueItem> {
+    queue: IQueue<QueueItem<any>>;
+    constructor(queue: IQueue<QueueItem<any>>);
+    private _getId;
+    feedRequest(request: () => Promise<any>): QueueItem;
+    consumeAll(): Promise<any>;
+    consumeAllWhen(condition: (item: QueueItem<any>) => boolean): Promise<any>;
 }

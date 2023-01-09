@@ -1,7 +1,9 @@
+import { randomUUID } from "crypto";
 import { ArrayDelegate, Arr } from "..";
 
-export type QueueItem = {
-  id: number;
+export type QueueItem<M=any> = {
+  id: number|string;
+  meta?: M;
   promise: () => Promise<any>;
   resolve: any;
   reject: any;
@@ -10,14 +12,22 @@ export type QueueItem = {
 };
 
 export abstract class IQueue<T extends QueueItem> {
-  abstract queue: T[];
+  abstract queue: ArrayDelegate<T>;
   abstract enqueue(
-    id: number,
+    id: number|string,
     promise: () => Promise<any>,
     timeout?: number
   ): Promise<any>;
-  abstract dequeue(option: {id: number, removeQueue: boolean}): Promise<any>;
-  abstract dequeueByResult(option: {id: number, result: any}): Promise<any>;
+  abstract dequeue(option: {id: number|string, removeQueue: boolean}): Promise<any>;
+  abstract dequeueByResult(option: {id: number|string, result: any}): Promise<any>;
+}
+
+
+export abstract class IQueueConsumer<T extends QueueItem> {
+  abstract queue: IQueue<T>;
+  abstract feedRequest(request: () => Promise<any>): QueueItem;
+  abstract consumeAll(): Promise<any>;
+  abstract consumeAllWhen(condition: (item: QueueItem)=>boolean): Promise<any>;
 }
 
 /**
@@ -88,7 +98,9 @@ export class Queue implements IQueue<QueueItem> {
    * {@link dequeue} 才將 Queued 物件由列表中移除
    * @param id - 請求 ID
    * @param promise - 處請求邏輯
-   * @param timeout - timeout
+   * @param timeout - default 10 * 1000
+   * @param meta - 使用者自定義註解
+   * @param dequeueImmediately - 
    * @returns 
    * @example
       ```ts
@@ -101,15 +113,18 @@ export class Queue implements IQueue<QueueItem> {
       ```
    */
   public enqueue(
-    id: number,
+    id: number|string,
     promise: () => Promise<any>,
     timeout: number = 10000,
+    meta: any = {},
+    dequeueImmediately: boolean = true,
   ): Promise<any> {
     const timestamp = new Date().getTime();
     return new Promise((resolve, reject) => {
       this.queue.push({
         id,
         timestamp,
+        meta,
         timeout: setTimeout(() => {
           this.onTimeout(id);
         }, timeout),
@@ -117,11 +132,28 @@ export class Queue implements IQueue<QueueItem> {
         resolve,
         reject
       });
-      this.dequeue({id, removeQueue: false});
+      if (dequeueImmediately)
+        this.dequeue({id, removeQueue: false});
     });
   }
 
-  private onTimeout(id: number) {
+  /** 與  {@link enqueue} 相同，只是 id 自動生成 */
+  public enqueueWithNoId(
+    promise: () => Promise<any>,
+    timeout: number = 10000,
+    meta: any = {},
+    dequeueImmediately: boolean = true,
+  ){
+    this.enqueue(this._getId() , promise, timeout, meta, dequeueImmediately);
+    const item = this.queue.last;
+    return item;
+  }
+
+  private _getId(): number|string{
+    return randomUUID();
+  }
+
+  private onTimeout(id: number|string) {
     const item = this.queue.firstWhere(_ => _.id == id)!;
     if (!item) return;
     item.reject(this.timeoutErrorObj);
@@ -149,8 +181,28 @@ export class Queue implements IQueue<QueueItem> {
     q.dequeueByResult({id: pendingId, result: {succeed: true}});
     expect(pending).resolves.toEquals({succeed: true});
    ```
+
+   @example - refreshToken 換發
+   ```ts
+    const pendingId = "idA";
+    // 十秒後 timeout
+    const pendingRequest = q.enqueue(pendingId, async ()=>{
+        const response = await axios.get(...);
+        const isAuthExpired = ...;
+        if (isAuthExpired){
+          const waiting =  waitForTimeOut(10, 1000);
+          refreshAuth().then(async (_)=>{
+            await result = await fetchAgain();
+            q.dequeueByResult({id: pendingId, result});
+          });
+          return waiting;
+        }else{
+          return response;
+        }
+    });
+   ```
    */
-  public async dequeueByResult(option: {id: number, result: any}): Promise<any> {
+  public async dequeueByResult(option: {id: number|string, result: any}): Promise<any> {
     const {id, result} = option;
     const removeQueue = true;
     const item = this.queue.firstWhere(_ => _.id == id)!;
@@ -177,7 +229,7 @@ export class Queue implements IQueue<QueueItem> {
    * @param option.removeQueue - 預設 true
    * @returns 
    */
-  public async dequeue(option: {id: number, removeQueue?: boolean}): Promise<any> {
+  public async dequeue(option: {id: number|string, removeQueue?: boolean}): Promise<any> {
     const {id, removeQueue} = option;
     const item = this.queue.firstWhere(_ => _.id == id)!;
     if (!item) {
@@ -195,5 +247,27 @@ export class Queue implements IQueue<QueueItem> {
         this.remove(item);
     }
     return null;
+  }
+}
+
+export class SequencedQueueConsumer 
+  implements IQueueConsumer<QueueItem>
+{
+  constructor(public queue: IQueue<QueueItem<any>>){}
+
+  private _getId(): number|string{
+    return randomUUID();
+  }
+  feedRequest(request: () => Promise<any>): QueueItem {
+    this.queue.enqueue(this._getId() , request);
+    const item = this.queue.queue.last;
+    return item;
+  }
+
+  consumeAll(): Promise<any> {
+    throw new Error("Method not implemented.");
+  }
+  consumeAllWhen(condition: (item: QueueItem<any>) => boolean): Promise<any> {
+    throw new Error("Method not implemented.");
   }
 }
