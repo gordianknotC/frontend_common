@@ -72,12 +72,18 @@ class Queue {
         this.timeoutErrorObj = timeoutErrorObj;
         this.queue = (0, __1.Arr)([]);
     }
+    /** 判斷 {@link queue} 是否為空 */
+    get isEmpty() {
+        return this.queue.length == 0;
+    }
     /**
      * 將請求推到 Queue 裡，並同時執行，直到使用者
      * {@link dequeue} 才將 Queued 物件由列表中移除
      * @param id - 請求 ID
      * @param promise - 處請求邏輯
-     * @param timeout - timeout
+     * @param timeout - default 10 * 1000
+     * @param meta - 使用者自定義註解
+     * @param dequeueImmediately -
      * @returns
      * @example
         ```ts
@@ -107,8 +113,9 @@ class Queue {
                 this.dequeue({ id, removeQueue: false });
         });
     }
-    enqueueWithNoId(promise) {
-        this.enqueue(this._getId(), promise);
+    /** 與  {@link enqueue} 相同，只是 id 自動生成 */
+    enqueueWithNoId(promise, timeout = 10000, meta = {}, dequeueImmediately = true) {
+        this.enqueue(this._getId(), promise, timeout, meta, dequeueImmediately);
         const item = this.queue.last;
         return item;
     }

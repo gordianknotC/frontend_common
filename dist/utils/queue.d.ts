@@ -11,6 +11,7 @@ export declare type QueueItem<M = any> = {
 };
 export declare abstract class IQueue<T extends QueueItem> {
     abstract queue: ArrayDelegate<T>;
+    abstract get isEmpty(): boolean;
     abstract enqueue(id: number | string, promise: () => Promise<any>, timeout?: number): Promise<any>;
     abstract dequeue(option: {
         id: number | string;
@@ -83,13 +84,17 @@ export declare abstract class IQueueConsumer<T extends QueueItem> {
 export declare class Queue implements IQueue<QueueItem> {
     timeoutErrorObj: any;
     queue: ArrayDelegate<QueueItem>;
+    /** 判斷 {@link queue} 是否為空 */
+    get isEmpty(): boolean;
     constructor(timeoutErrorObj?: any);
     /**
      * 將請求推到 Queue 裡，並同時執行，直到使用者
      * {@link dequeue} 才將 Queued 物件由列表中移除
      * @param id - 請求 ID
      * @param promise - 處請求邏輯
-     * @param timeout - timeout
+     * @param timeout - default 10 * 1000
+     * @param meta - 使用者自定義註解
+     * @param dequeueImmediately -
      * @returns
      * @example
         ```ts
@@ -102,7 +107,8 @@ export declare class Queue implements IQueue<QueueItem> {
         ```
      */
     enqueue(id: number | string, promise: () => Promise<any>, timeout?: number, meta?: any, dequeueImmediately?: boolean): Promise<any>;
-    enqueueWithNoId(promise: () => Promise<any>): QueueItem<any>;
+    /** 與  {@link enqueue} 相同，只是 id 自動生成 */
+    enqueueWithNoId(promise: () => Promise<any>, timeout?: number, meta?: any, dequeueImmediately?: boolean): QueueItem<any>;
     private _getId;
     private onTimeout;
     private remove;
