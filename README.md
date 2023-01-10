@@ -17,7 +17,8 @@ yarn serve:doc
 - injector
 - declare lazy loading object
 - declare lazy loading function
-- promise queue
+- promise queue 
+- completer (類似 Promise, 只是將 resolve/reject 寫進物件中)
 - a CRUD function for writing pseudo code api
 
 # Table of Content
@@ -655,7 +656,7 @@ expect(pending).resolves.toEquals({succeed: true});
 
 ---
 # Completer:
-Completer (假用Dart Completer概念), Completer 為 Promise 物件，只是將 reject/resolve 方法寫進 Completer 物件中，只要持有 Completer 物件便能待不確定的未來中執行 reject/resolve 方法以返回 Promise 結果
+Completer (借用Dart Completer概念), 將 Promise 物件寫進 Completer.future 中，並將 reject/resolve 方法也寫進 Completer 物件中，只要持有 Completer 物件便能待不確定的未來中執行 reject/resolve 方法以返回 Promise 結果
 
 __型別__ | [source][s-completer]
 ```ts

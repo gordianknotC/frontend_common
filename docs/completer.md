@@ -2,7 +2,7 @@
 
 ---
 <!--#-->
-Completer (假用Dart Completer概念), Completer 為 Promise 物件，只是將 reject/resolve 方法寫進 Completer 物件中，只要持有 Completer 物件便能待不確定的未來中執行 reject/resolve 方法以返回 Promise 結果
+Completer (借用Dart Completer概念), 將 Promise 物件寫進 Completer.future 中，並將 reject/resolve 方法也寫進 Completer 物件中，只要持有 Completer 物件便能待不確定的未來中執行 reject/resolve 方法以返回 Promise 結果
 
 __型別__ | [source][s-completer]
 ```ts

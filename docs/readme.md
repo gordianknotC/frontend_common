@@ -17,7 +17,8 @@ yarn serve:doc
 - injector
 - declare lazy loading object
 - declare lazy loading function
-- promise queue
+- promise queue 
+- completer (類似 Promise, 只是將 resolve/reject 寫進物件中)
 - a CRUD function for writing pseudo code api
 
 # Table of Content

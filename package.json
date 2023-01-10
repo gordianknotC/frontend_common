@@ -1,6 +1,6 @@
 {
   "name": "@gdknot/frontend_common",
-  "version": "0.7.2",
+  "version": "0.7.3",
   "description": "common js util for frontend development",
   "scripts": {
     "build": "tsc --project tsconfig.build.json && tsc-alias -p tsconfig.build.json",
