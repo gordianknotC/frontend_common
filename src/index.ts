@@ -67,6 +67,7 @@ export {
 export type { TUnWrapVueRef, InterfaceIs } from "~/utils/typeInference";
 export type { QueueItem, IQueue, IQueueConsumer } from "~/utils/queue";
 export { Queue, SequencedQueueConsumer } from "~/utils/queue";
+export { Completer  } from "~/utils/completer";
 
 /**
  *

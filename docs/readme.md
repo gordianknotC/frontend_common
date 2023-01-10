@@ -27,4 +27,6 @@ yarn serve:doc
 [s-provideDependency]: src/vueMixins/common.ts
 [s-provideFacade]: src/vueMixins/common.ts
 [s-queue]: src/utils/queue.ts
+[s-completer]: src/utils/completer.ts
 [s-test-queue]: __tests__/queue.test.ts
+[s-test-completer]: __tests__/completer.test.ts

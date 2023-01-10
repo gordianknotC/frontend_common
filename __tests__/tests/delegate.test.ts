@@ -8,7 +8,7 @@ import {
   _reactive,
   _ref,
   _watch,
-} from "../src/extension/extension_setup";
+} from "../../src/extension/extension_setup";
 import {
   is,
   asEnum,
@@ -19,9 +19,9 @@ import {
   Arr,
   ArrayDelegate,
   Obj,
-} from "../src/index";
+} from "../../src/index";
 import { ref, reactive, watch, computed } from "vue";
-import { CallableDelegate } from "../src/utils/lazy";
+import { CallableDelegate } from "../../src/utils/lazy";
 
 
 describe("Array/Object delegate tests", () => {

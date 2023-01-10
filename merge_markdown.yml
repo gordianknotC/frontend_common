@@ -4,6 +4,7 @@ input:
  docs/facade.md:  {noYAML: true, doctoc: true, replace: {<!--#-->: "# Facade:"}}
  docs/lazyloading.md:  {noYAML: true, doctoc: true, replace: {<!--#-->: "# Lazy Loading:"}}
  docs/queue.md:  {noYAML: true, doctoc: true, replace: {<!--#-->: "# Queue:"}}
+ docs/completer.md:  {noYAML: true, doctoc: true, replace: {<!--#-->: "# Completer:"}}
  docs/common_util.md:  {noYAML: true, doctoc: true, replace: {<!--#-->: "# Common Utils:"}}
  docs/apiTestUtil_CRUD.md:  {noYAML: true, doctoc: true, replace: {<!--#-->: "# Writing pseudo code for api - 測試API工具:"}}
  docs/reactive.md:  {noYAML: true, doctoc: true, replace: {<!--#-->: "# 注入 ui framework reactive 方法:"}}

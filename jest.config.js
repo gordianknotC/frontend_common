@@ -8,7 +8,9 @@ module.exports = {
   preset: "ts-jest",
   testEnvironment: "jsdom",
   extensionsToTreatAsEsm: [".ts"], // this is required in Jest doc https://jestjs.io/docs/next/configuration#extensionstotreatasesm-arraystring
-  testRegex: ["(/__tests__/.*|(\\.|/)(test|spec))\\.[jt]sx?$"],
+  testRegex: [
+    "(/__tests__/tests/.*|(\\.|/)(test|spec))\\.[jt]sx?$"
+  ],
   testPathIgnorePatterns: ["/node_modules/", "/__tests__/__mocks__/.*"],
   roots: ["<rootDir>"],
   modulePaths: ["<rootDir>/src"],

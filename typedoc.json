@@ -43,6 +43,10 @@
                 "source": "queue.md",
             },
             {
+                "title": "Completer",
+                "source": "completer.md",
+            },
+            {
                 "title": "Common util for js",
                 "source": "common_utils.md",
             },

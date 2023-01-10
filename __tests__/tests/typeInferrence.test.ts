@@ -12,13 +12,13 @@ import {
   getOmitsBy,
   flattenInstance,
   getAccessibleProperties,
-} from "../src/index";
+} from "../../src/index";
 import { ref, reactive, watch, computed } from "vue";
 import {
   _computed as RComputed,
   _reactive as RReactive,
   _ref as RRef,
-} from "../src/extension/extension_setup";
+} from "../../src/extension/extension_setup";
 
 
 describe("type inference tests", () => {

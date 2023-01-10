@@ -48,6 +48,7 @@ table of content
     - [enqueue](#enqueue)
     - [dequeue](#dequeue)
     - [dequeueByResult](#dequeuebyresult)
+- [Completer:](#completer)
 - [Writing pseudo code for api - 測試API工具:](#writing-pseudo-code-for-api---%E6%B8%AC%E8%A9%A6api%E5%B7%A5%E5%85%B7)
   - [CRUD](#crud)
     - [Example](#example)
@@ -61,7 +62,9 @@ table of content
 [s-provideDependency]: src/vueMixins/common.ts
 [s-provideFacade]: src/vueMixins/common.ts
 [s-queue]: src/utils/queue.ts
+[s-completer]: src/utils/completer.ts
 [s-test-queue]: __tests__/queue.test.ts
+[s-test-completer]: __tests__/completer.test.ts
 
 ---
 # Facade:
@@ -647,6 +650,44 @@ const pending = q.enqueue(pendingId, async ()=>{
 // 覆寫內容於是能將值返回給 pending 
 q.dequeueByResult({id: pendingId, result: {succeed: true}});
 expect(pending).resolves.toEquals({succeed: true});
+```
+
+
+---
+# Completer:
+Completer (假用Dart Completer概念), Completer 為 Promise 物件，只是將 reject/resolve 方法寫進 Completer 物件中，只要持有 Completer 物件便能待不確定的未來中執行 reject/resolve 方法以返回 Promise 結果
+
+__型別__ | [source][s-completer]
+```ts
+ export class Completer<T>  {
+  complete:(value: T | PromiseLike<T>) => void;
+  reject:(reason?: any) => void;
+  future: Promise<T>;
+  constructor() {
+    this.future= new Promise((resolve: any, reject: any)=>{
+      this.complete = (val: T)=>{
+        resolve(val);
+      };
+      this.reject = (reason)=>{
+        reject(reason);
+      };
+    })
+  }
+}
+```
+
+__example__ | [source][s-test-completer]:
+```ts
+  const completer = new Completer();
+  function fetch(){
+    return completer.future;
+  }
+  const futureResult = fetch();
+  await wait(400);
+  expect(typeof (futureResult.then)).toBe("function");
+  expect((futureResult as any).value).toBeUndefined();
+  completer.complete({value: ""})
+  expect(((await futureResult) as any).value).not.toBeUndefined();
 ```
 
 
