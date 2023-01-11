@@ -19,6 +19,7 @@ yarn serve:doc
 - declare lazy loading function
 - promise queue 
 - completer (類似 Promise, 只是將 resolve/reject 寫進物件中)
+- logger
 - a CRUD function for writing pseudo code api
 
 # Table of Content
@@ -50,6 +51,7 @@ table of content
     - [dequeue](#dequeue)
     - [dequeueByResult](#dequeuebyresult)
 - [Completer:](#completer)
+- [Logger:](#logger)
 - [Writing pseudo code for api - 測試API工具:](#writing-pseudo-code-for-api---%E6%B8%AC%E8%A9%A6api%E5%B7%A5%E5%85%B7)
   - [CRUD](#crud)
     - [Example](#example)
@@ -64,8 +66,10 @@ table of content
 [s-provideFacade]: src/vueMixins/common.ts
 [s-queue]: src/utils/queue.ts
 [s-completer]: src/utils/completer.ts
+[s-logger]: src/utils/logger.ts
 [s-test-queue]: __tests__/queue.test.ts
 [s-test-completer]: __tests__/completer.test.ts
+[s-test-logger]: __tests__/logger.test.ts
 
 ---
 # Facade:
@@ -677,6 +681,41 @@ __型別__ | [source][s-completer]
 }
 ```
 
+__example__
+如使用在 jest mocking test 中
+```ts
+const url = "/path/to/get";
+const expectedFetched = {
+  data: {username: "hello"}
+};
+const mockReturns = {
+  "error_code": 401,
+  "error_key": "Unauthorized",
+  "error_name": "Unauthorized",
+  "message": "Unauthorized",
+};
+const payload = {};
+const completer = new Completer();
+const wait = (helper.authHeaderUpdater!.processFulFill as any as jest.SpyInstance)
+  .withImplementation(
+    (config: AxiosRequestConfig<any>)=>{
+      return config;
+    }, async ()=>{
+      return completer.future;
+    }
+  );
+await helper.expectGetPassed(url,payload, mockReturns, expectedFetched);
+
+// 在 complete 前, processFulFill 都會一直維持 mocking implementation
+completer.complete({});
+await wait;
+// complete / wait 以後 恢復 implementation 
+expect(helper.authGuard!.canProcessReject).toBeCalled();
+expect(helper.authGuard!.canProcessFulFill).toBeCalled();
+```
+
+
+
 __example__ | [source][s-test-completer]:
 ```ts
   const completer = new Completer();
@@ -689,6 +728,101 @@ __example__ | [source][s-test-completer]:
   expect((futureResult as any).value).toBeUndefined();
   completer.complete({value: ""})
   expect(((await futureResult) as any).value).not.toBeUndefined();
+```
+
+
+---
+# Logger:
+Logger
+
+__型別__ | [source][s-logger]
+
+__example__ | [source][s-test-logger]:
+```ts
+  describe("Logger", () => {
+  let log: Logger<EModules>;
+  const testModule: AllowedModule<EModules> = {
+    moduleName: EModules.Test,
+    disallowedHandler: (level) => false,
+  };
+  const newLogModule: AllowedModule<EModules> = {
+    moduleName: EModules.Hobbits,
+    disallowedHandler: (level) => {
+      return level <= ELevel.info;
+    },
+  };
+  beforeAll(() => {
+    ...
+    log = new Logger(testModule);
+  });
+  test("add Module Test, expect Module Test exists", () => {
+    const option = log._allowance;
+    log = new Logger({ moduleName: EModules.Test });
+    expect(option).toBe(log._allowance);
+    expect(Logger.hasModule(testModule)).toBeTruthy();
+    expect(Logger.isAllowed(testModule, ELevel.trace)).toBeTruthy();
+  });
+  test("trace logger, expect only three stack showup on screen and first stack can trace back to SubTemp", () => {
+    const stackNumber = 3;
+    function Temp() {
+      function SubTemp() {
+        log.log(["hello world, it's testModule calling"], { stackNumber });
+      }
+      return SubTemp();
+    }
+    Temp();
+    expect(log._prevLog).not.toBeUndefined();
+    expect(log._prevLog.stacksOnDisplay.length).toBe(stackNumber);
+    expect(log._prevLog.stacksOnDisplay[0]).toContain("SubTemp");
+    expect(log._prevLog.moduleName).toBe("Test");
+  });
+
+  test("set disallowed module, expect new logger never being called", () => {
+    Logger.setLoggerAllowance<EModules>({
+      [EModules.Test]: testModule,
+    });
+    const newLog = new Logger(newLogModule);
+    log.log(["fellow", "it's testModule calling"]);
+    expect(log._prevLog.moduleName).toBe("Test");
+    expect(newLog._prevLog).toBeUndefined();
+  });
+
+  test("allow newLogModule and apply log on debug level, expect no logs to be allowed", () => {
+    Logger.setLoggerAllowance<EModules>({
+      [EModules.Test]: testModule,
+      [EModules.Hobbits]: newLogModule,
+    });
+    const newLog = new Logger(newLogModule);
+    newLog.log(["newLog", "it's newLog calling, expect not to be allowed"]);
+    expect(
+      Logger.isAllowed(newLogModule, ELevel.trace),
+      "to be disallowed on trace level"
+    ).toBeFalsy();
+    expect(
+      newLogModule.disallowedHandler(ELevel.trace),
+      "to be disallowed on trace level"
+    ).toBeTruthy();
+    expect(newLog._prevLog).toBeUndefined();
+  });
+
+  test("allow newLogModule and apply log on info level, expect logs to be applied", () => {
+    Logger.setLoggerAllowance<EModules>({
+      [EModules.Test]: testModule,
+      [EModules.Hobbits]: newLogModule,
+    });
+    const newLog = new Logger(newLogModule);
+    newLog.current(["newLog", "it's newLog calling, expect to be allowed"]);
+    expect(
+      Logger.isAllowed(newLogModule, ELevel.current),
+      "to be allowed on current level"
+    ).toBeTruthy();
+    expect(
+      newLogModule.disallowedHandler(ELevel.current),
+      "to be allowed on current level"
+    ).toBeFalsy();
+    expect(newLog._prevLog).not.toBeUndefined();
+  });
+});
 ```
 
 

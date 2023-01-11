@@ -26,7 +26,7 @@ let watchMethod = new CallableDelegate(() => {
   throw new InvalidUsageError("watch method used before setup. Please inject watch method with setupWatch first!");
 });
 
-type TEnv = "develop" | "production" | "release";
+type TEnv = "develop" | "production" | "release" | "test";
 let _env: { value: TEnv | undefined } = { value: "develop" };
 
 /**
@@ -98,8 +98,8 @@ export function setupWatch(watchConstructor: any) {
 
 /**
  * 用於外部注入開發環境
- * @param env - develop | production | release
+ * @param env - develop | production | release | test {@link TEnv}
  */
-export function setupCurrentEnv(env: "develop" | "production" | "release") {
+export function setupCurrentEnv(env: TEnv) {
   _env.value = env;
 }

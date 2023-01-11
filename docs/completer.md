@@ -23,6 +23,41 @@ __型別__ | [source][s-completer]
 }
 ```
 
+__example__
+如使用在 jest mocking test 中
+```ts
+const url = "/path/to/get";
+const expectedFetched = {
+  data: {username: "hello"}
+};
+const mockReturns = {
+  "error_code": 401,
+  "error_key": "Unauthorized",
+  "error_name": "Unauthorized",
+  "message": "Unauthorized",
+};
+const payload = {};
+const completer = new Completer();
+const wait = (helper.authHeaderUpdater!.processFulFill as any as jest.SpyInstance)
+  .withImplementation(
+    (config: AxiosRequestConfig<any>)=>{
+      return config;
+    }, async ()=>{
+      return completer.future;
+    }
+  );
+await helper.expectGetPassed(url,payload, mockReturns, expectedFetched);
+
+// 在 complete 前, processFulFill 都會一直維持 mocking implementation
+completer.complete({});
+await wait;
+// complete / wait 以後 恢復 implementation 
+expect(helper.authGuard!.canProcessReject).toBeCalled();
+expect(helper.authGuard!.canProcessFulFill).toBeCalled();
+```
+
+
+
 __example__ | [source][s-test-completer]:
 ```ts
   const completer = new Completer();

@@ -67,7 +67,7 @@ export {
 export type { TUnWrapVueRef, InterfaceIs } from "~/utils/typeInference";
 export type { QueueItem, IQueue, IQueueConsumer } from "~/utils/queue";
 export { Queue, SequencedQueueConsumer } from "~/utils/queue";
-export { Completer  } from "~/utils/completer";
+export { Completer } from "~/utils/completer";
 
 /**
  *
@@ -93,3 +93,16 @@ export {
   setupReactive,
   setupCurrentEnv,
 } from "~/extension/extension_setup";
+
+export {
+  Logger,
+  ELevel,
+} from "~/utils/logger";
+
+export type {
+  LogRecord,
+  LogOption,
+  LogColor,
+  AllowedModule,
+  AllowedLoggers,
+} from "~/utils/logger";

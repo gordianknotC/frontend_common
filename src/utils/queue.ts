@@ -167,6 +167,9 @@ export class Queue implements IQueue<QueueItem> {
 
   private remove(item: QueueItem) {
     clearTimeout(item.timeout);
+    item.reject({
+      reason: "flushed"
+    })
     this.queue.remove(item);
     console.log("remove:", item.id);
   }

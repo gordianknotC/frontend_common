@@ -28,3 +28,5 @@ export { is } from "./utils/typeInference";
 export { IFacade, provideFacade, CommonMixin, injectDependency, provideDependency, injectFacade, } from "./vueMixins/common";
 export { LazyHolder, CallableDelegate as Callable } from "./utils/lazy";
 export { setupComputed, setupRef, setupWatch, setupReactive, setupCurrentEnv, } from "./extension/extension_setup";
+export { Logger, ELevel, } from "./utils/logger";
+export type { LogRecord, LogOption, LogColor, AllowedModule, AllowedLoggers, } from "./utils/logger";

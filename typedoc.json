@@ -47,6 +47,10 @@
                 "source": "completer.md",
             },
             {
+                "title": "Logger",
+                "source": "logger.md",
+            },
+            {
                 "title": "Common util for js",
                 "source": "common_utils.md",
             },

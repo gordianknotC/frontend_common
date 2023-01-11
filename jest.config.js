@@ -20,4 +20,5 @@ module.exports = {
     "~/(.*)": ["<rootDir>/src/$1"],
   },
   globals: {},
+  setupFilesAfterEnv: ["jest-expect-message"]
 };

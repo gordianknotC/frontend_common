@@ -130,6 +130,9 @@ class Queue {
     }
     remove(item) {
         clearTimeout(item.timeout);
+        item.reject({
+            reason: "flushed"
+        });
         this.queue.remove(item);
         console.log("remove:", item.id);
     }

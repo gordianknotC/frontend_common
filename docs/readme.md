@@ -19,6 +19,7 @@ yarn serve:doc
 - declare lazy loading function
 - promise queue 
 - completer (類似 Promise, 只是將 resolve/reject 寫進物件中)
+- logger
 - a CRUD function for writing pseudo code api
 
 # Table of Content
@@ -29,5 +30,7 @@ yarn serve:doc
 [s-provideFacade]: src/vueMixins/common.ts
 [s-queue]: src/utils/queue.ts
 [s-completer]: src/utils/completer.ts
+[s-logger]: src/utils/logger.ts
 [s-test-queue]: __tests__/queue.test.ts
 [s-test-completer]: __tests__/completer.test.ts
+[s-test-logger]: __tests__/logger.test.ts

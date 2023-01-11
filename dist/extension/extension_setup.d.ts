@@ -5,7 +5,7 @@ export declare type ExtSetupOption = {
     computed: any;
     ref: any;
 };
-declare type TEnv = "develop" | "production" | "release";
+declare type TEnv = "develop" | "production" | "release" | "test";
 /**
  * @internal 由外部注入 computed method  - 如 vue 的 computed
  * @see {@link setupComputed}
@@ -55,7 +55,7 @@ export declare function setupReactive(reactiveConstructor: any): void;
 export declare function setupWatch(watchConstructor: any): void;
 /**
  * 用於外部注入開發環境
- * @param env - develop | production | release
+ * @param env - develop | production | release | test {@link TEnv}
  */
-export declare function setupCurrentEnv(env: "develop" | "production" | "release"): void;
+export declare function setupCurrentEnv(env: TEnv): void;
 export {};

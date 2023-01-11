@@ -71,5 +71,7 @@
     "__tests__/*.ts",
     "src/index.ts",
     "jest.d.ts"
-  ]
+  ],
+  // support jest-expect message, see: https://github.com/mattphillips/jest-expect-message
+  "files": ["node_modules/jest-expect-message/types/index.d.ts"],
 }
