@@ -6,7 +6,7 @@ import {
   setupCurrentEnv,
 } from "@/index";
 import { Completer } from "@/utils/completer";
-import { AllowedLoggers, AllowedModule, ELevel, Logger } from "@/utils/logger";
+import { AllowedLogger, AllowedModule, ELevel, Logger } from "@/utils/logger";
 import { Queue } from "@/utils/queue";
 import { computed, reactive, ref, watch } from "vue";
 import { wait } from "../helpers/common.util.test.helper";
@@ -63,8 +63,7 @@ describe("Logger", () => {
       [EModules.Test]: testModule,
     });
     const newLog = new Logger(newLogModule);
-    log.log(["fellow", "it's testModule calling"]);
-    expect(log._prevLog.moduleName).toBe("Test");
+    newLog.log(["fellow", "it's testModule calling"]);
     expect(newLog._prevLog).toBeUndefined();
   });
 
@@ -102,5 +101,14 @@ describe("Logger", () => {
       "to be allowed on current level"
     ).toBeFalsy();
     expect(newLog._prevLog).not.toBeUndefined();
+  });
+
+  test("setAllowanceByEnv, expect assertion error", ()=>{
+    const action = ()=> Logger.setLoggerAllowanceByEnv({
+      test: {},
+      develop: {}
+    });
+    expect(action).toThrow();
+    expect(action).toThrowError("AssertionError");
   });
 });

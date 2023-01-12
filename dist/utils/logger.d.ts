@@ -1,5 +1,6 @@
+import { Env } from "../extension/extension_setup";
 import { Color } from "colors";
-export declare type LogColor = (keyof Color);
+export declare type LogColor = keyof Color;
 /** LogRecord 暫時用來除錯的型別 */
 export declare type LogRecord = {
     allStacks: string[];
@@ -12,7 +13,13 @@ export declare type AllowedModule<M> = {
     moduleName: M;
     disallowedHandler: (level: ELevel) => boolean;
 };
-export declare type AllowedLoggers<M extends string> = Record<M, AllowedModule<M>>;
+export declare type AllowedLogger<M extends string> = Record<M, AllowedModule<M>>;
+export declare type AllowedLoggerByEnv<M extends string> = {
+    production?: AllowedLogger<M>;
+    release?: AllowedLogger<M>;
+    develop: AllowedLogger<M>;
+    test: AllowedLogger<M>;
+};
 export declare type LogOption = {
     /** 預設為2，由現在的 trace stack 中，回算幾個 traceBack 作為起點
      * 因為實作上的理由所以預設是3
@@ -54,7 +61,7 @@ declare abstract class LoggerMethods {
     abstract current(msg: any[], option?: LogOption): void;
 }
 export declare class Logger<M> implements LoggerMethods {
-    static setOverallAllowanceOnEnv(): void;
+    static setCurrentEnv(env: Env): void;
     static isDisallowed(option: AllowedModule<any>, level: ELevel): boolean;
     static isAllowed(option: AllowedModule<any>, level: ELevel): boolean;
     /** 設定不同 level 要程現什麼樣的色彩
@@ -88,7 +95,12 @@ export declare class Logger<M> implements LoggerMethods {
     private static allowedModules;
     private static addModule;
     /** 設定什麼樣層級的 logger 允許被顯示 */
-    static setLoggerAllowance<M extends string>(option: Partial<AllowedLoggers<M>>): void;
+    static setLoggerAllowance<M extends string>(option: Partial<AllowedLogger<M>>): void;
+    private static _setLoggerAllowance;
+    /** 依據 env設定什麼樣層級的 logger 允許被顯示, 可透過
+     * {@link setCurrentEnv} 改變當前 env 值
+     */
+    static setLoggerAllowanceByEnv<M extends string>(option: AllowedLoggerByEnv<M>): void;
     static hasModule<M>(option: AllowedModule<M>): boolean;
     _prevLog?: LogRecord;
     _allowance?: AllowedModule<M>;

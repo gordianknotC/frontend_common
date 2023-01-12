@@ -169,7 +169,7 @@ describe("Services", ()=>{
         });
       });
       await wait(wD);
-      q.dequeueByResult({id: idD, result: {
+      await q.dequeueByResult({id: idD, result: {
         succeed: true
       }});
 

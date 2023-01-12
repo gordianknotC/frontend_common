@@ -20,6 +20,10 @@
  * ```
  */
 export declare function LazyHolder<T extends object>(initializer: () => T): T;
+/** 假用 Dart final */
+export declare function final<T>(): {
+    value: T | undefined;
+};
 /**
  * design pattern for Callable Object
  *

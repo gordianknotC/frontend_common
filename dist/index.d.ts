@@ -29,4 +29,4 @@ export { IFacade, provideFacade, CommonMixin, injectDependency, provideDependenc
 export { LazyHolder, CallableDelegate as Callable } from "./utils/lazy";
 export { setupComputed, setupRef, setupWatch, setupReactive, setupCurrentEnv, } from "./extension/extension_setup";
 export { Logger, ELevel, } from "./utils/logger";
-export type { LogRecord, LogOption, LogColor, AllowedModule, AllowedLoggers, } from "./utils/logger";
+export type { LogRecord, LogOption, LogColor, AllowedModule, AllowedLogger as AllowedLoggers, } from "./utils/logger";

@@ -1,3 +1,4 @@
+import { assert } from "./assert";
 
 
 /**
@@ -30,6 +31,25 @@ export function LazyHolder<T extends object>(initializer: () => T): T {
       return instance[name];
     }
   }) as T;
+}
+
+/** 假用 Dart final */
+export function final<T>(): {value: T | undefined}{
+  const ret = {value: undefined as T};
+  return new Proxy(ret, {
+    get: function (target, name) {
+      return (target as any)[name];
+    },
+    set: function(target, prop, val, receiver): boolean{
+      const canSet =  (prop == "value") && (target as any)[prop] == undefined;
+      if (canSet){
+        (target as any).value = val;
+      } else if (prop == "value"){
+        throw new Error("Final cannot be set again");
+      }
+      return canSet;
+    }
+  }) as any as {value: T | undefined} ;
 }
 
 

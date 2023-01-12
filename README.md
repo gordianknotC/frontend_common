@@ -52,6 +52,9 @@ table of content
     - [dequeueByResult](#dequeuebyresult)
 - [Completer:](#completer)
 - [Logger:](#logger)
+  - [Feature](#feature-1)
+    - [設置色彩](#%E8%A8%AD%E7%BD%AE%E8%89%B2%E5%BD%A9)
+    - [設置 log level](#%E8%A8%AD%E7%BD%AE-log-level)
 - [Writing pseudo code for api - 測試API工具:](#writing-pseudo-code-for-api---%E6%B8%AC%E8%A9%A6api%E5%B7%A5%E5%85%B7)
   - [CRUD](#crud)
     - [Example](#example)
@@ -733,7 +736,14 @@ __example__ | [source][s-test-completer]:
 
 ---
 # Logger:
-Logger
+## Feature
+- 針對 trace/debug/info/warn/current/error/fatal 設置不同色彩
+- 根據環境變數設置 overall log level
+- 根據各別模組設置 log level
+
+### 設置色彩 
+
+### 設置 log level
 
 __型別__ | [source][s-logger]
 
@@ -782,8 +792,7 @@ __example__ | [source][s-test-logger]:
       [EModules.Test]: testModule,
     });
     const newLog = new Logger(newLogModule);
-    log.log(["fellow", "it's testModule calling"]);
-    expect(log._prevLog.moduleName).toBe("Test");
+    newLog.log(["fellow", "it's testModule calling"]);
     expect(newLog._prevLog).toBeUndefined();
   });
 

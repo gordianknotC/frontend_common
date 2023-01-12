@@ -128,11 +128,12 @@ class Queue {
             return;
         item.reject(this.timeoutErrorObj);
     }
-    remove(item) {
+    remove(item, reject = false) {
         clearTimeout(item.timeout);
-        item.reject({
-            reason: "flushed"
-        });
+        if (reject)
+            item.reject({
+                reason: "flushed"
+            });
         this.queue.remove(item);
         console.log("remove:", item.id);
     }
@@ -140,7 +141,7 @@ class Queue {
     clearQueue() {
         for (let index = 0; index < this.queue.length; index++) {
             const item = this.queue[index];
-            this.remove(item);
+            this.remove(item, true);
         }
     }
     /**

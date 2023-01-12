@@ -80,7 +80,7 @@ function setupWatch(watchConstructor) {
 exports.setupWatch = setupWatch;
 /**
  * 用於外部注入開發環境
- * @param env - develop | production | release | test {@link TEnv}
+ * @param env - develop | production | release | test {@link Env}
  */
 function setupCurrentEnv(env) {
     _env.value = env;

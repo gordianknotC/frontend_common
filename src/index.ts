@@ -104,5 +104,5 @@ export type {
   LogOption,
   LogColor,
   AllowedModule,
-  AllowedLoggers,
+  AllowedLogger as AllowedLoggers,
 } from "~/utils/logger";

@@ -3,7 +3,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Logger = exports.ELevel = void 0;
 const extension_setup_1 = require("../extension/extension_setup");
 const colorsPlugin_1 = require("../plugin/colorsPlugin");
-const console_1 = require("console");
+const assert_1 = require("./assert");
+const lazy_1 = require("./lazy");
 /**
 TRACE.
 DEBUG.
@@ -63,6 +64,7 @@ function message(moduleName, level, msg, traceBack = 2, stackNumber = 5) {
 }
 class LoggerMethods {
 }
+const LOGGER_MODE = (0, lazy_1.final)();
 class Logger {
     constructor(option) {
         if (Logger.hasModule(option)) {
@@ -74,14 +76,15 @@ class Logger {
             this._allowance = Object.assign({
                 disallowedLevels: (level) => {
                     return false;
-                }
+                },
             }, {
-                ...option
+                ...option,
             });
             Logger.addModule(this._allowance);
         }
     }
-    static setOverallAllowanceOnEnv() {
+    static setCurrentEnv(env) {
+        (0, extension_setup_1.setupCurrentEnv)(env);
     }
     static isDisallowed(option, level) {
         return !this.isAllowed(option, level);
@@ -131,6 +134,12 @@ class Logger {
     }
     /** 設定什麼樣層級的 logger 允許被顯示 */
     static setLoggerAllowance(option) {
+        var _a;
+        (0, assert_1.assert)(() => LOGGER_MODE.value == undefined || LOGGER_MODE.value == "IgnoreEnv", "Do not mix use of setLoggerAllowance and setLoggerAllowanceByEnv together");
+        (_a = LOGGER_MODE.value) !== null && _a !== void 0 ? _a : (LOGGER_MODE.value = "IgnoreEnv");
+        this._setLoggerAllowance(option);
+    }
+    static _setLoggerAllowance(option) {
         Logger.allowedModules = {};
         const a = {};
         Object.entries(option).forEach((pair) => {
@@ -138,14 +147,27 @@ class Logger {
             Logger.addModule(v);
         });
     }
+    /** 依據 env設定什麼樣層級的 logger 允許被顯示, 可透過
+     * {@link setCurrentEnv} 改變當前 env 值
+     */
+    static setLoggerAllowanceByEnv(option) {
+        var _a;
+        (0, assert_1.assert)(() => false, "AssertionError: Do not mix use of setLoggerAllowance and setLoggerAllowanceByEnv together");
+        console.log("******", LOGGER_MODE.value, extension_setup_1._currentEnv.value);
+        console.log("*********", LOGGER_MODE.value == undefined || LOGGER_MODE.value == "ByEnv");
+        (_a = LOGGER_MODE.value) !== null && _a !== void 0 ? _a : (LOGGER_MODE.value = "ByEnv");
+        const env = extension_setup_1._currentEnv.value;
+        const allowedLogger = option[env];
+        this._setLoggerAllowance(allowedLogger);
+    }
     static hasModule(option) {
         return this.allowedModules[option.moduleName] != undefined;
     }
     _messenger(msg, level, option) {
         var _a, _b;
         if (Logger.isAllowed(this._allowance, level)) {
-            (0, console_1.assert)(() => this._allowance != undefined);
-            console.log('invoke log:', ...msg);
+            (0, assert_1.assert)(() => this._allowance != undefined);
+            console.log("invoke log:", ...msg);
             this._prevLog = message(this._allowance.moduleName, level, msg, (_a = option === null || option === void 0 ? void 0 : option.traceBack) !== null && _a !== void 0 ? _a : defaultLogOption.traceBack, (_b = option === null || option === void 0 ? void 0 : option.stackNumber) !== null && _b !== void 0 ? _b : defaultLogOption.stackNumber);
         }
     }

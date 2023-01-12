@@ -5,7 +5,7 @@ export declare type ExtSetupOption = {
     computed: any;
     ref: any;
 };
-declare type TEnv = "develop" | "production" | "release" | "test";
+export declare type Env = "develop" | "production" | "release" | "test";
 /**
  * @internal 由外部注入 computed method  - 如 vue 的 computed
  * @see {@link setupComputed}
@@ -31,7 +31,7 @@ export declare const _ref: CallableDelegate<(<T>(arg?: T) => Ref<T>)>;
  * @see {@link setupCurrentEnv}
  *  */
 export declare const _currentEnv: {
-    value: TEnv | undefined;
+    value: Env | undefined;
 };
 /**
  * 用於外部注入 vue RefImpl constructor
@@ -55,7 +55,6 @@ export declare function setupReactive(reactiveConstructor: any): void;
 export declare function setupWatch(watchConstructor: any): void;
 /**
  * 用於外部注入開發環境
- * @param env - develop | production | release | test {@link TEnv}
+ * @param env - develop | production | release | test {@link Env}
  */
-export declare function setupCurrentEnv(env: TEnv): void;
-export {};
+export declare function setupCurrentEnv(env: Env): void;

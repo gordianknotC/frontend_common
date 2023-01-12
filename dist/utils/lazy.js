@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CallableDelegate = exports.LazyHolder = void 0;
+exports.CallableDelegate = exports.final = exports.LazyHolder = void 0;
 /**
  * 用 Proxy 實作 lazyLoading
  * @param initializer
@@ -33,6 +33,26 @@ function LazyHolder(initializer) {
     });
 }
 exports.LazyHolder = LazyHolder;
+/** 假用 Dart final */
+function final() {
+    const ret = { value: undefined };
+    return new Proxy(ret, {
+        get: function (target, name) {
+            return target[name];
+        },
+        set: function (target, prop, val, receiver) {
+            const canSet = (prop == "value") && target[prop] == undefined;
+            if (canSet) {
+                target.value = val;
+            }
+            else if (prop == "value") {
+                throw new Error("Final cannot be set again");
+            }
+            return canSet;
+        }
+    });
+}
+exports.final = final;
 /**
  * design pattern for Callable Object
  *

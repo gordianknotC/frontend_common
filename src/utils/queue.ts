@@ -165,11 +165,12 @@ export class Queue implements IQueue<QueueItem> {
     item.reject(this.timeoutErrorObj);
   }
 
-  private remove(item: QueueItem) {
+  private remove(item: QueueItem, reject: boolean = false) {
     clearTimeout(item.timeout);
-    item.reject({
-      reason: "flushed"
-    })
+    if (reject)
+      item.reject({
+        reason: "flushed"
+      })
     this.queue.remove(item);
     console.log("remove:", item.id);
   }
@@ -178,7 +179,7 @@ export class Queue implements IQueue<QueueItem> {
   public clearQueue(): void {
     for (let index = 0; index < this.queue.length; index++) {
       const item = this.queue[index];
-      this.remove(item);
+      this.remove(item, true);
     }
   }
 

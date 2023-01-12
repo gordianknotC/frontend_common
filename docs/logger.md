@@ -2,7 +2,14 @@
 
 ---
 <!--#-->
-Logger
+## Feature
+- 針對 trace/debug/info/warn/current/error/fatal 設置不同色彩
+- 根據環境變數設置 overall log level
+- 根據各別模組設置 log level
+
+### 設置色彩 
+
+### 設置 log level
 
 __型別__ | [source][s-logger]
 
@@ -51,8 +58,7 @@ __example__ | [source][s-test-logger]:
       [EModules.Test]: testModule,
     });
     const newLog = new Logger(newLogModule);
-    log.log(["fellow", "it's testModule calling"]);
-    expect(log._prevLog.moduleName).toBe("Test");
+    newLog.log(["fellow", "it's testModule calling"]);
     expect(newLog._prevLog).toBeUndefined();
   });
 

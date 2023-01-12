@@ -4,6 +4,7 @@ import {
   setupReactive,
   setupRef,
   setupWatch,
+  assert,
 } from "@/index";
 import {
   is,
@@ -266,3 +267,23 @@ describe("type inference tests", () => {
     });
   });
 });
+
+
+describe("assert tests", ()=>{
+  test("expect assertion error raised", ()=>{
+    setupCurrentEnv("develop")
+    expect(()=>assert(()=>false, "AssertionError")).toThrow();
+  })
+  test("expect assertion error raised", ()=>{
+    setupCurrentEnv("test")
+    expect(()=>assert(()=>false, "AssertionError")).toThrow();
+  })
+  test("expect no assertion error raised", ()=>{
+    setupCurrentEnv("release")
+    expect(()=>assert(()=>false, "AssertionError")).not.toThrow();
+  })
+  test("expect no assertion error raised", ()=>{
+    setupCurrentEnv("production")
+    expect(()=>assert(()=>false, "AssertionError")).not.toThrow();
+  })
+})

@@ -54,7 +54,8 @@ exports.AssertionError = AssertionError;
  * @param message
  */
 function assert(condition, message) {
-    if (extension_setup_1._currentEnv.value == "develop" && !condition) {
+    const devEnv = (extension_setup_1._currentEnv.value == "develop" || extension_setup_1._currentEnv.value == "test");
+    if (devEnv && !condition()) {
         throw new AssertionError(message !== null && message !== void 0 ? message : "");
     }
 }
