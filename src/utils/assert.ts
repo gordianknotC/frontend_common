@@ -54,11 +54,11 @@ class AssertionError extends Error{
 
 /**
  * 
- * @param condition 
+ * @param condition - assert to be true, raise assertion error while false
  * @param message 
  */
 export
-function assert(condition: any, message?: string): asserts condition{
+function assert(condition: ()=>boolean, message?: string): asserts condition{
     const devEnv = (_currentEnv.value == "develop" || _currentEnv.value == "test");
     if (devEnv && !condition()){
         throw new AssertionError(message ?? "");
