@@ -27,7 +27,8 @@ export declare class AssertionError extends Error {
 }
 /**
  *
- * @param condition
+ * @param condition - assert to be true, raise assertion error while false
  * @param message
  */
-export declare function assert(condition: any, message?: string): asserts condition;
+export declare function assert(condition: () => boolean, message?: string): asserts condition;
+export declare function ensureNoRaise<T>(action: () => T, defaults: T): T;

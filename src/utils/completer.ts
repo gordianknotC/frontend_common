@@ -1,3 +1,5 @@
+import { randomUUID } from "crypto";
+import { ArrayDelegate, Arr } from "..";
 
 abstract class _Completer<T> extends Promise<T> {
   abstract resolve(value: T | PromiseLike<T>) : void;
@@ -32,10 +34,22 @@ abstract class _Completer<T> extends Promise<T> {
  ```
  */
  export class Completer<T>  {
+  /** 同 Promise.resolve, resolve {@link future} 本身*/
   complete:(value: T | PromiseLike<T>) => void;
+
+  /** 同 Promise.reject, reject {@link future} 本身 */
   reject:(reason?: any) => void;
+
+  /** 即 Promise 物件本身, 其 resolve / reject 方法分別為
+   * {@link complete} / {@link reject}
+  */
   future: Promise<T>;
-  constructor() {
+
+  /** 
+   * @param _meta - 用來暫時代表 future 值的物件，也可作為 Completer
+   *                本身的註解
+   */
+  constructor(public _meta?: T) {
     this.future= new Promise((resolve: any, reject: any)=>{
       this.complete = (val: T)=>{
         resolve(val);
@@ -47,12 +61,4 @@ abstract class _Completer<T> extends Promise<T> {
   }
 }
 
-// export function Completer<T>(): Promise<T> & _Completer<T> {
-//   let completer = {value:  undefined} as any;
-//   completer.value = new Promise<T>((resolve, reject) => {
-//     console.log("tobe called !!!!!!", completer);
-//     completer.value.resolve = resolve;
-//     completer.value.reject = reject;
-//   }) as _Completer<T>;
-//   return completer.value;  
-// }
+ 

@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.assert = exports.AssertionError = exports.assertMsg = exports.AssertMsg = void 0;
+exports.ensureNoRaise = exports.assert = exports.AssertionError = exports.assertMsg = exports.AssertMsg = void 0;
 const extension_setup_1 = require("../extension/extension_setup");
 class AssertMsg {
     constructor() {
@@ -50,7 +50,7 @@ class AssertionError extends Error {
 exports.AssertionError = AssertionError;
 /**
  *
- * @param condition
+ * @param condition - assert to be true, raise assertion error while false
  * @param message
  */
 function assert(condition, message) {
@@ -60,4 +60,14 @@ function assert(condition, message) {
     }
 }
 exports.assert = assert;
+function ensureNoRaise(action, defaults) {
+    try {
+        return action();
+    }
+    catch (e) {
+        console.error(e);
+        return defaults;
+    }
+}
+exports.ensureNoRaise = ensureNoRaise;
 //# sourceMappingURL=assert.js.map

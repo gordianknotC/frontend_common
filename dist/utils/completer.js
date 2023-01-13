@@ -20,7 +20,12 @@ class _Completer extends Promise {
  ```
  */
 class Completer {
-    constructor() {
+    /**
+     * @param _meta - 用來暫時代表 future 值的物件，也可作為 Completer
+     *                本身的註解
+     */
+    constructor(_meta) {
+        this._meta = _meta;
         this.future = new Promise((resolve, reject) => {
             this.complete = (val) => {
                 resolve(val);
@@ -32,13 +37,4 @@ class Completer {
     }
 }
 exports.Completer = Completer;
-// export function Completer<T>(): Promise<T> & _Completer<T> {
-//   let completer = {value:  undefined} as any;
-//   completer.value = new Promise<T>((resolve, reject) => {
-//     console.log("tobe called !!!!!!", completer);
-//     completer.value.resolve = resolve;
-//     completer.value.reject = reject;
-//   }) as _Completer<T>;
-//   return completer.value;  
-// }
 //# sourceMappingURL=completer.js.map

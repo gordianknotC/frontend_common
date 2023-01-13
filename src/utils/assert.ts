@@ -64,3 +64,14 @@ function assert(condition: ()=>boolean, message?: string): asserts condition{
         throw new AssertionError(message ?? "");
     }
 }
+
+
+export 
+function ensureNoRaise<T>(action: ()=> T, defaults: T): T{
+    try{
+        return action();
+    }catch(e){
+        console.error(e);
+        return defaults;
+    }
+}

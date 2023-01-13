@@ -256,7 +256,7 @@ export function IFacade<T extends Object>(ident=FACADE_KEY, option?: {transformF
       container[ident] ??= {};
       const facade = container[ident];
       const member = facade[name as keyof T];
-      assert(facade[name as keyof T] !== undefined, `key name "${name.toString()}" not found in facade`);
+      assert(()=>facade[name as keyof T] !== undefined, `key name "${name.toString()}" not found in facade`);
 
       // note: 當傳入的型別為 function
       // 則視為傳入參照，以參照處理.

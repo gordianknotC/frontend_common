@@ -1,16 +1,14 @@
 /// <reference types="node" />
-import { ArrayDelegate } from "..";
+import { ArrayDelegate, Completer } from "..";
 export declare type QueueItem<M = any> = {
     id: number | string;
     meta?: M;
     promise: () => Promise<any>;
-    resolve: any;
-    reject: any;
     timestamp: number;
     timeout: NodeJS.Timeout;
 };
-export declare abstract class IQueue<T extends QueueItem> {
-    abstract queue: ArrayDelegate<T>;
+export declare abstract class IQueue {
+    abstract queue: ArrayDelegate<Completer<QueueItem>>;
     abstract get isEmpty(): boolean;
     abstract enqueue(id: number | string, promise: () => Promise<any>, timeout?: number): Promise<any>;
     abstract dequeue(option: {
@@ -23,16 +21,16 @@ export declare abstract class IQueue<T extends QueueItem> {
     }): Promise<any>;
     abstract clearQueue(): void;
 }
-export declare abstract class IQueueConsumer<T extends QueueItem> {
-    abstract queue: IQueue<T>;
-    abstract feedRequest(request: () => Promise<any>): QueueItem;
+export declare abstract class IQueueConsumer {
+    abstract queue: IQueue;
+    abstract feedRequest(request: () => Promise<any>): Completer<QueueItem>;
     abstract consumeAll(): Promise<any>;
-    abstract consumeAllWhen(condition: (item: QueueItem) => boolean): Promise<any>;
+    abstract consumeAllWhen(condition: (item: Completer<QueueItem>) => boolean): Promise<any>;
 }
 /**
  * 應用如 api client 處理需籍由 websocket 傳送出去的請求, 將請求暫存於 queue 以後，待收到 socket
  * 資料，再由 queue 裡的 promise resolve 返回值， resolve 後無論成功失敗，移除該筆 queue
- *
+ * @typeParam T - {@link QueueItem}
  * @example
    ```ts
    test("put three async in sequence and postpone to dequeue when on time", async ()=>{
@@ -82,9 +80,9 @@ export declare abstract class IQueueConsumer<T extends QueueItem> {
     });
    ```
  */
-export declare class Queue implements IQueue<QueueItem> {
+export declare class Queue implements IQueue {
     timeoutErrorObj: any;
-    queue: ArrayDelegate<QueueItem>;
+    queue: ArrayDelegate<Completer<QueueItem>>;
     /** 判斷 {@link queue} 是否為空 */
     get isEmpty(): boolean;
     constructor(timeoutErrorObj?: any);
@@ -109,7 +107,7 @@ export declare class Queue implements IQueue<QueueItem> {
      */
     enqueue(id: number | string, promise: () => Promise<any>, timeout?: number, meta?: any, dequeueImmediately?: boolean): Promise<any>;
     /** 與  {@link enqueue} 相同，只是 id 自動生成 */
-    enqueueWithNoId(promise: () => Promise<any>, timeout?: number, meta?: any, dequeueImmediately?: boolean): QueueItem<any>;
+    enqueueWithNoId(promise: () => Promise<any>, timeout?: number, meta?: any, dequeueImmediately?: boolean): Completer<QueueItem<any>>;
     private _getId;
     private onTimeout;
     private remove;
@@ -168,11 +166,11 @@ export declare class Queue implements IQueue<QueueItem> {
         removeQueue?: boolean;
     }): Promise<any>;
 }
-export declare class SequencedQueueConsumer implements IQueueConsumer<QueueItem> {
-    queue: IQueue<QueueItem<any>>;
-    constructor(queue: IQueue<QueueItem<any>>);
+export declare class SequencedQueueConsumer implements IQueueConsumer {
+    queue: IQueue;
+    constructor(queue: IQueue);
     private _getId;
-    feedRequest(request: () => Promise<any>): QueueItem;
+    feedRequest(request: () => Promise<any>): Completer<QueueItem>;
     consumeAll(): Promise<any>;
-    consumeAllWhen(condition: (item: QueueItem<any>) => boolean): Promise<any>;
+    consumeAllWhen(condition: (item: Completer<QueueItem<any>>) => boolean): Promise<any>;
 }

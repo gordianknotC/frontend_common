@@ -15,7 +15,6 @@ function wait (span: number): Promise<boolean>{
 function time(): number{
   return (new Date()).getTime();
 }
-
 class QTester{
   constructor(public q: Queue){}
 
@@ -79,6 +78,7 @@ describe("Services", ()=>{
           rC = {idC}
         });
       });
+      expect(q.queue.length).toBe(3);
 
       await wait(2 * span / 3 );
       expect(rA).toBeUndefined();
@@ -168,12 +168,14 @@ describe("Services", ()=>{
           await wait(10000);
         });
       });
+      function getPendingResult(){
+        return pending;
+      }
       await wait(wD);
-      await q.dequeueByResult({id: idD, result: {
+      q.dequeueByResult({id: idD, result: {
         succeed: true
       }});
-
-      expect(pending).resolves.toEqual({
+      expect(getPendingResult()).resolves.toEqual({
         succeed: true
       });
     })

@@ -831,6 +831,15 @@ __example__ | [source][s-test-logger]:
     ).toBeFalsy();
     expect(newLog._prevLog).not.toBeUndefined();
   });
+
+  test("setAllowanceByEnv, expect assertion error", ()=>{
+    const action = ()=> Logger.setLoggerAllowanceByEnv({
+      test: {},
+      develop: {}
+    });
+    expect(action).toThrow();
+    expect(action).toThrowError("AssertionError");
+  });
 });
 ```
 

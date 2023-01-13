@@ -12,7 +12,7 @@ exports.IQueueConsumer = IQueueConsumer;
 /**
  * 應用如 api client 處理需籍由 websocket 傳送出去的請求, 將請求暫存於 queue 以後，待收到 socket
  * 資料，再由 queue 裡的 promise resolve 返回值， resolve 後無論成功失敗，移除該筆 queue
- *
+ * @typeParam T - {@link QueueItem}
  * @example
    ```ts
    test("put three async in sequence and postpone to dequeue when on time", async ()=>{
@@ -97,21 +97,34 @@ class Queue {
      */
     enqueue(id, promise, timeout = 10000, meta = {}, dequeueImmediately = true) {
         const timestamp = new Date().getTime();
-        return new Promise((resolve, reject) => {
-            this.queue.push({
-                id,
-                timestamp,
-                meta,
-                timeout: setTimeout(() => {
-                    this.onTimeout(id);
-                }, timeout),
-                promise,
-                resolve,
-                reject
-            });
-            if (dequeueImmediately)
-                this.dequeue({ id, removeQueue: false });
+        const completer = new __1.Completer({
+            id,
+            timestamp,
+            meta,
+            timeout: setTimeout(() => {
+                this.onTimeout(id);
+            }, timeout),
+            promise,
         });
+        this.queue.push(completer);
+        if (dequeueImmediately)
+            this.dequeue({ id, removeQueue: false });
+        return completer.future;
+        // return new Promise((resolve, reject) => {
+        //   this.queue.push({
+        //     id,
+        //     timestamp,
+        //     meta,
+        //     timeout: setTimeout(() => {
+        //       this.onTimeout(id);
+        //     }, timeout),
+        //     promise,
+        //     resolve,
+        //     reject
+        //   });
+        //   if (dequeueImmediately)
+        //     this.dequeue({id, removeQueue: false});
+        // });
     }
     /** 與  {@link enqueue} 相同，只是 id 自動生成 */
     enqueueWithNoId(promise, timeout = 10000, meta = {}, dequeueImmediately = true) {
@@ -123,19 +136,19 @@ class Queue {
         return (0, crypto_1.randomUUID)();
     }
     onTimeout(id) {
-        const item = this.queue.firstWhere(_ => _.id == id);
+        const item = this.queue.firstWhere(_ => _._meta.id == id);
         if (!item)
             return;
         item.reject(this.timeoutErrorObj);
     }
     remove(item, reject = false) {
-        clearTimeout(item.timeout);
+        clearTimeout(item._meta.timeout);
         if (reject)
             item.reject({
                 reason: "flushed"
             });
         this.queue.remove(item);
-        console.log("remove:", item.id);
+        console.log("remove:", item._meta.id);
     }
     /**清除 {@link queue} */
     clearQueue() {
@@ -184,14 +197,14 @@ class Queue {
     async dequeueByResult(option) {
         const { id, result } = option;
         const removeQueue = true;
-        const item = this.queue.firstWhere(_ => _.id == id);
+        const item = this.queue.firstWhere(_ => _._meta.id == id);
         if (!item) {
             return null;
         }
         try {
             if (removeQueue !== null && removeQueue !== void 0 ? removeQueue : true)
                 this.remove(item);
-            item.resolve(result);
+            item.complete(result);
             return result;
         }
         catch (err) {
@@ -210,15 +223,15 @@ class Queue {
      */
     async dequeue(option) {
         const { id, removeQueue } = option;
-        const item = this.queue.firstWhere(_ => _.id == id);
+        const item = this.queue.firstWhere(_ => _._meta.id == id);
         if (!item) {
             return null;
         }
         try {
-            const result = await item.promise();
+            const result = await item._meta.promise();
             if (removeQueue !== null && removeQueue !== void 0 ? removeQueue : true)
                 this.remove(item);
-            item.resolve(result);
+            item.complete(result);
             return result;
         }
         catch (err) {

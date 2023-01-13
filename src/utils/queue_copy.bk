@@ -1,7 +1,7 @@
 import { randomUUID } from "crypto";
-import { ArrayDelegate, Arr, Completer } from "..";
+import { ArrayDelegate, Arr } from "..";
 
-export type QueueItem<M=any> = {
+export type Identifier<M=any> = {
   id: number|string;
   meta?: M;
   promise: () => Promise<any>;
@@ -9,10 +9,13 @@ export type QueueItem<M=any> = {
   timeout: NodeJS.Timeout;
 };
 
+export type QueueItem<M=any> = Identifier<M> & {
+  resolve: any;
+  reject: any;
+};
 
-
-export abstract class IQueue {
-  abstract queue: ArrayDelegate<Completer<QueueItem>>;
+export abstract class IQueue<T extends Identifier> {
+  abstract queue: ArrayDelegate<T>;
   abstract get isEmpty(): boolean;
   abstract enqueue(
     id: number|string,
@@ -24,14 +27,12 @@ export abstract class IQueue {
   abstract clearQueue(): void;
 }
 
- 
 
-
-export abstract class IQueueConsumer {
-  abstract queue: IQueue;
-  abstract feedRequest(request: () => Promise<any>):  Completer<QueueItem>;
+export abstract class IQueueConsumer<T extends Identifier> {
+  abstract queue: IQueue<T>;
+  abstract feedRequest(request: () => Promise<any>): T;
   abstract consumeAll(): Promise<any>;
-  abstract consumeAllWhen(condition: (item:  Completer<QueueItem>)=>boolean): Promise<any>;
+  abstract consumeAllWhen(condition: (item: T)=>boolean): Promise<any>;
 }
 
 /**
@@ -87,8 +88,8 @@ export abstract class IQueueConsumer {
     });
    ```
  */
-export class Queue  implements IQueue {
-  queue: ArrayDelegate<Completer<QueueItem>> = Arr([]);
+export class Queue<T extends Identifier=QueueItem> implements IQueue<T> {
+  queue: ArrayDelegate<T> = Arr([]);
   /** 判斷 {@link queue} 是否為空 */
   get isEmpty(){
     return this.queue.length == 0;
@@ -104,11 +105,14 @@ export class Queue  implements IQueue {
   /**
    * 將請求推到 Queue 裡，並同時執行，直到使用者 
    * {@link dequeue} 才將 Queued 物件由列表中移除
+   * @typeParam T - {@link QueueItem}
+   * 
    * @param id - 請求 ID
    * @param promise - 處請求邏輯
    * @param timeout - default 10 * 1000
    * @param meta - 使用者自定義註解
    * @param dequeueImmediately - 
+   * 
    * @returns 
    * @example
       ```ts
@@ -128,34 +132,21 @@ export class Queue  implements IQueue {
     dequeueImmediately: boolean = true,
   ): Promise<any> {
     const timestamp = new Date().getTime();
-    const completer = new Completer<QueueItem>({
-      id,
-      timestamp,
-      meta,
-      timeout: setTimeout(() => {
-        this.onTimeout(id);
-      }, timeout),
-      promise,
-    });
-    this.queue.push(completer)
-    if (dequeueImmediately)
+    return new Promise((resolve, reject) => {
+      this.queue.push({
+        id,
+        timestamp,
+        meta,
+        timeout: setTimeout(() => {
+          this.onTimeout(id);
+        }, timeout),
+        promise,
+        resolve,
+        reject
+      } as any as T);
+      if (dequeueImmediately)
         this.dequeue({id, removeQueue: false});
-    return completer.future;
-    // return new Promise((resolve, reject) => {
-    //   this.queue.push({
-    //     id,
-    //     timestamp,
-    //     meta,
-    //     timeout: setTimeout(() => {
-    //       this.onTimeout(id);
-    //     }, timeout),
-    //     promise,
-    //     resolve,
-    //     reject
-    //   });
-    //   if (dequeueImmediately)
-    //     this.dequeue({id, removeQueue: false});
-    // });
+    });
   }
 
   /** 與  {@link enqueue} 相同，只是 id 自動生成 */
@@ -175,19 +166,21 @@ export class Queue  implements IQueue {
   }
 
   private onTimeout(id: number|string) {
-    const item = this.queue.firstWhere(_ => _._meta.id == id)!;
+    const item = this.queue.firstWhere(_ => _.id == id)!;
     if (!item) return;
-    item.reject(this.timeoutErrorObj);
+    (item as any as QueueItem).reject(this.timeoutErrorObj);
   }
 
-  private remove(item: Completer<QueueItem>, reject: boolean = false) {
-    clearTimeout(item._meta.timeout);
+  /** 
+   * @typeParam T - {@link QueueItem} */
+  private remove(item: T, reject: boolean = false) {
+    clearTimeout(item.timeout);
     if (reject)
-      item.reject({
+      (item as any as QueueItem).reject({
         reason: "flushed"
       })
     this.queue.remove(item);
-    console.log("remove:", item._meta.id);
+    console.log("remove:", item.id);
   }
 
   /**清除 {@link queue} */
@@ -239,17 +232,17 @@ export class Queue  implements IQueue {
   public async dequeueByResult(option: {id: number|string, result: any}): Promise<any> {
     const {id, result} = option;
     const removeQueue = true;
-    const item = this.queue.firstWhere(_ => _._meta.id == id)!;
+    const item = this.queue.firstWhere(_ => _.id == id)!;
     if (!item) {
       return null;
     }
     try {
       if (removeQueue ?? true)
         this.remove(item);
-      item.complete(result);
+      (item as any as QueueItem).resolve(result);
       return result;
     } catch (err) {
-      item.reject(err);
+      (item as any as QueueItem).reject(err);
       if (removeQueue ?? true)
         this.remove(item);
     }
@@ -265,18 +258,18 @@ export class Queue  implements IQueue {
    */
   public async dequeue(option: {id: number|string, removeQueue?: boolean}): Promise<any> {
     const {id, removeQueue} = option;
-    const item = this.queue.firstWhere(_ => _._meta.id == id)!;
+    const item = this.queue.firstWhere(_ => _.id == id)!;
     if (!item) {
       return null;
     }
     try {
-      const result = await item._meta.promise();
+      const result = await item.promise();
       if (removeQueue ?? true)
         this.remove(item);
-      item.complete(result);
+        (item as any as QueueItem).resolve(result);
       return result;
     } catch (err) {
-      item.reject(err);
+      (item as any as QueueItem).reject(err);
       if (removeQueue ?? true)
         this.remove(item);
     }
@@ -285,14 +278,14 @@ export class Queue  implements IQueue {
 }
 
 export class SequencedQueueConsumer 
-  implements IQueueConsumer
+  implements IQueueConsumer<QueueItem>
 {
-  constructor(public queue: IQueue){}
+  constructor(public queue: IQueue<QueueItem<any>>){}
 
   private _getId(): number|string{
     return randomUUID();
   }
-  feedRequest(request: () => Promise<any>): Completer<QueueItem> {
+  feedRequest(request: () => Promise<any>): QueueItem {
     this.queue.enqueue(this._getId() , request);
     const item = this.queue.queue.last;
     return item;
@@ -301,7 +294,7 @@ export class SequencedQueueConsumer
   consumeAll(): Promise<any> {
     throw new Error("Method not implemented.");
   }
-  consumeAllWhen(condition: (item: Completer<QueueItem<any>>) => boolean): Promise<any> {
+  consumeAllWhen(condition: (item: QueueItem<any>) => boolean): Promise<any> {
     throw new Error("Method not implemented.");
   }
 }
