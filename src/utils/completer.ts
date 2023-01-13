@@ -27,6 +27,7 @@ abstract class _Completer<T, M=T> {
  ```
  */
 export class Completer<T, M=T> {
+  isCompleted: boolean = false;
   /** 同 Promise.resolve, resolve {@link future} 本身*/
   complete: (value: T | PromiseLike<T>) => void;
 
@@ -52,10 +53,18 @@ export class Completer<T, M=T> {
     this.future = new Promise((resolve: any, reject: any) => {
       this.complete = (val: T) => {
         resolve(val);
+        this.isCompleted = true;
+        this._onComplete?.(this);
       };
       this.reject = (reason) => {
         reject(reason);
       };
     });
+  }
+
+  private _onComplete?: (self: Completer<T, M>)=>void;
+
+  onComplete(cb: (self: Completer<T, M>)=>void){
+    this._onComplete = cb;
   }
 }

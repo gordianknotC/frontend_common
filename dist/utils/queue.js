@@ -144,7 +144,9 @@ class AsyncQueue {
         //     this.dequeue({id, removeQueue: false});
         // });
     }
-    /** 與  {@link enqueue} 相同，只是 id 自動生成 */
+    /** 與  {@link enqueue} 相同，只是 id 自動生成
+     * @returns Completer 物件，非 async Promise
+    */
     enqueueWithoutId(promise, timeout = 10000, meta = {}, dequeueImmediately = true) {
         this.enqueue(this._getId(), promise, timeout, meta, dequeueImmediately);
         const item = this.queue.last;
@@ -215,7 +217,7 @@ class AsyncQueue {
       });
      ```
      */
-    async dequeueByResult(option) {
+    dequeueByResult(option) {
         const { id, result } = option;
         const removeQueue = true;
         const item = this.queue.firstWhere(_ => _._meta.id == id);
@@ -223,17 +225,15 @@ class AsyncQueue {
             return null;
         }
         try {
+            item.complete(result);
             if (removeQueue !== null && removeQueue !== void 0 ? removeQueue : true)
                 this.remove(item);
-            item.complete(result);
-            return result;
         }
         catch (err) {
             item.reject(err);
             if (removeQueue !== null && removeQueue !== void 0 ? removeQueue : true)
                 this.remove(item);
         }
-        return null;
     }
     /**
      * 依所提供的 id 查找相應的 QueueItem，執行 QueueItem 裡的 Promise 請求並依

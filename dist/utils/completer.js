@@ -34,14 +34,21 @@ class Completer {
      */
     constructor(_meta) {
         this._meta = _meta;
+        this.isCompleted = false;
         this.future = new Promise((resolve, reject) => {
             this.complete = (val) => {
+                var _a;
                 resolve(val);
+                this.isCompleted = true;
+                (_a = this._onComplete) === null || _a === void 0 ? void 0 : _a.call(this, this);
             };
             this.reject = (reason) => {
                 reject(reason);
             };
         });
+    }
+    onComplete(cb) {
+        this._onComplete = cb;
     }
 }
 exports.Completer = Completer;

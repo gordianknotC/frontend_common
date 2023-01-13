@@ -23,7 +23,7 @@ export declare abstract class IAsyncQueue {
     abstract dequeueByResult(option: {
         id: number | string;
         result: any;
-    }): Promise<any>;
+    }): void;
     abstract clearQueue(): void;
 }
 export declare abstract class IQueueConsumer {
@@ -125,8 +125,10 @@ export declare class AsyncQueue implements IAsyncQueue {
        ```
      */
     enqueue(id: number | string, promise: () => Promise<any>, timeout?: number, meta?: any, dequeueImmediately?: boolean): Promise<any>;
-    /** 與  {@link enqueue} 相同，只是 id 自動生成 */
-    enqueueWithoutId(promise: () => Promise<any>, timeout?: number, meta?: any, dequeueImmediately?: boolean): Completer<any, QueueItem<any>>;
+    /** 與  {@link enqueue} 相同，只是 id 自動生成
+     * @returns Completer 物件，非 async Promise
+    */
+    enqueueWithoutId(promise: () => Promise<any>, timeout?: number, meta?: any, dequeueImmediately?: boolean): Completer<any, QueueItem>;
     private _getId;
     private onTimeout;
     private remove;
@@ -175,7 +177,7 @@ export declare class AsyncQueue implements IAsyncQueue {
     dequeueByResult(option: {
         id: number | string;
         result: any;
-    }): Promise<any>;
+    }): void;
     /**
      * 依所提供的 id 查找相應的 QueueItem，執行 QueueItem 裡的 Promise 請求並依
      * option.removeQueue 決定是否移除 QueueItem, 預設 option.removeQueue 為 true

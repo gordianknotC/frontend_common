@@ -23,7 +23,7 @@ export abstract class IAsyncQueue {
     timeout?: number
   ): Promise<any>;
   abstract dequeue(option: {id: number|string, removeQueue: boolean}): Promise<any>;
-  abstract dequeueByResult(option: {id: number|string, result: any}): Promise<any>;
+  abstract dequeueByResult(option: {id: number|string, result: any}): void;
   abstract clearQueue(): void;
 }
 
@@ -181,13 +181,15 @@ export class AsyncQueue  implements IAsyncQueue {
     // });
   }
 
-  /** 與  {@link enqueue} 相同，只是 id 自動生成 */
+  /** 與  {@link enqueue} 相同，只是 id 自動生成 
+   * @returns Completer 物件，非 async Promise
+  */
   public enqueueWithoutId(
     promise: () => Promise<any>,
     timeout: number = 10000,
     meta: any = {},
     dequeueImmediately: boolean = true,
-  ){
+  ): Completer<any, QueueItem>{
     this.enqueue(this._getId() , promise, timeout, meta, dequeueImmediately);
     const item = this.queue.last;
     return item;
@@ -210,6 +212,7 @@ export class AsyncQueue  implements IAsyncQueue {
         reason: "flushed"
       })
     this.queue.remove(item);
+
     console.log("remove:", item._meta.id);
   }
 
@@ -262,7 +265,7 @@ export class AsyncQueue  implements IAsyncQueue {
     });
    ```
    */
-  public async dequeueByResult(option: {id: number|string, result: any}): Promise<any> {
+  public dequeueByResult(option: {id: number|string, result: any}): void {
     const {id, result} = option;
     const removeQueue = true;
     const item = this.queue.firstWhere(_ => _._meta.id == id)!;
@@ -270,16 +273,14 @@ export class AsyncQueue  implements IAsyncQueue {
       return null;
     }
     try {
+      item.complete(result);
       if (removeQueue ?? true)
         this.remove(item);
-      item.complete(result);
-      return result;
     } catch (err) {
       item.reject(err);
       if (removeQueue ?? true)
         this.remove(item);
     }
-    return null;
   }
 
   /**
