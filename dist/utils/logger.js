@@ -25,7 +25,7 @@ var ELevel;
     ELevel[ELevel["fatal"] = 6] = "fatal";
 })(ELevel = exports.ELevel || (exports.ELevel = {}));
 const defaultLogOption = { traceBack: 3, stackNumber: 5 };
-const colorCaster = {
+const defaultColorCaster = {
     [ELevel.trace]: (msg) => msg.grey,
     [ELevel.debug]: function (msg) {
         return msg.white;
@@ -52,7 +52,7 @@ function message(moduleName, level, msg, traceBack = 2, stackNumber = 5) {
     const lBound = Math.min(traceBack + 1, maxStackRecs);
     const stacksOnDisplay = allStacks.splice(lBound, Math.min(stackNumber, maxStackRecs));
     const rBound = lBound + stacksOnDisplay.length;
-    const renderedModuleName = colorCaster[level](`[${moduleName}]`);
+    const renderedModuleName = defaultColorCaster[level](`[${moduleName}]`);
     console.log(renderedModuleName, ...msg, "\n" + stacksOnDisplay.join("\n"));
     return {
         stacksOnDisplay,
@@ -64,7 +64,11 @@ function message(moduleName, level, msg, traceBack = 2, stackNumber = 5) {
 }
 class LoggerMethods {
 }
-const LOGGER_MODE = (0, lazy_1.final)();
+let LOGGER_MODE = (0, lazy_1.final)();
+/**
+ * @static setLoggerAllowance
+ *
+ */
 class Logger {
     constructor(option) {
         if (Logger.hasModule(option)) {
@@ -74,13 +78,14 @@ class Logger {
         else {
             (0, colorsPlugin_1.useColors)();
             this._allowance = Object.assign({
-                disallowedLevels: (level) => {
+                disallowedHandler: (level) => {
                     return false;
                 },
             }, {
                 ...option,
             });
-            Logger.addModule(this._allowance);
+            if (LOGGER_MODE.value == "IgnoreEnv")
+                Logger.addModule(this._allowance);
         }
     }
     static setCurrentEnv(env) {
@@ -89,10 +94,15 @@ class Logger {
     static isDisallowed(option, level) {
         return !this.isAllowed(option, level);
     }
+    /** 判斷 model 於當前 env 中，該 level 是否被允許
+     * 如果是 dev mode (develop/test) 狀態下，預許不顯示 info 以下的 log
+     */
     static isAllowed(option, level) {
         if (extension_setup_1._currentEnv.value != "develop" && extension_setup_1._currentEnv.value != "test") {
-            if (level <= ELevel.info)
+            if (level <= ELevel.info) {
+                console.log("block allowance, since it's not dev mode");
                 return false;
+            }
         }
         const module = this.allowedModules[option.moduleName];
         const allowed = !module.disallowedHandler(level);
@@ -127,34 +137,37 @@ class Logger {
      * ```
      */
     static setLevelColors(option) {
-        Object.assign(colorCaster, option);
+        Object.assign(defaultColorCaster, option);
     }
-    static addModule(allowance) {
-        Logger.allowedModules[allowance.moduleName] = allowance;
-    }
-    /** 設定什麼樣層級的 logger 允許被顯示 */
+    /** 不考慮 env, 設定什麼樣層級的 logger 允許被顯示, 不得與
+     * {@link setLoggerAllowanceByEnv} 混用如混用會 raise AssertionError
+     * @typeParam M - 模組名
+     * @example - 混用的列子
+       ```ts
+      Logger.setLoggerAllowance<EModules>({
+        [EModules.Test]: testModule,
+        [EModules.Hobbits]: newLogModule,
+      });
+      const action = ()=> Logger.setLoggerAllowanceByEnv({
+        test: {},
+        develop: {}
+      });
+      expect(action).toThrow();
+      expect(action).toThrowError("AssertionError");
+       ```
+     */
     static setLoggerAllowance(option) {
         var _a;
         (0, assert_1.assert)(() => LOGGER_MODE.value == undefined || LOGGER_MODE.value == "IgnoreEnv", "Do not mix use of setLoggerAllowance and setLoggerAllowanceByEnv together");
         (_a = LOGGER_MODE.value) !== null && _a !== void 0 ? _a : (LOGGER_MODE.value = "IgnoreEnv");
         this._setLoggerAllowance(option);
     }
-    static _setLoggerAllowance(option) {
-        Logger.allowedModules = {};
-        const a = {};
-        Object.entries(option).forEach((pair) => {
-            const [k, v] = pair;
-            Logger.addModule(v);
-        });
-    }
-    /** 依據 env設定什麼樣層級的 logger 允許被顯示, 可透過
-     * {@link setCurrentEnv} 改變當前 env 值
+    /**
+     * 依據 env設定什麼樣層級的 logger 允許被顯示, 需要在 {@link setCurrentEnv} 後呼叫
      */
     static setLoggerAllowanceByEnv(option) {
         var _a;
-        (0, assert_1.assert)(() => false, "AssertionError: Do not mix use of setLoggerAllowance and setLoggerAllowanceByEnv together");
-        console.log("******", LOGGER_MODE.value, extension_setup_1._currentEnv.value);
-        console.log("*********", LOGGER_MODE.value == undefined || LOGGER_MODE.value == "ByEnv");
+        (0, assert_1.assert)(() => LOGGER_MODE.value == undefined || LOGGER_MODE.value == "ByEnv", "AssertionError: Do not mix use of setLoggerAllowance and setLoggerAllowanceByEnv together");
         (_a = LOGGER_MODE.value) !== null && _a !== void 0 ? _a : (LOGGER_MODE.value = "ByEnv");
         const env = extension_setup_1._currentEnv.value;
         const allowedLogger = option[env];
@@ -162,6 +175,23 @@ class Logger {
     }
     static hasModule(option) {
         return this.allowedModules[option.moduleName] != undefined;
+    }
+    static clearModules() {
+        this.allowedModules = {};
+        LOGGER_MODE = (0, lazy_1.final)();
+    }
+    static addModule(allowance) {
+        Logger.allowedModules[allowance.moduleName] = allowance;
+    }
+    static _setLoggerAllowance(option) {
+        console.log("_setLoggerAllowance:", option);
+        Logger.allowedModules = {};
+        const a = {};
+        Object.entries(option).forEach((pair) => {
+            const [k, v] = pair;
+            Logger.addModule(v);
+        });
+        console.log("_setLoggerAllowance, allowedModules:", this.allowedModules);
     }
     _messenger(msg, level, option) {
         var _a, _b;

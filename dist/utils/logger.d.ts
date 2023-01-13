@@ -3,22 +3,47 @@ import { Color } from "colors";
 export declare type LogColor = keyof Color;
 /** LogRecord 暫時用來除錯的型別 */
 export declare type LogRecord = {
+    /** 所有 stack */
     allStacks: string[];
+    /** lbound/rbound 處理後顥示的 stack */
     stacksOnDisplay: string[];
     lBound: number;
     rBound: number;
     moduleName: string;
 };
+/**
+  * @typeParam M - module name
+*/
 export declare type AllowedModule<M> = {
     moduleName: M;
     disallowedHandler: (level: ELevel) => boolean;
 };
+/**
+ * @typeParam M - module name
+ * @example
+ * ```ts
+    enum EModules {
+      Test = "Test",
+      Hobbits = "Hobbits",
+    }
+    const testModule: AllowedModule = {
+      moduleName: EModules.Test,
+      disallowedHandler: (l)=> l <= ELevel.info
+    }
+    const allowed = {
+      [EModules.Test]: testModule
+    }
+   ```*/
 export declare type AllowedLogger<M extends string> = Record<M, AllowedModule<M>>;
+/**
+ * @see {@link AllowedLogger}
+ * @typeParam M - module name
+*/
 export declare type AllowedLoggerByEnv<M extends string> = {
-    production?: AllowedLogger<M>;
-    release?: AllowedLogger<M>;
-    develop: AllowedLogger<M>;
-    test: AllowedLogger<M>;
+    production?: Partial<AllowedLogger<M>>;
+    release?: Partial<AllowedLogger<M>>;
+    develop: Partial<AllowedLogger<M>>;
+    test: Partial<AllowedLogger<M>>;
 };
 export declare type LogOption = {
     /** 預設為2，由現在的 trace stack 中，回算幾個 traceBack 作為起點
@@ -49,7 +74,7 @@ export declare enum ELevel {
     error = 5,
     fatal = 6
 }
-declare const colorCaster: Record<ELevel, (msg: string) => string>;
+declare const defaultColorCaster: Record<ELevel, (msg: string) => string>;
 declare abstract class LoggerMethods {
     abstract log(msg: any[], option?: LogOption): void;
     abstract trace(msg: any[], option?: LogOption): void;
@@ -60,9 +85,16 @@ declare abstract class LoggerMethods {
     abstract warn(msg: any[], option?: LogOption): void;
     abstract current(msg: any[], option?: LogOption): void;
 }
+/**
+ * @static setLoggerAllowance
+ *
+ */
 export declare class Logger<M> implements LoggerMethods {
     static setCurrentEnv(env: Env): void;
     static isDisallowed(option: AllowedModule<any>, level: ELevel): boolean;
+    /** 判斷 model 於當前 env 中，該 level 是否被允許
+     * 如果是 dev mode (develop/test) 狀態下，預許不顯示 info 以下的 log
+     */
     static isAllowed(option: AllowedModule<any>, level: ELevel): boolean;
     /** 設定不同 level 要程現什麼樣的色彩
      * @example
@@ -91,17 +123,34 @@ export declare class Logger<M> implements LoggerMethods {
       Logger.setLevelColors(colorCaster);
      * ```
      */
-    static setLevelColors(option: Partial<typeof colorCaster>): void;
-    private static allowedModules;
-    private static addModule;
-    /** 設定什麼樣層級的 logger 允許被顯示 */
+    static setLevelColors(option: Partial<typeof defaultColorCaster>): void;
+    /** 不考慮 env, 設定什麼樣層級的 logger 允許被顯示, 不得與
+     * {@link setLoggerAllowanceByEnv} 混用如混用會 raise AssertionError
+     * @typeParam M - 模組名
+     * @example - 混用的列子
+       ```ts
+      Logger.setLoggerAllowance<EModules>({
+        [EModules.Test]: testModule,
+        [EModules.Hobbits]: newLogModule,
+      });
+      const action = ()=> Logger.setLoggerAllowanceByEnv({
+        test: {},
+        develop: {}
+      });
+      expect(action).toThrow();
+      expect(action).toThrowError("AssertionError");
+       ```
+     */
     static setLoggerAllowance<M extends string>(option: Partial<AllowedLogger<M>>): void;
-    private static _setLoggerAllowance;
-    /** 依據 env設定什麼樣層級的 logger 允許被顯示, 可透過
-     * {@link setCurrentEnv} 改變當前 env 值
+    /**
+     * 依據 env設定什麼樣層級的 logger 允許被顯示, 需要在 {@link setCurrentEnv} 後呼叫
      */
     static setLoggerAllowanceByEnv<M extends string>(option: AllowedLoggerByEnv<M>): void;
     static hasModule<M>(option: AllowedModule<M>): boolean;
+    static clearModules(): void;
+    private static allowedModules;
+    private static addModule;
+    private static _setLoggerAllowance;
     _prevLog?: LogRecord;
     _allowance?: AllowedModule<M>;
     constructor(option: Pick<AllowedModule<M>, "moduleName">);

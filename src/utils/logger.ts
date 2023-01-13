@@ -8,24 +8,49 @@ export type LogColor = keyof Color;
 
 /** LogRecord 暫時用來除錯的型別 */
 export type LogRecord = {
+  /** 所有 stack */
   allStacks: string[];
+  /** lbound/rbound 處理後顥示的 stack */
   stacksOnDisplay: string[];
   lBound: number;
   rBound: number;
   moduleName: string;
 };
+/** 
+  * @typeParam M - module name 
+*/
 export type AllowedModule<M> = {
   moduleName: M;
   disallowedHandler: (level: ELevel) => boolean;
 };
 
+/** 
+ * @typeParam M - module name 
+ * @example
+ * ```ts
+    enum EModules {
+      Test = "Test",
+      Hobbits = "Hobbits",
+    }
+    const testModule: AllowedModule = {
+      moduleName: EModules.Test,
+      disallowedHandler: (l)=> l <= ELevel.info
+    }
+    const allowed = {
+      [EModules.Test]: testModule
+    }
+   ```*/
 export type AllowedLogger<M extends string> = Record<M, AllowedModule<M>>;
 
+/** 
+ * @see {@link AllowedLogger} 
+ * @typeParam M - module name 
+*/
 export type AllowedLoggerByEnv<M extends string> = {
-  production?: AllowedLogger<M>;
-  release?: AllowedLogger<M>;
-  develop: AllowedLogger<M>;
-  test: AllowedLogger<M>;
+  production?: Partial<AllowedLogger<M>>;
+  release?: Partial<AllowedLogger<M>>;
+  develop: Partial<AllowedLogger<M>>;
+  test: Partial<AllowedLogger<M>>;
 };
 
 export type LogOption = {
@@ -60,7 +85,7 @@ export enum ELevel {
 
 const defaultLogOption = { traceBack: 3, stackNumber: 5 };
 
-const colorCaster: Record<ELevel, (msg: string) => string> = {
+const defaultColorCaster: Record<ELevel, (msg: string) => string> = {
   [ELevel.trace]: (msg) => msg.grey,
   [ELevel.debug]: function (msg: string): string {
     return msg.white;
@@ -97,7 +122,7 @@ function message(
     Math.min(stackNumber, maxStackRecs)
   );
   const rBound = lBound + stacksOnDisplay.length;
-  const renderedModuleName = (colorCaster[level] as any)(`[${moduleName}]`);
+  const renderedModuleName = (defaultColorCaster[level] as any)(`[${moduleName}]`);
   console.log(renderedModuleName, ...msg, "\n" + stacksOnDisplay.join("\n"));
   return {
     stacksOnDisplay,
@@ -121,8 +146,12 @@ abstract class LoggerMethods {
 
 type SetLoggerAllowanceMode = "ByEnv" | "IgnoreEnv";
 
-const LOGGER_MODE = final<SetLoggerAllowanceMode>();
+let LOGGER_MODE = final<SetLoggerAllowanceMode>();
 
+/**
+ * @static setLoggerAllowance
+ *
+ */
 export class Logger<M> implements LoggerMethods {
   static setCurrentEnv(env: Env) {
     setupCurrentEnv(env);
@@ -130,9 +159,16 @@ export class Logger<M> implements LoggerMethods {
   static isDisallowed(option: AllowedModule<any>, level: ELevel) {
     return !this.isAllowed(option, level);
   }
-  static isAllowed(option: AllowedModule<any>, level: ELevel) {
+
+  /** 判斷 model 於當前 env 中，該 level 是否被允許
+   * 如果是 dev mode (develop/test) 狀態下，預許不顯示 info 以下的 log
+   */
+  static isAllowed(option: AllowedModule<any>, level: ELevel): boolean {
     if (_currentEnv.value != "develop" && _currentEnv.value != "test") {
-      if (level <= ELevel.info) return false;
+      if (level <= ELevel.info) {
+        console.log("block allowance, since it's not dev mode")
+        return false;
+      }
     }
     const module = this.allowedModules[option.moduleName as any];
     const allowed = !module.disallowedHandler(level);
@@ -167,17 +203,27 @@ export class Logger<M> implements LoggerMethods {
     Logger.setLevelColors(colorCaster);
    * ```
    */
-  static setLevelColors(option: Partial<typeof colorCaster>) {
-    Object.assign(colorCaster, option);
+  static setLevelColors(option: Partial<typeof defaultColorCaster>) {
+    Object.assign(defaultColorCaster, option);
   }
 
-  private static allowedModules: AllowedLogger<any> = {} as any;
-
-  private static addModule<M>(allowance: AllowedModule<M>) {
-    Logger.allowedModules[allowance.moduleName as any] = allowance;
-  }
-
-  /** 設定什麼樣層級的 logger 允許被顯示 */
+  /** 不考慮 env, 設定什麼樣層級的 logger 允許被顯示, 不得與 
+   * {@link setLoggerAllowanceByEnv} 混用如混用會 raise AssertionError
+   * @typeParam M - 模組名
+   * @example - 混用的列子
+     ```ts
+    Logger.setLoggerAllowance<EModules>({
+      [EModules.Test]: testModule,
+      [EModules.Hobbits]: newLogModule,
+    });
+    const action = ()=> Logger.setLoggerAllowanceByEnv({
+      test: {},
+      develop: {}
+    });
+    expect(action).toThrow();
+    expect(action).toThrowError("AssertionError");
+     ```
+   */
   static setLoggerAllowance<M extends string>(
     option: Partial<AllowedLogger<M>>
   ) {
@@ -189,29 +235,16 @@ export class Logger<M> implements LoggerMethods {
     this._setLoggerAllowance(option);
   }
 
-  private static _setLoggerAllowance<M extends string>(
-    option: Partial<AllowedLogger<M>>
-  ) {
-    Logger.allowedModules = {};
-    const a = {};
-    Object.entries(option).forEach((pair) => {
-      const [k, v] = pair as any as [M, AllowedModule<M>];
-      Logger.addModule(v);
-    });
-  }
-
-  /** 依據 env設定什麼樣層級的 logger 允許被顯示, 可透過
-   * {@link setCurrentEnv} 改變當前 env 值
+  /** 
+   * 依據 env設定什麼樣層級的 logger 允許被顯示, 需要在 {@link setCurrentEnv} 後呼叫
    */
   static setLoggerAllowanceByEnv<M extends string>(
     option: AllowedLoggerByEnv<M>
   ) {
     assert(
-      () => false,
+      () => LOGGER_MODE.value == undefined || LOGGER_MODE.value == "ByEnv",
       "AssertionError: Do not mix use of setLoggerAllowance and setLoggerAllowanceByEnv together"
     );
-    console.log("******", LOGGER_MODE.value, _currentEnv.value);
-    console.log("*********", LOGGER_MODE.value == undefined || LOGGER_MODE.value == "ByEnv");
     LOGGER_MODE.value ??= "ByEnv";
     const env = _currentEnv.value;
     const allowedLogger = option[env];
@@ -220,6 +253,30 @@ export class Logger<M> implements LoggerMethods {
 
   static hasModule<M>(option: AllowedModule<M>) {
     return this.allowedModules[option.moduleName as any] != undefined;
+  }
+
+  static clearModules(){
+    this.allowedModules = {};
+    LOGGER_MODE = final();
+  }
+
+  private static allowedModules: AllowedLogger<any> = {} as any;
+
+  private static addModule<M>(allowance: AllowedModule<M>) {
+    Logger.allowedModules[allowance.moduleName as any] = allowance;
+  }
+
+  private static _setLoggerAllowance<M extends string>(
+    option: Partial<AllowedLogger<M>>
+  ) {
+    console.log("_setLoggerAllowance:", option)
+    Logger.allowedModules = {};
+    const a = {};
+    Object.entries(option).forEach((pair) => {
+      const [k, v] = pair as any as [M, AllowedModule<M>];
+      Logger.addModule(v);
+    });
+    console.log("_setLoggerAllowance, allowedModules:", this.allowedModules)
   }
 
   _prevLog?: LogRecord;
@@ -233,7 +290,7 @@ export class Logger<M> implements LoggerMethods {
       useColors();
       this._allowance = Object.assign(
         {
-          disallowedLevels: (level: ELevel) => {
+          disallowedHandler: (level: ELevel) => {
             return false;
           },
         },
@@ -241,7 +298,8 @@ export class Logger<M> implements LoggerMethods {
           ...option,
         } as AllowedModule<M>
       );
-      Logger.addModule(this._allowance!);
+      if (LOGGER_MODE.value == "IgnoreEnv")
+        Logger.addModule(this._allowance!);
     }
   }
 
