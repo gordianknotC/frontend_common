@@ -28,6 +28,10 @@ describe("Logger", () => {
       return level <= ELevel.info;
     },
   };
+  const logModules: AllowedLogger<EModules> = {
+    [EModules.Test]: testModule,
+    [EModules.Hobbits]: newLogModule
+  }
   beforeAll(() => {
     setupComputed(computed);
     setupReactive(reactive);

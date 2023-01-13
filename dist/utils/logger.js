@@ -24,6 +24,7 @@ var ELevel;
     ELevel[ELevel["error"] = 5] = "error";
     ELevel[ELevel["fatal"] = 6] = "fatal";
 })(ELevel = exports.ELevel || (exports.ELevel = {}));
+const EmptyLogOption = { test: {}, develop: {} };
 const defaultLogOption = { traceBack: 3, stackNumber: 5 };
 const defaultColorCaster = {
     [ELevel.trace]: (msg) => msg.grey,
@@ -66,13 +67,69 @@ class LoggerMethods {
 }
 let LOGGER_MODE = (0, lazy_1.final)();
 /**
- * @static setLoggerAllowance
+ * ### 始始化有以下二種方式
+ * 1) {@link setLoggerAllowance}
+ * 2) {@link setLoggerAllowanceByEnv}
  *
+ * #### setLoggerAllowance
+ * @example
+  ```ts
+  // logger.setup.ts
+  enum EModules {
+    Test = "Test",
+    Hobbits = "Hobbits",
+  }
+  const LogModules: AllowedModule<EModules> = {
+    [EModules.Test]: {
+      moduleName: EModules.Test,
+      disallowedHandler: (level) => false,
+    },
+    [EModules.Hobbits]: {
+      moduleName: EModules.Test,
+      disallowedHandler: (level) => false,
+    },
+  }
+  Logger.setCurrentEnv("develop")
+  Logger.setLoggerAllowance(LogModules)
+
+  // 使用：arbitrary.test.source.ts
+  const D = new Logger(LogModules.Test)
+  ```
+ *
+ * #### setLoggerAllowanceByEnv
+ * @example
+ ```ts
+  // logger.setup.ts
+  enum EModules {
+    Test = "Test",
+    Hobbits = "Hobbits",
+  }
+  const LogModules: AllowedModule<EModules> = {
+    [EModules.Test]: {
+      moduleName: EModules.Test,
+      disallowedHandler: (level) => false,
+    },
+    [EModules.Hobbits]: {
+      moduleName: EModules.Test,
+      disallowedHandler: (level) => false,
+    },
+  }
+  Logger.setCurrentEnv("develop")
+  // 以下只有 release 允許 log
+  Logger.setLoggerAllowanceByEnv({
+    test: {},
+    develop: {},
+    release: LogModules
+  })
+
+  // 使用：arbitrary.hobbits.source.ts
+  const D = new Logger(LogModules.Hobbits)
+  ```
  */
 class Logger {
     constructor(option) {
         if (Logger.hasModule(option)) {
-            this._allowance = Logger.allowedModules[option.moduleName];
+            this._allowance = Logger.allowedModules[Logger.getEnv()][option.moduleName];
             // todo: remind of user that module configuration never being override
         }
         else {
@@ -88,8 +145,8 @@ class Logger {
                 Logger.addModule(this._allowance);
         }
     }
-    static setCurrentEnv(env) {
-        (0, extension_setup_1.setupCurrentEnv)(env);
+    static setCurrentEnv(envGetter) {
+        this.getEnv = envGetter;
     }
     static isDisallowed(option, level) {
         return !this.isAllowed(option, level);
@@ -98,14 +155,16 @@ class Logger {
      * 如果是 dev mode (develop/test) 狀態下，預許不顯示 info 以下的 log
      */
     static isAllowed(option, level) {
-        if (extension_setup_1._currentEnv.value != "develop" && extension_setup_1._currentEnv.value != "test") {
+        var _a;
+        if (Logger.getEnv() != "develop" && Logger.getEnv() != "test") {
             if (level <= ELevel.info) {
                 console.log("block allowance, since it's not dev mode");
                 return false;
             }
         }
-        const module = this.allowedModules[option.moduleName];
-        const allowed = !module.disallowedHandler(level);
+        const module = this.allowedModules[this.getEnv()][option.moduleName];
+        (0, assert_1.assert)(() => module != undefined, `module: ${option.moduleName} not found, please`);
+        const allowed = !((_a = module === null || module === void 0 ? void 0 : module.disallowedHandler(level)) !== null && _a !== void 0 ? _a : true);
         console.log("isAllowed:", allowed, option.moduleName, "on level:", level);
         return allowed;
     }
@@ -169,24 +228,22 @@ class Logger {
         var _a;
         (0, assert_1.assert)(() => LOGGER_MODE.value == undefined || LOGGER_MODE.value == "ByEnv", "AssertionError: Do not mix use of setLoggerAllowance and setLoggerAllowanceByEnv together");
         (_a = LOGGER_MODE.value) !== null && _a !== void 0 ? _a : (LOGGER_MODE.value = "ByEnv");
-        const env = extension_setup_1._currentEnv.value;
-        const allowedLogger = option[env];
-        this._setLoggerAllowance(allowedLogger);
+        const env = Logger.getEnv();
+        Logger.allowedModules = Object.assign({ ...EmptyLogOption }, option);
     }
     static hasModule(option) {
-        return this.allowedModules[option.moduleName] != undefined;
+        return this.allowedModules[this.getEnv()][option.moduleName] != undefined;
     }
     static clearModules() {
-        this.allowedModules = {};
+        this.allowedModules = { ...EmptyLogOption };
         LOGGER_MODE = (0, lazy_1.final)();
     }
     static addModule(allowance) {
-        Logger.allowedModules[allowance.moduleName] = allowance;
+        Logger.allowedModules[Logger.getEnv()][allowance.moduleName] = allowance;
     }
     static _setLoggerAllowance(option) {
         console.log("_setLoggerAllowance:", option);
-        Logger.allowedModules = {};
-        const a = {};
+        Logger.allowedModules = { ...EmptyLogOption };
         Object.entries(option).forEach((pair) => {
             const [k, v] = pair;
             Logger.addModule(v);
@@ -239,5 +296,8 @@ class Logger {
     }
 }
 exports.Logger = Logger;
-Logger.allowedModules = {};
+Logger.allowedModules = {
+    test: {}, develop: {}
+};
+Logger.getEnv = () => extension_setup_1._currentEnv.value;
 //# sourceMappingURL=logger.js.map

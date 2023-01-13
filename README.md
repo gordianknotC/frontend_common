@@ -55,6 +55,7 @@ table of content
     - [特性](#%E7%89%B9%E6%80%A7)
 - [Logger:](#logger)
     - [Feature](#feature-1)
+    - [袑始化](#%E8%A2%91%E5%A7%8B%E5%8C%96)
     - [設置色彩](#%E8%A8%AD%E7%BD%AE%E8%89%B2%E5%BD%A9)
     - [設置允許的 Logger](#%E8%A8%AD%E7%BD%AE%E5%85%81%E8%A8%B1%E7%9A%84-logger)
 - [Writing pseudo code for api - 測試API工具:](#writing-pseudo-code-for-api---%E6%B8%AC%E8%A9%A6api%E5%B7%A5%E5%85%B7)
@@ -918,6 +919,60 @@ Logger<M> implements LoggerMethods {
   static hasModule<M>(option: AllowedModule<M>):boolean{};
 }
 ```
+### 袑始化
+__[setLoggerAllowanceByEnv](#setLoggerAllowanceByEnv)__
+```ts
+// logger.setup.ts
+enum EModules {
+  Test = "Test",
+  Hobbits = "Hobbits",
+}
+const LogModules: AllowedModule<EModules> = {
+  [EModules.Test]: {
+    moduleName: EModules.Test,
+    disallowedHandler: (level) => false,
+  },
+  [EModules.Hobbits]: {
+    moduleName: EModules.Test,
+    disallowedHandler: (level) => false,
+  },
+}
+Logger.setCurrentEnv(()=>"develop")
+// 以下只有 release 允許 log
+Logger.setLoggerAllowanceByEnv({
+  test: {},
+  develop: {},
+  release: LogModules
+})
+
+// 使用：arbitrary.hobbits.source.ts
+const D = new Logger(LogModules.Hobbits)
+```
+
+__[setLoggerAllowance](#setLoggerAllowance)__
+```ts
+// logger.setup.ts
+enum EModules {
+  Test = "Test",
+  Hobbits = "Hobbits",
+}
+const LogModules: AllowedModule<EModules> = {
+  [EModules.Test]: {
+    moduleName: EModules.Test,
+    disallowedHandler: (level) => false,
+  },
+  [EModules.Hobbits]: {
+    moduleName: EModules.Test,
+    disallowedHandler: (level) => false,
+  },
+}
+Logger.setCurrentEnv(()=>"develop")
+Logger.setLoggerAllowance(LogModules)
+
+// 使用：arbitrary.test.source.ts
+const D = new Logger(LogModules.Test)
+```
+
 
 ### 設置色彩 
 __型別__ | [source][s-logger]

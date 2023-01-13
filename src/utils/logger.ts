@@ -83,6 +83,8 @@ export enum ELevel {
   fatal,
 }
 
+const EmptyLogOption: AllowedLoggerByEnv<any> = {test: {}, develop: {}};
+
 const defaultLogOption = { traceBack: 3, stackNumber: 5 };
 
 const defaultColorCaster: Record<ELevel, (msg: string) => string> = {
@@ -149,12 +151,68 @@ type SetLoggerAllowanceMode = "ByEnv" | "IgnoreEnv";
 let LOGGER_MODE = final<SetLoggerAllowanceMode>();
 
 /**
- * @static setLoggerAllowance
- *
+ * ### 始始化有以下二種方式
+ * 1) {@link setLoggerAllowance}
+ * 2) {@link setLoggerAllowanceByEnv}
+ * 
+ * #### setLoggerAllowance
+ * @example
+  ```ts
+  // logger.setup.ts
+  enum EModules {
+    Test = "Test",
+    Hobbits = "Hobbits",
+  }
+  const LogModules: AllowedModule<EModules> = {
+    [EModules.Test]: {
+      moduleName: EModules.Test,
+      disallowedHandler: (level) => false,
+    },
+    [EModules.Hobbits]: {
+      moduleName: EModules.Test,
+      disallowedHandler: (level) => false,
+    },
+  }
+  Logger.setCurrentEnv("develop")
+  Logger.setLoggerAllowance(LogModules)
+
+  // 使用：arbitrary.test.source.ts
+  const D = new Logger(LogModules.Test)
+  ```
+ * 
+ * #### setLoggerAllowanceByEnv
+ * @example
+ ```ts
+  // logger.setup.ts
+  enum EModules {
+    Test = "Test",
+    Hobbits = "Hobbits",
+  }
+  const LogModules: AllowedModule<EModules> = {
+    [EModules.Test]: {
+      moduleName: EModules.Test,
+      disallowedHandler: (level) => false,
+    },
+    [EModules.Hobbits]: {
+      moduleName: EModules.Test,
+      disallowedHandler: (level) => false,
+    },
+  }
+  Logger.setCurrentEnv("develop")
+  // 以下只有 release 允許 log
+  Logger.setLoggerAllowanceByEnv({
+    test: {},
+    develop: {},
+    release: LogModules
+  })
+
+  // 使用：arbitrary.hobbits.source.ts
+  const D = new Logger(LogModules.Hobbits)
+  ```
  */
 export class Logger<M> implements LoggerMethods {
-  static setCurrentEnv(env: Env) {
-    setupCurrentEnv(env);
+  static setCurrentEnv(envGetter: ()=>Env) {
+    this.getEnv = envGetter;
   }
   static isDisallowed(option: AllowedModule<any>, level: ELevel) {
     return !this.isAllowed(option, level);
@@ -164,14 +222,15 @@ export class Logger<M> implements LoggerMethods {
    * 如果是 dev mode (develop/test) 狀態下，預許不顯示 info 以下的 log
    */
   static isAllowed(option: AllowedModule<any>, level: ELevel): boolean {
-    if (_currentEnv.value != "develop" && _currentEnv.value != "test") {
+    if (Logger.getEnv() != "develop" && Logger.getEnv() != "test") {
       if (level <= ELevel.info) {
         console.log("block allowance, since it's not dev mode")
         return false;
       }
     }
-    const module = this.allowedModules[option.moduleName as any];
-    const allowed = !module.disallowedHandler(level);
+    const module = this.allowedModules[this.getEnv()][option.moduleName as any];
+    assert(()=>module != undefined, `module: ${option.moduleName} not found, please`);
+    const allowed = !(module?.disallowedHandler(level) ?? true);
     console.log("isAllowed:", allowed, option.moduleName, "on level:", level);
     return allowed;
   }
@@ -246,32 +305,33 @@ export class Logger<M> implements LoggerMethods {
       "AssertionError: Do not mix use of setLoggerAllowance and setLoggerAllowanceByEnv together"
     );
     LOGGER_MODE.value ??= "ByEnv";
-    const env = _currentEnv.value;
-    const allowedLogger = option[env];
-    this._setLoggerAllowance(allowedLogger);
+    const env = Logger.getEnv();
+    Logger.allowedModules = Object.assign({...EmptyLogOption}, option);
   }
 
   static hasModule<M>(option: AllowedModule<M>) {
-    return this.allowedModules[option.moduleName as any] != undefined;
+    return this.allowedModules[this.getEnv()][option.moduleName as any] != undefined;
   }
 
   static clearModules(){
-    this.allowedModules = {};
+    this.allowedModules = {...EmptyLogOption};
     LOGGER_MODE = final();
   }
 
-  private static allowedModules: AllowedLogger<any> = {} as any;
+  private static allowedModules: AllowedLoggerByEnv<any> = {
+    test: {}, develop: {}
+  };
 
   private static addModule<M>(allowance: AllowedModule<M>) {
-    Logger.allowedModules[allowance.moduleName as any] = allowance;
+    Logger.allowedModules[Logger.getEnv()][allowance.moduleName as any] = allowance;
   }
+  private static getEnv = ()=> _currentEnv.value;
 
   private static _setLoggerAllowance<M extends string>(
     option: Partial<AllowedLogger<M>>
   ) {
     console.log("_setLoggerAllowance:", option)
-    Logger.allowedModules = {};
-    const a = {};
+    Logger.allowedModules = {...EmptyLogOption};
     Object.entries(option).forEach((pair) => {
       const [k, v] = pair as any as [M, AllowedModule<M>];
       Logger.addModule(v);
@@ -284,7 +344,7 @@ export class Logger<M> implements LoggerMethods {
 
   constructor(option: Pick<AllowedModule<M>, "moduleName">) {
     if (Logger.hasModule(option as any)) {
-      this._allowance = Logger.allowedModules[option.moduleName];
+      this._allowance = Logger.allowedModules[Logger.getEnv()][option.moduleName];
       // todo: remind of user that module configuration never being override
     } else {
       useColors();

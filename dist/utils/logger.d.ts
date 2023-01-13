@@ -86,11 +86,67 @@ declare abstract class LoggerMethods {
     abstract current(msg: any[], option?: LogOption): void;
 }
 /**
- * @static setLoggerAllowance
+ * ### 始始化有以下二種方式
+ * 1) {@link setLoggerAllowance}
+ * 2) {@link setLoggerAllowanceByEnv}
  *
+ * #### setLoggerAllowance
+ * @example
+  ```ts
+  // logger.setup.ts
+  enum EModules {
+    Test = "Test",
+    Hobbits = "Hobbits",
+  }
+  const LogModules: AllowedModule<EModules> = {
+    [EModules.Test]: {
+      moduleName: EModules.Test,
+      disallowedHandler: (level) => false,
+    },
+    [EModules.Hobbits]: {
+      moduleName: EModules.Test,
+      disallowedHandler: (level) => false,
+    },
+  }
+  Logger.setCurrentEnv("develop")
+  Logger.setLoggerAllowance(LogModules)
+
+  // 使用：arbitrary.test.source.ts
+  const D = new Logger(LogModules.Test)
+  ```
+ *
+ * #### setLoggerAllowanceByEnv
+ * @example
+ ```ts
+  // logger.setup.ts
+  enum EModules {
+    Test = "Test",
+    Hobbits = "Hobbits",
+  }
+  const LogModules: AllowedModule<EModules> = {
+    [EModules.Test]: {
+      moduleName: EModules.Test,
+      disallowedHandler: (level) => false,
+    },
+    [EModules.Hobbits]: {
+      moduleName: EModules.Test,
+      disallowedHandler: (level) => false,
+    },
+  }
+  Logger.setCurrentEnv("develop")
+  // 以下只有 release 允許 log
+  Logger.setLoggerAllowanceByEnv({
+    test: {},
+    develop: {},
+    release: LogModules
+  })
+
+  // 使用：arbitrary.hobbits.source.ts
+  const D = new Logger(LogModules.Hobbits)
+  ```
  */
 export declare class Logger<M> implements LoggerMethods {
-    static setCurrentEnv(env: Env): void;
+    static setCurrentEnv(envGetter: () => Env): void;
     static isDisallowed(option: AllowedModule<any>, level: ELevel): boolean;
     /** 判斷 model 於當前 env 中，該 level 是否被允許
      * 如果是 dev mode (develop/test) 狀態下，預許不顯示 info 以下的 log
@@ -150,6 +206,7 @@ export declare class Logger<M> implements LoggerMethods {
     static clearModules(): void;
     private static allowedModules;
     private static addModule;
+    private static getEnv;
     private static _setLoggerAllowance;
     _prevLog?: LogRecord;
     _allowance?: AllowedModule<M>;
