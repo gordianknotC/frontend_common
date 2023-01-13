@@ -15,7 +15,7 @@ export type QueueItem<M=any> = {
 };
 
 export abstract class IAsyncQueue {
-  abstract queue: ArrayDelegate<Completer<QueueItem>>;
+  abstract queue: ArrayDelegate<Completer<any, QueueItem>>;
   abstract get isEmpty(): boolean;
   abstract enqueue(
     id: number|string,
@@ -32,9 +32,9 @@ export abstract class IAsyncQueue {
 
 export abstract class IQueueConsumer {
   abstract queue: IAsyncQueue;
-  abstract feedRequest(request: () => Promise<any>):  Completer<QueueItem>;
+  abstract feedRequest(request: () => Promise<any>):  Completer<any, QueueItem>;
   abstract consumeAll(): Promise<any>;
-  abstract consumeAllWhen(condition: (item:  Completer<QueueItem>)=>boolean): Promise<any>;
+  abstract consumeAllWhen(condition: (item:  Completer<any, QueueItem>)=>boolean): Promise<any>;
 }
 
 /**
@@ -91,7 +91,7 @@ export abstract class IQueueConsumer {
    ```
  */
 export class AsyncQueue  implements IAsyncQueue {
-  queue: ArrayDelegate<Completer<QueueItem>> = Arr([]);
+  queue: ArrayDelegate<Completer<any, QueueItem>> = Arr([]);
   /** 判斷 {@link queue} 是否為空 */
   get isEmpty(){
     return this.queue.length == 0;
@@ -105,7 +105,7 @@ export class AsyncQueue  implements IAsyncQueue {
     }
   ){}
 
-  getQueueItem(id:number|string):Completer<QueueItem> | null{
+  getQueueItem(id:number|string):Completer<any, QueueItem> | null{
     if (this.queue.length == 0)
       return null;
     return this.queue.firstWhere((_)=>_._meta!.id == id);
@@ -151,7 +151,7 @@ export class AsyncQueue  implements IAsyncQueue {
     dequeueImmediately: boolean = true,
   ): Promise<any> {
     const timestamp = new Date().getTime();
-    const completer = new Completer<QueueItem>({
+    const completer = new Completer<any, QueueItem>({
       id,
       timestamp,
       meta,
@@ -203,7 +203,7 @@ export class AsyncQueue  implements IAsyncQueue {
     item.reject(this.timeoutErrorObj);
   }
 
-  private remove(item: Completer<QueueItem>, reject: boolean = false) {
+  private remove(item: Completer<any, QueueItem>, reject: boolean = false) {
     clearTimeout(item._meta.timeout);
     if (reject)
       item.reject({
@@ -325,7 +325,7 @@ export class SequencedQueueConsumer
   private _getId(): number|string{
     return randomUUID();
   }
-  feedRequest(request: () => Promise<any>): Completer<QueueItem> {
+  feedRequest(request: () => Promise<any>): Completer<any, QueueItem> {
     this.queue.enqueue(this._getId() , request);
     const item = this.queue.queue.last;
     return item;
@@ -334,7 +334,7 @@ export class SequencedQueueConsumer
   consumeAll(): Promise<any> {
     throw new Error("Method not implemented.");
   }
-  consumeAllWhen(condition: (item: Completer<QueueItem<any>>) => boolean): Promise<any> {
+  consumeAllWhen(condition: (item: Completer<any, QueueItem<any>>) => boolean): Promise<any> {
     throw new Error("Method not implemented.");
   }
 }

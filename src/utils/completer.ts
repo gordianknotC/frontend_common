@@ -1,14 +1,16 @@
 import { randomUUID } from "crypto";
 import { ArrayDelegate, Arr } from "..";
 
-abstract class _Completer<T> {
-  abstract _meta?: T;
+abstract class _Completer<T, M=T> {
+  abstract _meta?: M;
   abstract future: Promise<T>;
   abstract complete(value: T | PromiseLike<T>): void;
   abstract reject(reason?: any): void;
 }
 
 /** 借用 Dart Completer 概念
+ * @typeParam T - Promise 返回型別
+ * @typeParam M - meta 型別
  * @example
  * ```ts
    const futureQueue = [];
@@ -24,7 +26,7 @@ abstract class _Completer<T> {
    // futureQueue[0].reject...
  ```
  */
-export class Completer<T> {
+export class Completer<T, M=T> {
   /** 同 Promise.resolve, resolve {@link future} 本身*/
   complete: (value: T | PromiseLike<T>) => void;
 
@@ -46,7 +48,7 @@ export class Completer<T> {
       })
    * ```
    */
-  constructor(public _meta?: T) {
+  constructor(public _meta?: M) {
     this.future = new Promise((resolve: any, reject: any) => {
       this.complete = (val: T) => {
         resolve(val);

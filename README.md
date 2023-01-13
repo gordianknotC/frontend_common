@@ -54,7 +54,7 @@ table of content
 - [Completer:](#completer)
     - [特性](#%E7%89%B9%E6%80%A7)
 - [Logger:](#logger)
-  - [Feature](#feature-1)
+    - [Feature](#feature-1)
     - [設置色彩](#%E8%A8%AD%E7%BD%AE%E8%89%B2%E5%BD%A9)
     - [設置允許的 Logger](#%E8%A8%AD%E7%BD%AE%E5%85%81%E8%A8%B1%E7%9A%84-logger)
 - [Writing pseudo code for api - 測試API工具:](#writing-pseudo-code-for-api---%E6%B8%AC%E8%A9%A6api%E5%B7%A5%E5%85%B7)
@@ -891,7 +891,7 @@ expect(helper.authGuard!.canProcessFulFill).toBeCalled();
 
 ---
 # Logger:
-## Feature
+### Feature
 - 針對 trace/debug/info/warn/current/error/fatal 設置不同色彩
 - 根據環境變數設置 overall log level
 - 根據各別模組設置 log level

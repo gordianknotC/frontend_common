@@ -2,7 +2,7 @@
 
 ---
 <!--#-->
-## Feature
+### Feature
 - 針對 trace/debug/info/warn/current/error/fatal 設置不同色彩
 - 根據環境變數設置 overall log level
 - 根據各別模組設置 log level

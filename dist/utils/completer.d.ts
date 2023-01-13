@@ -1,4 +1,6 @@
 /** 借用 Dart Completer 概念
+ * @typeParam T - Promise 返回型別
+ * @typeParam M - meta 型別
  * @example
  * ```ts
    const futureQueue = [];
@@ -14,8 +16,8 @@
    // futureQueue[0].reject...
  ```
  */
-export declare class Completer<T> {
-    _meta?: T;
+export declare class Completer<T, M = T> {
+    _meta?: M;
     /** 同 Promise.resolve, resolve {@link future} 本身*/
     complete: (value: T | PromiseLike<T>) => void;
     /** 同 Promise.reject, reject {@link future} 本身 */
@@ -34,5 +36,5 @@ export declare class Completer<T> {
         })
      * ```
      */
-    constructor(_meta?: T);
+    constructor(_meta?: M);
 }

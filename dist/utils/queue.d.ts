@@ -13,7 +13,7 @@ export declare type QueueItem<M = any> = {
     timeout: NodeJS.Timeout;
 };
 export declare abstract class IAsyncQueue {
-    abstract queue: ArrayDelegate<Completer<QueueItem>>;
+    abstract queue: ArrayDelegate<Completer<any, QueueItem>>;
     abstract get isEmpty(): boolean;
     abstract enqueue(id: number | string, promise: () => Promise<any>, timeout?: number): Promise<any>;
     abstract dequeue(option: {
@@ -28,9 +28,9 @@ export declare abstract class IAsyncQueue {
 }
 export declare abstract class IQueueConsumer {
     abstract queue: IAsyncQueue;
-    abstract feedRequest(request: () => Promise<any>): Completer<QueueItem>;
+    abstract feedRequest(request: () => Promise<any>): Completer<any, QueueItem>;
     abstract consumeAll(): Promise<any>;
-    abstract consumeAllWhen(condition: (item: Completer<QueueItem>) => boolean): Promise<any>;
+    abstract consumeAllWhen(condition: (item: Completer<any, QueueItem>) => boolean): Promise<any>;
 }
 /**
  * 應用如 api client 處理需籍由 websocket 傳送出去的請求, 將請求暫存於 queue 以後，待收到 socket
@@ -87,11 +87,11 @@ export declare abstract class IQueueConsumer {
  */
 export declare class AsyncQueue implements IAsyncQueue {
     timeoutErrorObj: any;
-    queue: ArrayDelegate<Completer<QueueItem>>;
+    queue: ArrayDelegate<Completer<any, QueueItem>>;
     /** 判斷 {@link queue} 是否為空 */
     get isEmpty(): boolean;
     constructor(timeoutErrorObj?: any);
-    getQueueItem(id: number | string): Completer<QueueItem> | null;
+    getQueueItem(id: number | string): Completer<any, QueueItem> | null;
     /**
      * 將請求推到 Queue 裡，並有以下二種選擇 (視 @param dequeueImmediately)
      * 1） 同時執行 promise 非同部請求 via {@link dequeue} ，直到非同部請求 promise resolve 後， 使用者再次 {@link dequeue} 移除該列隊
@@ -126,7 +126,7 @@ export declare class AsyncQueue implements IAsyncQueue {
      */
     enqueue(id: number | string, promise: () => Promise<any>, timeout?: number, meta?: any, dequeueImmediately?: boolean): Promise<any>;
     /** 與  {@link enqueue} 相同，只是 id 自動生成 */
-    enqueueWithoutId(promise: () => Promise<any>, timeout?: number, meta?: any, dequeueImmediately?: boolean): Completer<QueueItem<any>>;
+    enqueueWithoutId(promise: () => Promise<any>, timeout?: number, meta?: any, dequeueImmediately?: boolean): Completer<any, QueueItem<any>>;
     private _getId;
     private onTimeout;
     private remove;
@@ -192,7 +192,7 @@ export declare class SequencedQueueConsumer implements IQueueConsumer {
     queue: IAsyncQueue;
     constructor(queue: IAsyncQueue);
     private _getId;
-    feedRequest(request: () => Promise<any>): Completer<QueueItem>;
+    feedRequest(request: () => Promise<any>): Completer<any, QueueItem>;
     consumeAll(): Promise<any>;
-    consumeAllWhen(condition: (item: Completer<QueueItem<any>>) => boolean): Promise<any>;
+    consumeAllWhen(condition: (item: Completer<any, QueueItem<any>>) => boolean): Promise<any>;
 }

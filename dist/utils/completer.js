@@ -4,6 +4,8 @@ exports.Completer = void 0;
 class _Completer {
 }
 /** 借用 Dart Completer 概念
+ * @typeParam T - Promise 返回型別
+ * @typeParam M - meta 型別
  * @example
  * ```ts
    const futureQueue = [];
