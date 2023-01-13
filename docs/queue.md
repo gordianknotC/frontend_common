@@ -4,7 +4,7 @@
 <!--#-->
 Promise 實作駐列處理, 由以下成員組成
 － queue
-用來代表每個等待處理或處理中的Promise請求，由 Array<Completer<QueueItem>> 物件陣列 存放所有 Promise 駐列每個駐列成員為一個 Completer<QueueItem>, Completer 本身類似 Promise 物件，只是將 resolve / reject 方法直接存在 Completer 物件裡, 只要使用者持有 Completer 物件，就能自行由外部呼叫 resolve 方法，不用侷限於 new Promise 的結構
+用來代表每個等待處理或處理中的Promise請求，由 Array<[Completer](#Completer)<QueueItem>> 物件陣列 存放所有 Promise 駐列每個駐列成員為一個 [Completer](#Completer)<QueueItem>, [Completer](#Completer) 本身類似 Promise 物件，只是將 resolve / reject 方法直接存在 [Completer](#Completer) 物件裡, 只要使用者持有 Completer 物件，就能自行由外部呼叫 resolve 方法，不用侷限於 new Promise 的結構
 
 - enqueue
 - dequeue
@@ -22,7 +22,7 @@ export type QueueItem<M=any> = {
   timeout: NodeJS.Timeout;
 };
 
-export abstract class IQueue {
+export abstract class IAsyncQueue {
   abstract queue: ArrayDelegate<Completer<QueueItem>>;
   abstract get isEmpty(): boolean;
   abstract enqueue(
@@ -36,7 +36,7 @@ export abstract class IQueue {
 }
 ```
 ### queue
-> queue 為 Completer<QueueItem> 物件陣列, QueueItem 有以下屬性
+> queue 為 [Completer](#Completer)<QueueItem> 物件陣列, QueueItem 有以下屬性
 ```ts
 export type QueueItem<M=any> = {
   /** id: QueueItem identifier */
@@ -68,7 +68,7 @@ abstract class _Completer<T> {
 }
 ```
 
-當我們以 Completer 存放 QueueItem 物件時便能於外部 resolve Promise 請求，Completer 則作為一個 存放 Promise 物件及相應 reject/resolve 方法的容器
+當我們以 [Completer](#Completer) 存放 QueueItem 物件時便能於外部 resolve Promise [Completer](#Completer) 則作為一個 存放 Promise 物件及相應 reject/resolve 方法的容器
 
 ### enqueue
 > 將 Promise 請求包入 QueueItem 並推到 Queue 裡，並有以下二種選擇 (視 @param dequeueImmediately)
