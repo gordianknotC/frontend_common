@@ -14,8 +14,12 @@ export { UnCaughtCondition, UncaughtEnumType, NotImplementedError, TypeMismatchE
 export { AssertMsg, AssertionError, assert } from "./utils/assert";
 export { isRefImpl, asEnum, getAccessibleProperties, flattenInstance, asUnWrappedVueRefMap, UnWrappedVueRef, asMapFromNumberedEnum as addStringMappingFromNumEnum, Is, getOmitsBy, } from "./utils/typeInference";
 export type { TUnWrapVueRef, InterfaceIs } from "./utils/typeInference";
-export type { QueueItem, IQueue, IQueueConsumer } from "./utils/queue";
-export { Queue, SequencedQueueConsumer } from "./utils/queue";
+export type { QueueItem, 
+/** @deprecated use IAsyncQueue instead */
+IAsyncQueue as IQueue, IAsyncQueue, IQueueConsumer } from "./utils/queue";
+export { 
+/** @deprecated use AsyncQueue instead */
+AsyncQueue as Queue, AsyncQueue, SequencedQueueConsumer } from "./utils/queue";
 export { Completer } from "./utils/completer";
 /**
  *

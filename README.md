@@ -47,10 +47,12 @@ table of content
   - [CallableDelegate - lazy loading for functions](#callabledelegate---lazy-loading-for-functions)
     - [以注入 vue watch method 為例](#%E4%BB%A5%E6%B3%A8%E5%85%A5-vue-watch-method-%E7%82%BA%E4%BE%8B)
 - [Queue:](#queue)
+    - [queue](#queue)
     - [enqueue](#enqueue)
     - [dequeue](#dequeue)
-    - [dequeueByResult](#dequeuebyresult)
+    - [其他方法](#%E5%85%B6%E4%BB%96%E6%96%B9%E6%B3%95)
 - [Completer:](#completer)
+    - [特性](#%E7%89%B9%E6%80%A7)
 - [Logger:](#logger)
   - [Feature](#feature-1)
     - [設置色彩](#%E8%A8%AD%E7%BD%AE%E8%89%B2%E5%BD%A9)
@@ -524,126 +526,219 @@ function setupWatch(watchConstructor: any){
 
 ---
 # Queue:
-Promise 實作駐列處理
+Promise 實作駐列處理, 由以下成員組成
+－ queue
+用來代表每個等待處理或處理中的Promise請求，由 Array<Completer<QueueItem>> 物件陣列 存放所有 Promise 駐列每個駐列成員為一個 Completer<QueueItem>, Completer 本身類似 Promise 物件，只是將 resolve / reject 方法直接存在 Completer 物件裡, 只要使用者持有 Completer 物件，就能自行由外部呼叫 resolve 方法，不用侷限於 new Promise 的結構
 
 - enqueue
 - dequeue
 - dequeueByResult
+- clearQueue
+- remove
 
 __型別__ | [source][s-queue]
 ```ts
-export abstract class IQueue<T extends QueueItem> {
-  abstract queue: T[];
+export type QueueItem<M=any> = {
+  id: number|string;
+  meta?: M;
+  promise: () => Promise<any>;
+  timestamp: number;
+  timeout: NodeJS.Timeout;
+};
+
+export abstract class IQueue {
+  abstract queue: ArrayDelegate<Completer<QueueItem>>;
+  abstract get isEmpty(): boolean;
   abstract enqueue(
-    id: number,
+    id: number|string,
     promise: () => Promise<any>,
     timeout?: number
   ): Promise<any>;
-  abstract dequeue(option: {id: number, removeQueue: boolean}): Promise<any>;
-  abstract dequeueByResult(option: {id: number, result: any}): Promise<any>;
+  abstract dequeue(option: {id: number|string, removeQueue: boolean}): Promise<any>;
+  abstract dequeueByResult(option: {id: number|string, result: any}): Promise<any>;
+  abstract clearQueue(): void;
+}
+```
+### queue
+> queue 為 Completer<QueueItem> 物件陣列, QueueItem 有以下屬性
+```ts
+export type QueueItem<M=any> = {
+  /** id: QueueItem identifier */
+  id: number|string;
+  /** meta: 用以儲存額外資訊，如 request config / request header */
+  meta?: M;
+  /** promise: 用來取得QueueItem所承載的非同步資料 */
+  promise: () => Promise<any>;
+  /** timestamp: 用來計算 timeout */
+  timestamp: number;
+  /** timeout: timeout id */
+  timeout: NodeJS.Timeout;
+};
+```
+
+> completer 本身類似 Promise 物件, 只是多了以下屬性
+[source][s-completer]
+```ts
+abstract class _Completer<T> {
+  /** 用來暫時代表 future 值的物件，也可作為 Completer 本身的註解 */
+  abstract _meta?: T
+  /** 即 Promise 物件本身, 其 resolve / reject 方法分別為
+   * {@link complete} / {@link reject} */
+  abstract future: Promise<T>;
+  /** 同 Promise.resolve, resolve {@link future} 本身*/
+  abstract complete(value: T | PromiseLike<T>) : void;
+  /** 同 Promise.reject, reject {@link future} 本身 */
+  abstract reject(reason?: any): void;
 }
 ```
 
+當我們以 Completer 存放 QueueItem 物件時便能於外部 resolve Promise 請求，Completer 則作為一個 存放 Promise 物件及相應 reject/resolve 方法的容器
+
 ### enqueue
-> 將請求推到 Queue 裡，並同時執行 QueueItem，直到使用者 [dequeue] 才將 Queued 物件由列表中移除
+> 將 Promise 請求包入 QueueItem 並推到 Queue 裡，並有以下二種選擇 (視 @param dequeueImmediately)
+> -  同時執行 promise 非同部請求 via [dequeue](#dequeue) ，直到非同部請求 promise resolve 後， 使用者再次 [dequeue](#dequeue) 移除該列隊
+> - 不立即執行 promise 非同部請求 [dequeue](#dequeue) ，直到使用者自行 [dequeue](#dequeue) 後，移除該列隊
   
 __型別__:
 ```ts
 /**
- * 將請求推到 Queue 裡，並同時執行，直到使用者 
- * {@link dequeue} 才將 Queued 物件由列表中移除
  * @param id - 請求 ID
- * @param promise - 處請求邏輯
- * @param timeout - timeout
- * @returns 
+ * @param promise - 處理非同部請求邏輯，待請求完成後，queue 生命周期完成移除
+ * @param timeout - default 10 * 1000
+ * @param meta - 使用者自定義註解
+ * @param dequeueImmediately - enqueue 後馬上 dequeue，即執上 promise 直到 promise resolve 後
  */
   public enqueue(
-    id: number,
+    id: number|string,
     promise: () => Promise<any>,
     timeout: number = 10000,
+    meta: any = {},
+    dequeueImmediately: boolean = true,
   ): Promise<any>
 ```
 
 __example__ | [source][s-test-queue]:
+> 立即執行 promise 非同部請求
 ```ts
-  const idC = 3;
-  q.enqueue(idC, async ()=>{
-    return new Promise(async resolve =>{
-      await wait(span);
-      resolve({idC});
-    });
+jest.spyOn(q, "dequeue");
+q.enqueue(idC, async ()=>{
+  return new Promise(async resolve =>{
+    console.log("promise called")
+    await wait(span);
+    resolve({idC});
   });
-  expect(q.queue.length).toBe(1);
+});
+expect(q.queue.length).toBe(1);
+expect(q.dequeue).toBeCalledTimes(1); // promise called
+
+await q.dequeue({id: idC, removeQueue});
+expect(q.queue.length).toBe(0);
+```
+__example__
+> 不立即執行 promise 非同部請求，直到使用者自行 {@link dequeue}
+```ts
+const removeQueue = false;
+jest.spyOn(q, "dequeue");
+q.enqueue(idC, async ()=>{
+  return new Promise(async resolve =>{
+    await wait(span);
+    resolve({idC});
+  });
+}, removeQueue);
+expect(q.queue.length).toBe(1);
+expect(q.dequeue).toBeCalledTimes(0);
+
+await q.dequeue({id: idC, removeQueue});
+expect(q.queue.length).toBe(0);
+expect(q.dequeue).toBeCalledTimes(1);
 ```
 
+
 ### dequeue
-> 執行queue裡的item，並依option.removeQueue決定是否移除queued item
+> 依所提供的 id 查找相應的 QueueItem，執行 QueueItem 裡的 Promise 請求並依
+  option.removeQueue 決定是否移除 QueueItem, 預設 option.removeQueue 為 true
 
 __型別__:
 ```ts
 /**
- * 執行queue裡的item，並依option.removeQueue決定是否移除queued item
- * 預設 option.removeQueue 為 true
  * @param option.id - 取得queue的id
  * @param option.removeQueue - 預設 true
- * @returns 
  */
 public async dequeue(option: {id: number, removeQueue?: boolean}): Promise<any>
 ```
 
 __example__ | [source][s-test-queue]:
 ```ts
-test("expect raise exception while it's queuing", async ()=>{
-    let rA, rB, rC, rD;
-    let [wA, wB, wC, wD] = [100, 200, 600, 800];
-    const t = time();
-    q.enqueue(idA, async ()=>{
-      return new Promise(async resolve =>{
-        await wait(wA);
-        rA = {idA};
-        resolve({idA});
-      });
+test("expect raise exception while it's queuing", async () => {
+  let rA, rB, rC, rD;
+  let [wA, wB, wC, wD] = [100, 200, 600, 800];
+  const t = time();
+  const removeQueue = true;
+  const meta = {};
+
+  jest.spyOn(q, "dequeue");
+  q.enqueue(idA, async () => {
+    return new Promise(async (resolve) => {
+      await wait(wA);
+      rA = { idA };
+      resolve({ idA });
+      console.log("resolve A");
     });
-    expect(q.queue.length).toBe(1);
-    q.enqueue(idC, async ()=>{
-      return new Promise(async resolve =>{
-        await wait(wC);
-        rC = {idC}
-        resolve({idC});
-      });
-    });
-    expect(q.queue.length).toBe(2);
-    expect(q.enqueue(idB, async ()=>{
-      return new Promise(async (resolve, reject) =>{
+  });
+  expect(q.queue.length).toBe(1);
+  expect(q.dequeue).toBeCalledTimes(1);
+
+  expect(
+    q.enqueue(idB, async () => {
+      return new Promise(async (resolve, reject) => {
         await wait(wB);
         reject("reject...");
+        console.log("resolve B");
       });
-    })).rejects.toEqual("reject...");
-    expect(q.queue.length).toBe(3);
+    })
+  ).rejects.toEqual("reject...");
+  expect(q.queue.length).toBe(2);
+  expect(q.dequeue).toBeCalledTimes(2);
 
-    const resultA = await q.dequeue({id: idA});
-    expect(resultA).toEqual({idA});
-    expect(q.queue.length).toBe(2);
-    
-    const resultC = await q.dequeue({id: idC});
-    expect(resultC).toEqual({idC});
-    expect(q.queue.length).toBe(1);
-
-    const resultB = await q.dequeue({id: idB});
-    expect(q.queue.length).toBe(0);
+  q.enqueue(idC, async () => {
+    return new Promise(async (resolve) => {
+      await wait(wC);
+      rC = { idC };
+      resolve({ idC });
+      console.log("resolve C");
+    });
   });
+  expect(q.queue.length).toBe(3);
+  expect(q.dequeue).toBeCalledTimes(3);
+
+  await wait(wA + wB + wC + 30);
+  // 雖然 dequeue, 但內部不移除，直到使用者 dequeue
+  expect(q.queue.length).toBe(3);
+
+  const resultA = await q.dequeue({ id: idA });
+  expect(resultA).toEqual({ idA });
+  expect(q.queue.length).toBe(2);
+
+  const resultC = await q.dequeue({ id: idC });
+  expect(resultC).toEqual({ idC });
+  expect(q.queue.length).toBe(1);
+
+  const resultB = await q.dequeue({ id: idB });
+  expect(q.queue.length).toBe(0);
+});
 ```
 
-### dequeueByResult
-> 提供 queue item 回傳 promise resolve 的結果，並將 queue item 移除 (概念籍用 Dart (Future/Completer))
+
+### 其他方法
+
+#### dequeueByResult
+> 別於 [dequeue](#dequeue) 執行 [enqueue](#enqueue) 傳入的 promise 方法，待 promise 請求 resolve 後移除 {@link QueueItem}, [dequeueByResult](#dequeueByResult) 則是不管 [enqueue](#enqueue) 所傳入的 promise 結果，直接取代其 result
 
 __型別__:
 ```ts
   /**
-   * 提供 queue item 回傳 promise resolve 的結困，並將 queue item 移除
    * @param option.id - 取得queue的id
    * @param option.removeQueue - 預設 true
-   * @returns 
    */
   public async dequeueByResult(option: {id: number, result: any}): Promise<any>
 ```
@@ -651,37 +746,110 @@ __型別__:
 __example__ | [source][s-test-queue]:
 ```ts
 const pendingId = "idA";
-// 十秒後 timeout
 const pending = q.enqueue(pendingId, async ()=>{
-    return waitForTimeOut(10 * 1000);
+  // 這裡 promise 不回傳結果，直接等待十秒後 timeout
+  return waitForTimeOut(10 * 1000);
 });
-// 覆寫內容於是能將值返回給 pending 
+// 覆寫內容於是能將值返回, pending 狀態於是 resolved 
 q.dequeueByResult({id: pendingId, result: {succeed: true}});
 expect(pending).resolves.toEquals({succeed: true});
+```
+#### getQueueItem
+```ts
+  getQueueItem(id:number|string):Completer<QueueItem> | null{
+    if (this.queue.length == 0)
+      return null;
+    return this.queue.firstWhere((_)=>_._meta!.id == id);
+  }
+```
+
+#### enqueueWithoutId
+```ts
+/** 與  {@link enqueue} 相同，只是 id 自動生成 */
+public enqueueWithoutId(
+  promise: () => Promise<any>,
+  timeout: number = 10000,
+  meta: any = {},
+  dequeueImmediately: boolean = true,
+)
+```
+
+#### clearQueue
+```ts
+/**清除 {@link queue} */
+public clearQueue(): void {
+  for (let index = 0; index < this.queue.length; index++) {
+    const item = this.queue[index];
+    this.remove(item, true);
+  }
+}
 ```
 
 
 ---
 # Completer:
-Completer (借用Dart Completer概念), 將 Promise 物件寫進 Completer.future 中，並將 reject/resolve 方法也寫進 Completer 物件中，只要持有 Completer 物件便能待不確定的未來中執行 reject/resolve 方法以返回 Promise 結果
+Completer (借用Dart Completer概念), 將 Promise 物件寫進 Completer.future 中，並將 reject/resolve 方法也寫進 Completer 物件中，只要持有 Completer 物件便能待不確定的未來中執行 reject/resolve 方法以返回 Promise 結果， __使用時機： 希望於其他 scope resolve promise 物件__
+
+### 特性
+- 用於存放 Promise 物件
+- 直接 expose resolve / reject 方法於 Completer 物件中, 用於外部 resolve/reject
+- 提供註解屬性 meta
 
 __型別__ | [source][s-completer]
 ```ts
- export class Completer<T>  {
-  complete:(value: T | PromiseLike<T>) => void;
-  reject:(reason?: any) => void;
-  future: Promise<T>;
-  constructor() {
-    this.future= new Promise((resolve: any, reject: any)=>{
-      this.complete = (val: T)=>{
-        resolve(val);
-      };
-      this.reject = (reason)=>{
-        reject(reason);
-      };
-    })
-  }
+abstract class _Completer<T> {
+  /** 用來暫時代表 future 值的物件，也可作為 Completer 本身的註解 */
+  abstract _meta?: T
+  /** 即 Promise 物件本身, 其 resolve / reject 方法分別為
+   * {@link complete} / {@link reject} */
+  abstract future: Promise<T>;
+  /** 同 Promise.resolve, resolve {@link future} 本身*/
+  abstract complete(value: T | PromiseLike<T>) : void;
+  /** 同 Promise.reject, reject {@link future} 本身 */
+  abstract reject(reason?: any): void;
 }
+```
+__example__
+以meta 屬性為例
+```ts
+const completer = new Completer<AxiosRequestConfig>({
+  meta: requestConfig
+})
+```
+
+__example__
+```ts
+async function example(){
+  const completer = new Completer({
+    id: 123, 
+    timeStamp: (new Date()).getTime(),
+  });
+  function fetch(){
+    return completer.future;
+  }
+  const future = fetch();
+
+  // 只要有 completer 物件就能夠在未來 resolve future
+  completer.complete( axios.get(...) )
+  console.log(await future);
+}
+```
+
+__example__ | [source][s-test-completer]:
+```ts
+  const completer = new Completer();
+  function fetch(): Promise<any>{
+    // 這裡，completer.future 永遠不 resolve
+    return completer.future;
+  }
+  const futureResult = fetch();
+  await wait(400);
+  // 因為永遠不 resolve 所以 futureResult 一直是 pending promise
+  expect(typeof (futureResult.then)).toBe("function");
+  expect((futureResult as any).value).toBeUndefined();
+  // completer.future 被 resolve
+  completer.complete({value: ""})
+  expect(((await futureResult) as any).value).not.toBeUndefined();
 ```
 
 __example__
@@ -719,19 +887,6 @@ expect(helper.authGuard!.canProcessFulFill).toBeCalled();
 
 
 
-__example__ | [source][s-test-completer]:
-```ts
-  const completer = new Completer();
-  function fetch(){
-    return completer.future;
-  }
-  const futureResult = fetch();
-  await wait(400);
-  expect(typeof (futureResult.then)).toBe("function");
-  expect((futureResult as any).value).toBeUndefined();
-  completer.complete({value: ""})
-  expect(((await futureResult) as any).value).not.toBeUndefined();
-```
 
 
 ---

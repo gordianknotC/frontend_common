@@ -1,7 +1,7 @@
 
 import { setupComputed, setupReactive, setupRef, setupWatch, setupCurrentEnv } from "@/index";
 import { Completer } from "@/utils/completer";
-import { Queue } from "@/utils/queue";
+import { AsyncQueue } from "@/utils/queue";
 import { computed, reactive, ref, watch } from "vue";
 import { wait } from "../helpers/common.util.test.helper";
 

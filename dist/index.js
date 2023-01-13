@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ELevel = exports.Logger = exports.setupCurrentEnv = exports.setupReactive = exports.setupWatch = exports.setupRef = exports.setupComputed = exports.Callable = exports.LazyHolder = exports.injectFacade = exports.provideDependency = exports.injectDependency = exports.CommonMixin = exports.provideFacade = exports.IFacade = exports.is = exports.assertMsg = exports.Arr = exports.Obj = exports.Completer = exports.SequencedQueueConsumer = exports.Queue = exports.getOmitsBy = exports.Is = exports.addStringMappingFromNumEnum = exports.UnWrappedVueRef = exports.asUnWrappedVueRefMap = exports.flattenInstance = exports.getAccessibleProperties = exports.asEnum = exports.isRefImpl = exports.assert = exports.AssertionError = exports.AssertMsg = exports.UnExpectedError = exports.InvalidUsageError = exports.TypeMismatchError = exports.NotImplementedError = exports.UncaughtEnumType = exports.UnCaughtCondition = exports._watch = exports._reactive = exports._ref = exports._computed = void 0;
+exports.ELevel = exports.Logger = exports.setupCurrentEnv = exports.setupReactive = exports.setupWatch = exports.setupRef = exports.setupComputed = exports.Callable = exports.LazyHolder = exports.injectFacade = exports.provideDependency = exports.injectDependency = exports.CommonMixin = exports.provideFacade = exports.IFacade = exports.is = exports.assertMsg = exports.Arr = exports.Obj = exports.Completer = exports.SequencedQueueConsumer = exports.AsyncQueue = exports.Queue = exports.getOmitsBy = exports.Is = exports.addStringMappingFromNumEnum = exports.UnWrappedVueRef = exports.asUnWrappedVueRefMap = exports.flattenInstance = exports.getAccessibleProperties = exports.asEnum = exports.isRefImpl = exports.assert = exports.AssertionError = exports.AssertMsg = exports.UnExpectedError = exports.InvalidUsageError = exports.TypeMismatchError = exports.NotImplementedError = exports.UncaughtEnumType = exports.UnCaughtCondition = exports._watch = exports._reactive = exports._ref = exports._computed = void 0;
 var extension_setup_1 = require("./extension/extension_setup");
 Object.defineProperty(exports, "_computed", { enumerable: true, get: function () { return extension_setup_1._computed; } });
 Object.defineProperty(exports, "_ref", { enumerable: true, get: function () { return extension_setup_1._ref; } });
@@ -38,7 +38,9 @@ Object.defineProperty(exports, "addStringMappingFromNumEnum", { enumerable: true
 Object.defineProperty(exports, "Is", { enumerable: true, get: function () { return typeInference_1.Is; } });
 Object.defineProperty(exports, "getOmitsBy", { enumerable: true, get: function () { return typeInference_1.getOmitsBy; } });
 var queue_1 = require("./utils/queue");
-Object.defineProperty(exports, "Queue", { enumerable: true, get: function () { return queue_1.Queue; } });
+/** @deprecated use AsyncQueue instead */
+Object.defineProperty(exports, "Queue", { enumerable: true, get: function () { return queue_1.AsyncQueue; } });
+Object.defineProperty(exports, "AsyncQueue", { enumerable: true, get: function () { return queue_1.AsyncQueue; } });
 Object.defineProperty(exports, "SequencedQueueConsumer", { enumerable: true, get: function () { return queue_1.SequencedQueueConsumer; } });
 var completer_1 = require("./utils/completer");
 Object.defineProperty(exports, "Completer", { enumerable: true, get: function () { return completer_1.Completer; } });

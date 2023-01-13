@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Completer = void 0;
-class _Completer extends Promise {
+class _Completer {
 }
 /** 借用 Dart Completer 概念
  * @example
@@ -22,7 +22,13 @@ class _Completer extends Promise {
 class Completer {
     /**
      * @param _meta - 用來暫時代表 future 值的物件，也可作為 Completer
-     *                本身的註解
+     * 本身的註解或額外資訊，如 request config / request header
+     * @example
+       ```ts
+        const completer = new Completer<AxiosRequestConfig>({
+          meta: requestConfig
+        })
+     * ```
      */
     constructor(_meta) {
         this._meta = _meta;

@@ -22,11 +22,17 @@ export declare class Completer<T> {
     reject: (reason?: any) => void;
     /** 即 Promise 物件本身, 其 resolve / reject 方法分別為
      * {@link complete} / {@link reject}
-    */
+     */
     future: Promise<T>;
     /**
      * @param _meta - 用來暫時代表 future 值的物件，也可作為 Completer
-     *                本身的註解
+     * 本身的註解或額外資訊，如 request config / request header
+     * @example
+       ```ts
+        const completer = new Completer<AxiosRequestConfig>({
+          meta: requestConfig
+        })
+     * ```
      */
     constructor(_meta?: T);
 }

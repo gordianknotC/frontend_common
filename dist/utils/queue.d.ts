@@ -1,13 +1,18 @@
 /// <reference types="node" />
 import { ArrayDelegate, Completer } from "..";
 export declare type QueueItem<M = any> = {
+    /** id: QueueItem identifier */
     id: number | string;
+    /** meta: 用以儲存額外資訊，如 request config / request header */
     meta?: M;
+    /** promise: 用來取得QueueItem所承載的非同步資料 */
     promise: () => Promise<any>;
+    /** timestamp: 用來計算 timeout */
     timestamp: number;
+    /** timeout: timeout id */
     timeout: NodeJS.Timeout;
 };
-export declare abstract class IQueue {
+export declare abstract class IAsyncQueue {
     abstract queue: ArrayDelegate<Completer<QueueItem>>;
     abstract get isEmpty(): boolean;
     abstract enqueue(id: number | string, promise: () => Promise<any>, timeout?: number): Promise<any>;
@@ -22,7 +27,7 @@ export declare abstract class IQueue {
     abstract clearQueue(): void;
 }
 export declare abstract class IQueueConsumer {
-    abstract queue: IQueue;
+    abstract queue: IAsyncQueue;
     abstract feedRequest(request: () => Promise<any>): Completer<QueueItem>;
     abstract consumeAll(): Promise<any>;
     abstract consumeAllWhen(condition: (item: Completer<QueueItem>) => boolean): Promise<any>;
@@ -80,22 +85,24 @@ export declare abstract class IQueueConsumer {
     });
    ```
  */
-export declare class Queue implements IQueue {
+export declare class AsyncQueue implements IAsyncQueue {
     timeoutErrorObj: any;
     queue: ArrayDelegate<Completer<QueueItem>>;
     /** 判斷 {@link queue} 是否為空 */
     get isEmpty(): boolean;
     constructor(timeoutErrorObj?: any);
+    getQueueItem(id: number | string): Completer<QueueItem> | null;
     /**
-     * 將請求推到 Queue 裡，並同時執行，直到使用者
-     * {@link dequeue} 才將 Queued 物件由列表中移除
+     * 將請求推到 Queue 裡，並有以下二種選擇 (視 @param dequeueImmediately)
+     * 1） 同時執行 promise 非同部請求 via {@link dequeue} ，直到非同部請求 promise resolve 後， 使用者再次 {@link dequeue} 移除該列隊
+     * 2） 不立即執行 promise 非同部請求 {@link dequeue} ，直到使用者自行 {@link dequeue} 後，移除該列隊
      * @param id - 請求 ID
-     * @param promise - 處請求邏輯
+     * @param promise - 處理非同部請求邏輯，待請求完成後，queue 生命周期完成移除
      * @param timeout - default 10 * 1000
      * @param meta - 使用者自定義註解
-     * @param dequeueImmediately -
+     * @param dequeueImmediately - enqueue 後馬上 dequeue，即執上 promise 直到 promise resolve 後
      * @returns
-     * @example
+     * @example - 1
         ```ts
         q.enqueue(idC, async ()=>{
           return new Promise(async resolve =>{
@@ -104,17 +111,32 @@ export declare class Queue implements IQueue {
           });
         });
         ```
+       @example - 2
+       ```ts
+       const removeQueue = false;
+       q.enqueue(idC, async ()=>{
+          return new Promise(async resolve =>{
+            await wait(span);
+            resolve({idC});
+          });
+        }, removeQueue);
+        const completer = q.getQueueItem(idC);
+        q.dequeue({id: idC, removeQueue});
+       ```
      */
     enqueue(id: number | string, promise: () => Promise<any>, timeout?: number, meta?: any, dequeueImmediately?: boolean): Promise<any>;
     /** 與  {@link enqueue} 相同，只是 id 自動生成 */
-    enqueueWithNoId(promise: () => Promise<any>, timeout?: number, meta?: any, dequeueImmediately?: boolean): Completer<QueueItem<any>>;
+    enqueueWithoutId(promise: () => Promise<any>, timeout?: number, meta?: any, dequeueImmediately?: boolean): Completer<QueueItem<any>>;
     private _getId;
     private onTimeout;
     private remove;
     /**清除 {@link queue} */
     clearQueue(): void;
     /**
-     * 提供 queue item 回傳 promise resolve 的結困，並將 queue item 移除
+     * 別於 {@link dequeue} 執行 {@link enqueue} 傳入的 promise 方法，待 promise 請求
+     * resolve 後移除 {@link QueueItem}, {@link dequeueByResult} 則是不管 {@link enqueue}
+     * 所傳入的 promise 結果，直接取代其 result
+     *
      * @param option.id - 取得queue的id
      * @param option.removeQueue - 預設 true
      * @returns
@@ -155,8 +177,8 @@ export declare class Queue implements IQueue {
         result: any;
     }): Promise<any>;
     /**
-     * 執行queue裡的item，並依option.removeQueue決定是否移除queued item
-     * 預設 option.removeQueue 為 true
+     * 依所提供的 id 查找相應的 QueueItem，執行 QueueItem 裡的 Promise 請求並依
+     * option.removeQueue 決定是否移除 QueueItem, 預設 option.removeQueue 為 true
      * @param option.id - 取得queue的id
      * @param option.removeQueue - 預設 true
      * @returns
@@ -167,8 +189,8 @@ export declare class Queue implements IQueue {
     }): Promise<any>;
 }
 export declare class SequencedQueueConsumer implements IQueueConsumer {
-    queue: IQueue;
-    constructor(queue: IQueue);
+    queue: IAsyncQueue;
+    constructor(queue: IAsyncQueue);
     private _getId;
     feedRequest(request: () => Promise<any>): Completer<QueueItem>;
     consumeAll(): Promise<any>;
