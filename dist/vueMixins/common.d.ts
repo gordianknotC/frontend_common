@@ -44,7 +44,7 @@ export declare class CommonMixin {
  *  assert(facade.override.b == 2);
  *  ```
  */
-declare type ProviderParams<T> = {
+export declare type ProviderParams<T> = {
     deps: Partial<T>;
     merge?: boolean;
     ident?: string | symbol;
@@ -181,4 +181,3 @@ export declare function injectFacade<T>(ident?: symbol): T;
 export declare function IFacade<T extends Object>(ident?: symbol, option?: {
     transformFuncAsGetter: boolean;
 }): T;
-export {};

@@ -67,7 +67,7 @@ const DEP_KEY = Symbol();
  *  assert(facade.override.b == 2);
  *  ```
  */
-type ProviderParams<T> = {deps: Partial<T>, merge?: boolean, ident?: string | symbol};
+export type ProviderParams<T> = {deps: Partial<T>, merge?: boolean, ident?: string | symbol};
 /**
  *  Dependency Provider
  *  provide 方法，將 dependency以 ident 作為 key 植入 container

@@ -64,7 +64,9 @@ export {
   getOmitsBy,
 } from "~/utils/typeInference";
 
-export type { TUnWrapVueRef, InterfaceIs } from "~/utils/typeInference";
+export type { 
+  TUnWrapVueRef, InterfaceIs
+ } from "~/utils/typeInference";
 export type { 
   QueueItem, 
   /** @deprecated use IAsyncQueue instead */
@@ -95,6 +97,9 @@ export {
   provideDependency,
   injectFacade,
 } from "~/vueMixins/common";
+export type {
+  ProviderParams
+} from "~/vueMixins/common";
 export { LazyHolder, CallableDelegate as Callable } from "~/utils/lazy";
 export {
   setupComputed,
@@ -111,11 +116,16 @@ export {
 export type {
   LogRecord,
   LogOption,
-  ColorNames as LogColor,
+  ColorNames,
   AllowedModule,
+  AllowedLoggerByEnv,
   RawAllowedLogger,
+  RawAllowedLoggerByEnv,
+  ColorConfig,
+  LoggerAllowanceMode
 } from "~/utils/logger.types";
 
 export type {
   ELevel,
 } from "~/utils/logger.types";
+

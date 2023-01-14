@@ -91,4 +91,4 @@ export declare abstract class LoggerMethods {
     abstract warn(msg: any[], option?: LogOption): void;
     abstract current(msg: any[], option?: LogOption): void;
 }
-export declare type SetLoggerAllowanceMode = "ByEnv" | "IgnoreEnv";
+export declare type LoggerAllowanceMode = "ByEnv" | "IgnoreEnv";

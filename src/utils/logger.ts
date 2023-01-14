@@ -3,7 +3,7 @@ import { useColors } from "@/plugin/colorsPlugin";
 import { Color, strip } from "colors";
 import { assert } from "./assert";
 import { final, LazyHolder } from "./lazy";
-import { RawAllowedLoggerByEnv, SetLoggerAllowanceMode, LoggerMethods, AllowedLoggerByEnv, ELevel, AllowedModule, LogRecord, LogOption, RawAllowedLogger } from "./logger.types";
+import { RawAllowedLoggerByEnv, LoggerAllowanceMode, LoggerMethods, AllowedLoggerByEnv, ELevel, AllowedModule, LogRecord, LogOption, RawAllowedLogger } from "./logger.types";
  
 const EmptyLogOption: RawAllowedLoggerByEnv<any> = {test: {}, develop: {}};
 
@@ -62,7 +62,7 @@ function message(
   };
 }
  
-let LOGGER_MODE = final<SetLoggerAllowanceMode>();
+let LOGGER_MODE = final<LoggerAllowanceMode>();
 
 /**
  * ### 始始化有以下二種方式

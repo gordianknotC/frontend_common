@@ -117,5 +117,5 @@ abstract class LoggerStatic {
   abstract clearModules(): void;
 }
 
-export type SetLoggerAllowanceMode = "ByEnv" | "IgnoreEnv";
+export type LoggerAllowanceMode = "ByEnv" | "IgnoreEnv";
 
