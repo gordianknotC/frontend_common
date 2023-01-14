@@ -7,7 +7,8 @@ import {
   setupCurrentEnv,
 } from "@/index";
 import { Completer } from "@/utils/completer";
-import { AllowedLogger, AllowedModule, ELevel, Logger } from "@/utils/logger";
+import { RawAllowedLogger, AllowedModule, ELevel } from "@/utils/logger.types";
+import { Logger } from "@/utils/logger";
 import { AsyncQueue } from "@/utils/queue";
 import { computed, reactive, ref, watch } from "vue";
 import { wait } from "../helpers/common.util.test.helper";
@@ -28,7 +29,7 @@ describe("Logger", () => {
       return level <= ELevel.info;
     },
   };
-  const logModules: AllowedLogger<EModules> = {
+  const logModules: RawAllowedLogger<EModules> = {
     [EModules.Test]: testModule,
     [EModules.Hobbits]: newLogModule
   }
@@ -41,7 +42,7 @@ describe("Logger", () => {
   });
   describe("Considering of not using env", ()=>{
     let log: Logger<EModules>;
-    function clear(env: Env, allowance: any){
+    function clear(env: Env, allowance: any[]){
       Logger.clearModules();
       setupCurrentEnv(env);
       Logger.setLoggerAllowance(allowance);
@@ -49,7 +50,7 @@ describe("Logger", () => {
     }
 
     beforeEach(()=>{
-      clear("test",{[EModules.Test]: testModule});
+      clear("test",[testModule]);
     });
     test("add Module Test, expect Module Test exists", () => {
       const option = log._allowance;
@@ -74,19 +75,14 @@ describe("Logger", () => {
     });
   
     test("set disallowed module, expect new logger never being called", () => {
-      Logger.setLoggerAllowance<EModules>({
-        [EModules.Test]: testModule,
-      });
+      Logger.setLoggerAllowance<EModules>([testModule, newLogModule]);
       const newLog = new Logger(newLogModule);
       newLog.log(["fellow", "it's testModule calling"]);
       expect(newLog._prevLog).toBeUndefined();
     });
   
     test("allow newLogModule and apply log on debug level, expect no logs to be allowed", () => {
-      Logger.setLoggerAllowance<EModules>({
-        [EModules.Test]: testModule,
-        [EModules.Hobbits]: newLogModule,
-      });
+      Logger.setLoggerAllowance<EModules>([testModule, newLogModule]);
       const newLog = new Logger(newLogModule);
       newLog.log(["newLog", "it's newLog calling, expect not to be allowed"]);
       expect(
@@ -101,10 +97,7 @@ describe("Logger", () => {
     });
   
     test("allow newLogModule and apply log on info level, expect logs to be applied", () => {
-      Logger.setLoggerAllowance<EModules>({
-        [EModules.Test]: testModule,
-        [EModules.Hobbits]: newLogModule,
-      });
+      Logger.setLoggerAllowance<EModules>([testModule, newLogModule]);
       const newLog = new Logger(newLogModule);
       newLog.current(["newLog", "it's newLog calling, expect to be allowed"]);
       expect(
@@ -120,8 +113,8 @@ describe("Logger", () => {
   
     test("setAllowanceByEnv, expect assertion error", ()=>{
       const action = ()=> Logger.setLoggerAllowanceByEnv({
-        test: {},
-        develop: {}
+        test: [],
+        develop: []
       });
       expect(action).toThrow();
       expect(action).toThrowError("AssertionError");
@@ -129,29 +122,25 @@ describe("Logger", () => {
   });
   describe("Considering of using env", ()=>{
     let log: Logger<EModules>;
-
-    function clear(env: Env, allowance: any){
+    function clear(env: Env, allowance: any[]){
       Logger.clearModules();
       setupCurrentEnv(env);
       Logger.setLoggerAllowanceByEnv(Object.assign({
-        test: {},
-        develop: {}
-      }, allowance));
+        test: [],develop: []
+      }, {
+        [env]: allowance
+      }) as any);
       log = new Logger(testModule);
     }
 
     beforeEach(()=>{
-      clear("release", {
-        release: {[EModules.Test]: testModule}
-      });
+      clear("release", [testModule]);
     });
 
     test("setLoggerAllowanceByEnv - expect module not exists", () => {
-      clear("test", {
-        release: {[EModules.Test]: testModule}
-      });
-      expect(_currentEnv.value).toBe("test");
-
+      clear("test", [testModule]);
+      setupCurrentEnv("develop");
+      expect(_currentEnv.value).toBe("develop");
       console.log("allowedModules", (Logger as any).allowedModules)
       expect(Logger.hasModule(testModule)).toBeFalsy();
       Logger.clearModules();

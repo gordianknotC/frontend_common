@@ -106,13 +106,16 @@ export {
 
 export {
   Logger,
-  ELevel,
 } from "~/utils/logger";
 
 export type {
   LogRecord,
   LogOption,
-  LogColor,
+  ColorNames as LogColor,
   AllowedModule,
-  AllowedLogger as AllowedLoggers,
-} from "~/utils/logger";
+  RawAllowedLogger,
+} from "~/utils/logger.types";
+
+export type {
+  ELevel,
+} from "~/utils/logger.types";

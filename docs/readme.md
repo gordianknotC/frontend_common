@@ -31,6 +31,7 @@ yarn serve:doc
 [s-queue]: src/utils/queue.ts
 [s-completer]: src/utils/completer.ts
 [s-logger]: src/utils/logger.ts
+[s-logger.types]: src/utils/logger.types.ts
 [s-test-queue]: __tests__/queue.test.ts
 [s-test-completer]: __tests__/completer.test.ts
 [s-test-logger]: __tests__/logger.test.ts

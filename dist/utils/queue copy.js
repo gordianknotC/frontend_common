@@ -1,11 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SequencedQueueConsumer = exports.AsyncQueue = exports.IQueueConsumer = exports.IAsyncQueue = void 0;
+exports.SequencedQueueConsumer = exports.Queue = exports.IQueueConsumer = exports.IQueue = void 0;
 const crypto_1 = require("crypto");
 const __1 = require("..");
-class IAsyncQueue {
+class IQueue {
 }
-exports.IAsyncQueue = IAsyncQueue;
+exports.IQueue = IQueue;
 class IQueueConsumer {
 }
 exports.IQueueConsumer = IQueueConsumer;
@@ -62,7 +62,7 @@ exports.IQueueConsumer = IQueueConsumer;
     });
    ```
  */
-class AsyncQueue {
+class Queue {
     constructor(timeoutErrorObj = {
         error_code: "timeout",
         error_key: "",
@@ -76,22 +76,19 @@ class AsyncQueue {
     get isEmpty() {
         return this.queue.length == 0;
     }
-    getQueueItem(id) {
-        if (this.queue.length == 0)
-            return null;
-        return this.queue.firstWhere((_) => _._meta.id == id);
-    }
     /**
-     * 將請求推到 Queue 裡，並有以下二種選擇 (視 @param dequeueImmediately)
-     * 1） 同時執行 promise 非同部請求 via {@link dequeue} ，直到非同部請求 promise resolve 後， 使用者再次 {@link dequeue} 移除該列隊
-     * 2） 不立即執行 promise 非同部請求 {@link dequeue} ，直到使用者自行 {@link dequeue} 後，移除該列隊
+     * 將請求推到 Queue 裡，並同時執行，直到使用者
+     * {@link dequeue} 才將 Queued 物件由列表中移除
+     * @typeParam T - {@link QueueItem}
+     *
      * @param id - 請求 ID
-     * @param promise - 處理非同部請求邏輯，待請求完成後，queue 生命周期完成移除
+     * @param promise - 處請求邏輯
      * @param timeout - default 10 * 1000
      * @param meta - 使用者自定義註解
-     * @param dequeueImmediately - enqueue 後馬上 dequeue，即執上 promise 直到 promise resolve 後
+     * @param dequeueImmediately -
+     *
      * @returns
-     * @example - 1
+     * @example
         ```ts
         q.enqueue(idC, async ()=>{
           return new Promise(async resolve =>{
@@ -100,54 +97,27 @@ class AsyncQueue {
           });
         });
         ```
-       @example - 2
-       ```ts
-       const removeQueue = false;
-       q.enqueue(idC, async ()=>{
-          return new Promise(async resolve =>{
-            await wait(span);
-            resolve({idC});
-          });
-        }, removeQueue);
-        const completer = q.getQueueItem(idC);
-        q.dequeue({id: idC, removeQueue});
-       ```
      */
     enqueue(id, promise, timeout = 10000, meta = {}, dequeueImmediately = true) {
         const timestamp = new Date().getTime();
-        const completer = new __1.Completer({
-            id,
-            timestamp,
-            meta,
-            timeout: setTimeout(() => {
-                this.onTimeout(id);
-            }, timeout),
-            promise,
+        return new Promise((resolve, reject) => {
+            this.queue.push({
+                id,
+                timestamp,
+                meta,
+                timeout: setTimeout(() => {
+                    this.onTimeout(id);
+                }, timeout),
+                promise,
+                resolve,
+                reject
+            });
+            if (dequeueImmediately)
+                this.dequeue({ id, removeQueue: false });
         });
-        this.queue.push(completer);
-        if (dequeueImmediately)
-            this.dequeue({ id, removeQueue: false });
-        return completer.future;
-        // return new Promise((resolve, reject) => {
-        //   this.queue.push({
-        //     id,
-        //     timestamp,
-        //     meta,
-        //     timeout: setTimeout(() => {
-        //       this.onTimeout(id);
-        //     }, timeout),
-        //     promise,
-        //     resolve,
-        //     reject
-        //   });
-        //   if (dequeueImmediately)
-        //     this.dequeue({id, removeQueue: false});
-        // });
     }
-    /** 與  {@link enqueue} 相同，只是 id 自動生成
-     * @returns Completer 物件，非 async Promise
-    */
-    enqueueWithoutId(promise, timeout = 10000, meta = {}, dequeueImmediately = true) {
+    /** 與  {@link enqueue} 相同，只是 id 自動生成 */
+    enqueueWithNoId(promise, timeout = 10000, meta = {}, dequeueImmediately = true) {
         this.enqueue(this._getId(), promise, timeout, meta, dequeueImmediately);
         const item = this.queue.last;
         return item;
@@ -156,19 +126,21 @@ class AsyncQueue {
         return (0, crypto_1.randomUUID)();
     }
     onTimeout(id) {
-        const item = this.queue.firstWhere(_ => _._meta.id == id);
+        const item = this.queue.firstWhere(_ => _.id == id);
         if (!item)
             return;
         item.reject(this.timeoutErrorObj);
     }
+    /**
+     * @typeParam T - {@link QueueItem} */
     remove(item, reject = false) {
-        clearTimeout(item._meta.timeout);
+        clearTimeout(item.timeout);
         if (reject)
             item.reject({
                 reason: "flushed"
             });
         this.queue.remove(item);
-        console.log("remove:", item._meta.id);
+        console.log("remove:", item.id);
     }
     /**清除 {@link queue} */
     clearQueue() {
@@ -178,10 +150,7 @@ class AsyncQueue {
         }
     }
     /**
-     * 別於 {@link dequeue} 執行 {@link enqueue} 傳入的 promise 方法，待 promise 請求
-     * resolve 後移除 {@link QueueItem}, {@link dequeueByResult} 則是不管 {@link enqueue}
-     * 所傳入的 promise 結果，直接取代其 result
-     *
+     * 提供 queue item 回傳 promise resolve 的結困，並將 queue item 移除
      * @param option.id - 取得queue的id
      * @param option.removeQueue - 預設 true
      * @returns
@@ -217,43 +186,44 @@ class AsyncQueue {
       });
      ```
      */
-    dequeueByResult(option) {
+    async dequeueByResult(option) {
         const { id, result } = option;
         const removeQueue = true;
-        const item = this.queue.firstWhere(_ => _._meta.id == id);
+        const item = this.queue.firstWhere(_ => _.id == id);
         if (!item) {
             return null;
         }
         try {
-            item.complete(result);
             if (removeQueue !== null && removeQueue !== void 0 ? removeQueue : true)
                 this.remove(item);
+            item.resolve(result);
+            return result;
         }
         catch (err) {
             item.reject(err);
             if (removeQueue !== null && removeQueue !== void 0 ? removeQueue : true)
                 this.remove(item);
         }
+        return null;
     }
     /**
-     * 依所提供的 id 查找相應的 QueueItem，執行 QueueItem 裡的 Promise 請求並依
-     * option.removeQueue 決定是否移除 QueueItem, 預設 option.removeQueue 為 true
+     * 執行queue裡的item，並依option.removeQueue決定是否移除queued item
+     * 預設 option.removeQueue 為 true
      * @param option.id - 取得queue的id
      * @param option.removeQueue - 預設 true
      * @returns
      */
     async dequeue(option) {
         const { id, removeQueue } = option;
-        const item = this.queue.firstWhere(_ => _._meta.id == id);
+        const item = this.queue.firstWhere(_ => _.id == id);
         if (!item) {
             return null;
         }
         try {
-            const result = await item._meta.promise();
-            if (removeQueue !== null && removeQueue !== void 0 ? removeQueue : true) {
+            const result = await item.promise();
+            if (removeQueue !== null && removeQueue !== void 0 ? removeQueue : true)
                 this.remove(item);
-            }
-            item.complete(result);
+            item.resolve(result);
             return result;
         }
         catch (err) {
@@ -264,7 +234,7 @@ class AsyncQueue {
         return null;
     }
 }
-exports.AsyncQueue = AsyncQueue;
+exports.Queue = Queue;
 class SequencedQueueConsumer {
     constructor(queue) {
         this.queue = queue;
@@ -285,4 +255,4 @@ class SequencedQueueConsumer {
     }
 }
 exports.SequencedQueueConsumer = SequencedQueueConsumer;
-//# sourceMappingURL=queue.js.map
+//# sourceMappingURL=queue%20copy.js.map

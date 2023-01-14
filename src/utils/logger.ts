@@ -3,90 +3,17 @@ import { useColors } from "@/plugin/colorsPlugin";
 import { Color, strip } from "colors";
 import { assert } from "./assert";
 import { final, LazyHolder } from "./lazy";
+import { RawAllowedLoggerByEnv, SetLoggerAllowanceMode, LoggerMethods, AllowedLoggerByEnv, ELevel, AllowedModule, LogRecord, LogOption, RawAllowedLogger } from "./logger.types";
+ 
+const EmptyLogOption: RawAllowedLoggerByEnv<any> = {test: {}, develop: {}};
 
-export type LogColor = keyof Color;
-
-/** LogRecord 暫時用來除錯的型別 */
-export type LogRecord = {
-  /** 所有 stack */
-  allStacks: string[];
-  /** lbound/rbound 處理後顥示的 stack */
-  stacksOnDisplay: string[];
-  lBound: number;
-  rBound: number;
-  moduleName: string;
-};
-/** 
-  * @typeParam M - module name 
-*/
-export type AllowedModule<M> = {
-  moduleName: M;
-  disallowedHandler: (level: ELevel) => boolean;
-};
-
-/** 
- * @typeParam M - module name 
- * @example
- * ```ts
-    enum EModules {
-      Test = "Test",
-      Hobbits = "Hobbits",
-    }
-    const testModule: AllowedModule = {
-      moduleName: EModules.Test,
-      disallowedHandler: (l)=> l <= ELevel.info
-    }
-    const allowed = {
-      [EModules.Test]: testModule
-    }
-   ```*/
-export type AllowedLogger<M extends string> = Record<M, AllowedModule<M>>;
-
-/** 
- * @see {@link AllowedLogger} 
- * @typeParam M - module name 
-*/
-export type AllowedLoggerByEnv<M extends string> = {
-  production?: Partial<AllowedLogger<M>>;
-  release?: Partial<AllowedLogger<M>>;
-  develop: Partial<AllowedLogger<M>>;
-  test: Partial<AllowedLogger<M>>;
-};
-
-export type LogOption = {
-  /** 預設為2，由現在的 trace stack 中，回算幾個 traceBack 作為起點
-   * 因為實作上的理由所以預設是3
-   * (message > logger > _messenger > whereUserInvokingLogs)
-   * 1          2        3            4
-   * ^----------^--------^------------^
-   * */
-  traceBack?: number;
-  /** 要顯示多少層的 error stacks */
-  stackNumber?: number;
-};
 /**
-TRACE.
-DEBUG.
-INFO.
-WARN.
-ERROR.
-FATAL.
-OFF.
+ * @property traceAt - 由現在的位置({@link message})向前 traceAt 多少行, 因實作因素預設3
+ * @property stackNumber - 由現在的 Stack 向前保留多少個 stack，預設5
  */
-export enum ELevel {
-  trace,
-  debug,
-  info,
-  warn,
-  current,
-  error,
-  fatal,
-}
+const defaultLogOption = { traceAt: 3, stackNumber: 5 };
 
-const EmptyLogOption: AllowedLoggerByEnv<any> = {test: {}, develop: {}};
-
-const defaultLogOption = { traceBack: 3, stackNumber: 5 };
-
+/** 預設 logger color */
 const defaultColorCaster: Record<ELevel, (msg: string) => string> = {
   [ELevel.trace]: (msg) => msg.grey,
   [ELevel.debug]: function (msg: string): string {
@@ -113,12 +40,12 @@ function message(
   moduleName: string,
   level: ELevel,
   msg: any[],
-  traceBack: number = 2,
+  traceAt: number = 2,
   stackNumber: number = 5
 ): LogRecord {
   const allStacks = new Error().stack!.split("\n");
   const maxStackRecs = allStacks.length;
-  const lBound = Math.min(traceBack + 1, maxStackRecs);
+  const lBound = Math.min(traceAt + 1, maxStackRecs);
   const stacksOnDisplay = allStacks.splice(
     lBound,
     Math.min(stackNumber, maxStackRecs)
@@ -134,20 +61,7 @@ function message(
     moduleName,
   };
 }
-
-abstract class LoggerMethods {
-  abstract log(msg: any[], option?: LogOption): void;
-  abstract trace(msg: any[], option?: LogOption): void;
-  abstract info(msg: any[], option?: LogOption): void;
-  abstract debug(msg: any[], option?: LogOption): void;
-  abstract error(msg: any[], option?: LogOption): void;
-  abstract fatal(msg: any[], option?: LogOption): void;
-  abstract warn(msg: any[], option?: LogOption): void;
-  abstract current(msg: any[], option?: LogOption): void;
-}
-
-type SetLoggerAllowanceMode = "ByEnv" | "IgnoreEnv";
-
+ 
 let LOGGER_MODE = final<SetLoggerAllowanceMode>();
 
 /**
@@ -155,7 +69,7 @@ let LOGGER_MODE = final<SetLoggerAllowanceMode>();
  * 1) {@link setLoggerAllowance}
  * 2) {@link setLoggerAllowanceByEnv}
  * 
- * #### setLoggerAllowance
+ * #### setLoggerAllowance 
  * @example
   ```ts
   // logger.setup.ts
@@ -163,18 +77,17 @@ let LOGGER_MODE = final<SetLoggerAllowanceMode>();
     Test = "Test",
     Hobbits = "Hobbits",
   }
-  const LogModules: AllowedModule<EModules> = {
-    [EModules.Test]: {
-      moduleName: EModules.Test,
-      disallowedHandler: (level) => false,
-    },
-    [EModules.Hobbits]: {
-      moduleName: EModules.Test,
-      disallowedHandler: (level) => false,
-    },
+  const testModule = {
+    moduleName: EModules.Test,
+    disallowedHandler: (level) => false,
+  };
+  const newModule = {
+    moduleName: EModules.Hobbits,
+    disallowedHandler: (level) => false,
   }
+  
   Logger.setCurrentEnv("develop")
-  Logger.setLoggerAllowance(LogModules)
+  const LogModules = Logger.setLoggerAllowance(LogModules)
 
   // 使用：arbitrary.test.source.ts
   const D = new Logger(LogModules.Test)
@@ -188,24 +101,20 @@ let LOGGER_MODE = final<SetLoggerAllowanceMode>();
     Test = "Test",
     Hobbits = "Hobbits",
   }
-  const LogModules: AllowedModule<EModules> = {
-    [EModules.Test]: {
-      moduleName: EModules.Test,
-      disallowedHandler: (level) => false,
-    },
-    [EModules.Hobbits]: {
-      moduleName: EModules.Test,
-      disallowedHandler: (level) => false,
-    },
+  const testModule = {
+    moduleName: EModules.Test,
+    disallowedHandler: (level) => false,
+  };
+  const newModule = {
+    moduleName: EModules.Hobbits,
+    disallowedHandler: (level) => false,
   }
   Logger.setCurrentEnv("develop")
-  // 以下只有 release 允許 log
-  Logger.setLoggerAllowanceByEnv({
-    test: {},
-    develop: {},
-    release: LogModules
-  })
-
+  const LogModules = Logger.setLoggerAllowanceByEnv({
+    test: [],
+    develop: [],
+    release: [testModule, newModule]
+  });
   // 使用：arbitrary.hobbits.source.ts
   const D = new Logger(LogModules.Hobbits)
   ```
@@ -217,23 +126,35 @@ export class Logger<M> implements LoggerMethods {
   static isDisallowed(option: AllowedModule<any>, level: ELevel) {
     return !this.isAllowed(option, level);
   }
-
   /** 判斷 model 於當前 env 中，該 level 是否被允許
    * 如果是 dev mode (develop/test) 狀態下，預許不顯示 info 以下的 log
    */
-  static isAllowed(option: AllowedModule<any>, level: ELevel): boolean {
+  static isAllowed(option?: AllowedModule<any>, level?: ELevel): boolean {
+    if (!option)
+      return false;
+    level ??= ELevel.trace;
     if (Logger.getEnv() != "develop" && Logger.getEnv() != "test") {
       if (level <= ELevel.info) {
-        console.log("block allowance, since it's not dev mode")
+        console.info("block allowance, since it's not dev mode")
         return false;
       }
     }
     const module = this.allowedModules[this.getEnv()][option.moduleName as any];
-    assert(()=>module != undefined, `module: ${option.moduleName} not found, please`);
-    const allowed = !(module?.disallowedHandler(level) ?? true);
-    console.log("isAllowed:", allowed, option.moduleName, "on level:", level);
+    assert(()=>module != undefined, `module: ${option.moduleName} not found, please setLoggerAllowance first! For more info "https://github.com/gordianknotC/frontend_common#%E8%A2%91%E5%A7%8B%E5%8C%96"`);
+    const allowed = !(
+      module!.disallowedHandler(module.logLevelHandler(level)) ?? true
+    );
     return allowed;
   }
+  static toAllowedLogger<M extends string>(modules: AllowedModule<M>[]): RawAllowedLogger<M> {
+    const result: RawAllowedLogger<M> = {} as any;
+    modules.forEach((module)=>{
+      module.logLevelHandler ??= (level)=>level;
+      result[module.moduleName] = module;
+    });
+    return result;
+  }
+
 
   /** 設定不同 level 要程現什麼樣的色彩
    * @example
@@ -270,28 +191,45 @@ export class Logger<M> implements LoggerMethods {
    * {@link setLoggerAllowanceByEnv} 混用如混用會 raise AssertionError
    * @typeParam M - 模組名
    * @example - 混用的列子
-     ```ts
-    Logger.setLoggerAllowance<EModules>({
-      [EModules.Test]: testModule,
-      [EModules.Hobbits]: newLogModule,
-    });
+    ```ts
+    Logger.setLoggerAllowance<EModules>([
+      testModule, newLogModule
+    ]);
     const action = ()=> Logger.setLoggerAllowanceByEnv({
-      test: {},
-      develop: {}
+      test: [],
+      develop: []
     });
     expect(action).toThrow();
     expect(action).toThrowError("AssertionError");
-     ```
+    ```
+   * @example - 非混用
+   * ```ts
+      const ClientModule: AllowedModule<EModules> = {
+        moduleName: EModules.Client,
+        disallowedHandler: (level)=> false
+      }
+      const LogModules = defineAllowedLoggers([
+        ClientModule,
+        {...ClientModule, moduleName: EModules.AuthGuard},
+        {...ClientModule, moduleName: EModules.RequestRep},
+        {...ClientModule, moduleName: EModules.HeaderUpdater}
+      ])
+      Logger.setLoggerAllowanceByEnv(LogModules)
+   * ```
    */
-  static setLoggerAllowance<M extends string>(
-    option: Partial<AllowedLogger<M>>
-  ) {
+  static setLoggerAllowance<M extends string>(modules: AllowedModule<M>[]): RawAllowedLogger<M> {
     assert(
       () => LOGGER_MODE.value == undefined || LOGGER_MODE.value == "IgnoreEnv",
       "Do not mix use of setLoggerAllowance and setLoggerAllowanceByEnv together"
     );
+    const allowedLogger = this.toAllowedLogger(modules);
     LOGGER_MODE.value ??= "IgnoreEnv";
-    this._setLoggerAllowance(option);
+    Logger.allowedModules = {...EmptyLogOption};
+    Object.entries(allowedLogger).forEach((pair) => {
+      const [k, v] = pair as any as [M, AllowedModule<M>];
+      Logger.addModule(v);
+    });
+    return allowedLogger;
   }
 
   /** 
@@ -299,14 +237,19 @@ export class Logger<M> implements LoggerMethods {
    */
   static setLoggerAllowanceByEnv<M extends string>(
     option: AllowedLoggerByEnv<M>
-  ) {
+  ): Partial<RawAllowedLogger<M>>  {
     assert(
       () => LOGGER_MODE.value == undefined || LOGGER_MODE.value == "ByEnv",
       "AssertionError: Do not mix use of setLoggerAllowance and setLoggerAllowanceByEnv together"
     );
     LOGGER_MODE.value ??= "ByEnv";
-    const env = Logger.getEnv();
-    Logger.allowedModules = Object.assign({...EmptyLogOption}, option);
+    const newOption: RawAllowedLoggerByEnv<M> = {} as any;
+    Object.entries(option).forEach((pair)=>{
+      const [env, v] = pair;
+      newOption[env as keyof (RawAllowedLoggerByEnv<M>)] = this.toAllowedLogger(v);
+    })
+    Logger.allowedModules = Object.assign({...EmptyLogOption}, newOption);
+    return this.allowedModules[this.getEnv()];
   }
 
   static hasModule<M>(option: AllowedModule<M>) {
@@ -318,7 +261,7 @@ export class Logger<M> implements LoggerMethods {
     LOGGER_MODE = final();
   }
 
-  private static allowedModules: AllowedLoggerByEnv<any> = {
+  private static allowedModules: RawAllowedLoggerByEnv<any> = {
     test: {}, develop: {}
   };
 
@@ -327,22 +270,14 @@ export class Logger<M> implements LoggerMethods {
   }
   private static getEnv = ()=> _currentEnv.value;
 
-  private static _setLoggerAllowance<M extends string>(
-    option: Partial<AllowedLogger<M>>
-  ) {
-    console.log("_setLoggerAllowance:", option)
-    Logger.allowedModules = {...EmptyLogOption};
-    Object.entries(option).forEach((pair) => {
-      const [k, v] = pair as any as [M, AllowedModule<M>];
-      Logger.addModule(v);
-    });
-    console.log("_setLoggerAllowance, allowedModules:", this.allowedModules)
-  }
-
+  
   _prevLog?: LogRecord;
   _allowance?: AllowedModule<M>;
 
-  constructor(option: Pick<AllowedModule<M>, "moduleName">) {
+  constructor(option?: Pick<AllowedModule<M>, "moduleName">) {
+    if (!option){
+      return;
+    }
     if (Logger.hasModule(option as any)) {
       this._allowance = Logger.allowedModules[Logger.getEnv()][option.moduleName];
       // todo: remind of user that module configuration never being override
@@ -364,22 +299,21 @@ export class Logger<M> implements LoggerMethods {
   }
 
   _messenger(msg: any[], level: ELevel, option?: LogOption) {
-    if (Logger.isAllowed(this._allowance!, level)) {
+    if (Logger.isAllowed(this._allowance, level)) {
       assert(() => this._allowance != undefined);
-      console.log("invoke log:", ...msg);
       this._prevLog = message(
         this._allowance.moduleName as any,
         level,
         msg,
-        option?.traceBack ?? defaultLogOption.traceBack,
+        option?.traceAt ?? defaultLogOption.traceAt,
         option?.stackNumber ?? defaultLogOption.stackNumber
       );
     }
   }
-  // todo: 簡化
+
   /**
-   * @param option.traceBack - {@link LogOption} 預設為2，由現在的 trace stack 中，回算幾個 traceBack 作為起點, 因為實作上的理由所以預設是3
-   * @param option.stackNumber - {@link LogOption} 要顯示多少層的 error stacks
+   * @param option.traceAt - {@link LogOption} {@link defaultLogOption}
+   * @param option.stackNumber - {@link LogOption} {@link defaultLogOption}
    */
   log(msg: any[], option?: LogOption): void {
     this._messenger(msg, ELevel.trace, option);
@@ -413,3 +347,4 @@ export class Logger<M> implements LoggerMethods {
     this._messenger(msg, ELevel.fatal, option);
   }
 }
+

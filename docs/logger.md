@@ -4,10 +4,13 @@
 <!--#-->
 ### Feature
 - 針對 trace/debug/info/warn/current/error/fatal 設置不同色彩
+  ![logger_image](./loggerA.png) 
+  ![logger_image](./loggerB.png | width=250)
+- logger 可設置 traceBack 由第幾個 stack 開始追蹤至第幾個結束
 - 根據環境變數設置 overall log level
 - 根據各別模組設置 log level
 
-__型別__ | [source][s-logger]
+#### __型別__ | [source][s-logger]
 ```ts
 abstract class LoggerMethods {
   abstract log(msg: any[], option?: LogOption): void;
@@ -19,17 +22,28 @@ abstract class LoggerMethods {
   abstract warn(msg: any[], option?: LogOption): void;
   abstract current(msg: any[], option?: LogOption): void;
 }
-Logger<M> implements LoggerMethods {
-  static setCurrentEnv(env: Env) :void{}
-  static isDisallowed(option: AllowedModule<any>, level: ELevel) :boolean{}
-  static isAllowed(option: AllowedModule<any>, level: ELevel) :boolean{}
-  static setLevelColors(option: Partial<typeof colorCaster>){};
-  static setLoggerAllowance<M extends string>(option: Partial<AllowedLogger<M>>){};
-  static setLoggerAllowanceByEnv<M extends string>(option: AllowedLoggerByEnv<M>){};
-  static hasModule<M>(option: AllowedModule<M>):boolean{};
+```
+
+#### __靜態方法__
+```ts
+abstract class LoggerStatic {
+  abstract setCurrentEnv(envGetter: ()=>Env): void;
+  abstract isDisallowed(option: AllowedModule<any>, level: ELevel): boolean;
+  abstract  isAllowed(option?: AllowedModule<any>, level?: ELevel): boolean ;
+  abstract toAllowedLogger<M extends string>(modules: AllowedModule<M>[]): RawAllowedLogger<M>;
+  abstract setLevelColors(option: Partial<ColorConfig>): void;
+  abstract  setLoggerAllowance<M extends string>(modules: AllowedModule<M>[]): RawAllowedLogger<M>;
+  abstract setLoggerAllowanceByEnv<M extends string>(option: AllowedLoggerByEnv<M>): Partial<RawAllowedLogger<M>>;
+  abstract hasModule<M>(option: AllowedModule<M>):boolean;
+  abstract clearModules(): void;
 }
 ```
+
 ### 袑始化
+始始化有以下二種方式, 這二種方式不得混用
+ * 1) [setLoggerAllowanceByEnv](#setLoggerAllowanceByEnv)
+ * 2) [setLoggerAllowance](#setLoggerAllowance)
+  
 __[setLoggerAllowanceByEnv](#setLoggerAllowanceByEnv)__
 ```ts
 // logger.setup.ts
@@ -37,50 +51,49 @@ enum EModules {
   Test = "Test",
   Hobbits = "Hobbits",
 }
-const LogModules: AllowedModule<EModules> = {
-  [EModules.Test]: {
-    moduleName: EModules.Test,
-    disallowedHandler: (level) => false,
-  },
-  [EModules.Hobbits]: {
-    moduleName: EModules.Test,
-    disallowedHandler: (level) => false,
-  },
+const testModule = {
+  moduleName: EModules.Test,
+  disallowedHandler: (level) => false,
+};
+const newModule = {
+  moduleName: EModules.Hobbits,
+  disallowedHandler: (level) => false,
 }
-Logger.setCurrentEnv(()=>"develop")
-// 以下只有 release 允許 log
-Logger.setLoggerAllowanceByEnv({
-  test: {},
-  develop: {},
-  release: LogModules
-})
 
-// 使用：arbitrary.hobbits.source.ts
-const D = new Logger(LogModules.Hobbits)
+Logger.setCurrentEnv("develop")
+const LogModules = Logger.setLoggerAllowance(LogModules)
+
+// 使用：arbitrary.test.source.ts
+const D = new Logger(LogModules.Test)
 ```
 
 __[setLoggerAllowance](#setLoggerAllowance)__
 ```ts
-// logger.setup.ts
-enum EModules {
-  Test = "Test",
-  Hobbits = "Hobbits",
-}
-const LogModules: AllowedModule<EModules> = {
-  [EModules.Test]: {
+  // logger.setup.ts
+  enum EModules {
+    Test = "Test",
+    Hobbits = "Hobbits",
+  }
+  const testModule = {
     moduleName: EModules.Test,
     disallowedHandler: (level) => false,
-  },
-  [EModules.Hobbits]: {
-    moduleName: EModules.Test,
+  };
+  const newModule = {
+    moduleName: EModules.Hobbits,
     disallowedHandler: (level) => false,
-  },
-}
-Logger.setCurrentEnv(()=>"develop")
-Logger.setLoggerAllowance(LogModules)
+  }
+  Logger.setCurrentEnv("develop")
+  const LogModules = Logger.setLoggerAllowanceByEnv({
+    test: [],
+    develop: [],
+    release: [testModule, newModule]
+  });
 
-// 使用：arbitrary.test.source.ts
-const D = new Logger(LogModules.Test)
+  // 使用：arbitrary.hobbits.source.ts
+  const D = new Logger(LogModules.Hobbits)
+
+  // 使用：arbitrary.test.source.ts
+  const D = new Logger(LogModules.Test)
 ```
 
 
@@ -132,14 +145,15 @@ Logger.setLevelColors(option);
 __型別__ | [source][s-logger]
 ```ts
 /** 
-  * @typeParam M - module name 
+* @typeParam M - 模組名
 */
 export type AllowedModule<M> = {
   moduleName: M;
   disallowedHandler: (level: ELevel) => boolean;
 };
 export type AllowedLogger<M extends string> = Record<M, AllowedModule<M>>;
-setLoggerAllowance<M extends string>(option: Partial<AllowedLogger<M>>){}
+
+setLoggerAllowance<M extends string>(modules: AllowedModule<M>[]): RawAllowedLogger<M>{}
 ```
 
 __example__ 
@@ -147,17 +161,44 @@ __example__
 
 ```ts
 // 不考慮 env
-Logger.setLoggerAllowance<EModules>({
-  [EModules.Test]: testModule,
-  [EModules.Hobbits]: newLogModule,
-});
+Logger.setLoggerAllowance<EModules>([
+  testModule, newLogModule
+]);
 const action = ()=> Logger.setLoggerAllowanceByEnv({
-  test: {},
-  develop: {}
+  test: [],
+  develop: []
 });
 expect(action).toThrow();
 expect(action).toThrowError("AssertionError");
 ```
+#### AllowedModule
+__型別__ | [source][s-logger.types]
+```ts
+export type AllowedModule<M> = {
+  /** module identifier */
+  moduleName: M;
+  /** 判斷哪一層級的 {@link ELevel} 不被允許 */
+  disallowedHandler: (level: ELevel) => boolean;
+  /** 用來覆寫當前 log level, 預設為保持不變： (level)=>level */
+  logLevelHandler?: (level: ELevel)=> ELevel;
+};
+```
+__example__
+```ts
+enum EModules {
+  Test = "Test",
+  Hobbits = "Hobbits",
+}
+const testModule: AllowedModule = {
+  moduleName: EModules.Test,
+  // log level <= info 才被允許，換言之 trace / debug 不允許
+  disallowedHandler: (l)=> l <= ELevel.info,
+  // 不覆寫 log level, 如想將所有 log level 覆寫為 current:
+  // logLevelHandler: (l)=>ELevel.current
+  logLevelHandler: (l)=> l,
+}
+```
+
 
 #### setLoggerAllowanceByEnv
 __型別__ | [source][s-logger]
@@ -175,40 +216,49 @@ export type AllowedLoggerByEnv<M extends string> = {
 setLoggerAllowanceByEnv<M extends string>(option: AllowedLoggerByEnv<M>){}
 ```
 
+__example__
+```ts
+// 假定有以下二模組
+enum EModules {
+  Test = "Test",
+  Hobbits = "Hobbits",
+}
+const ClientModule: AllowedModule<EModules> = {
+  moduleName: EModules.Client,
+  disallowedHandler: (level)=> false
+}
+const LogModules = defineAllowedLoggers([
+  ClientModule,
+  {...ClientModule, moduleName: EModules.AuthGuard},
+  {...ClientModule, moduleName: EModules.RequestRep},
+  {...ClientModule, moduleName: EModules.HeaderUpdater}
+])
+Logger.setLoggerAllowanceByEnv(LogModules)
+```
 
 __example__ | [source][s-test-logger]:
 ```ts
 describe("Considering of using env", ()=>{
   let log: Logger<EModules>;
-  const testModule: AllowedModule<EModules> = {
-    moduleName: EModules.Test,
-    disallowedHandler: (level) => false,
-  };
-  function clear(env: Env, allowance: any){
+  function clear(env: Env, allowance: any[]){
     Logger.clearModules();
     setupCurrentEnv(env);
-    // 分別設置不同 env 下允許的 log level
     Logger.setLoggerAllowanceByEnv(Object.assign({
-      test: {},
-      develop: {},
-      release: {},
-      production: {}
-    }, allowance));
+      test: [],develop: []
+    }, {
+      [env]: allowance
+    }) as any);
     log = new Logger(testModule);
   }
 
   beforeEach(()=>{
-    clear("release", {
-      release: {[EModules.Test]: testModule}
-    });
+    clear("release", [testModule]);
   });
 
   test("setLoggerAllowanceByEnv - expect module not exists", () => {
-    clear("test", {
-      release: {[EModules.Test]: testModule}
-    });
-    expect(_currentEnv.value).toBe("test");
-
+    clear("test", [testModule]);
+    setupCurrentEnv("develop");
+    expect(_currentEnv.value).toBe("develop");
     console.log("allowedModules", (Logger as any).allowedModules)
     expect(Logger.hasModule(testModule)).toBeFalsy();
     Logger.clearModules();

@@ -1,11 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Logger = exports.ELevel = void 0;
-function message(msg, traceBack = 2, stackNumber = 5) {
+function message(msg, traceAt = 2, stackNumber = 5) {
     const lines = new Error().stack.split("\n");
     const maxLines = lines.length;
-    const stacks = lines.splice(Math.min(traceBack + 1, maxLines), stackNumber);
-    console.log("lines:", maxLines, traceBack + 1, traceBack + 1 + stackNumber, Math.min(traceBack + 1, maxLines), Math.min(traceBack + 1 + stackNumber, maxLines), stacks.length);
+    const stacks = lines.splice(Math.min(traceAt + 1, maxLines), stackNumber);
+    console.log("lines:", maxLines, traceAt + 1, traceAt + 1 + stackNumber, Math.min(traceAt + 1, maxLines), Math.min(traceAt + 1 + stackNumber, maxLines), stacks.length);
     console.log(...msg, "\n" + stacks.join('\n'));
 }
 var ELevel;
@@ -32,9 +32,9 @@ class Logger {
             Logger.allowedModules.add(name);
         });
     }
-    log(msg, traceBack = 2, stackNumber = 5) {
+    log(msg, traceAt = 2, stackNumber = 5) {
         if (Logger.allowedModules.has(this.moduleName))
-            message(msg, traceBack, stackNumber);
+            message(msg, traceAt, stackNumber);
     }
 }
 exports.Logger = Logger;

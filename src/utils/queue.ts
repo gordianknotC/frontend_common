@@ -294,26 +294,20 @@ export class AsyncQueue  implements IAsyncQueue {
     const {id, removeQueue} = option;
     const item = this.queue.firstWhere(_ => _._meta.id == id)!;
     if (!item) {
-      console.log("d1");
       return null;
     }
     try {
-      console.log("d2");
       const result = await item._meta.promise();
       if (removeQueue ?? true){
-        console.log("d3");
         this.remove(item);
       }
-      console.log("d4");
       item.complete(result);
       return result;
     } catch (err) {
-      console.log("d5");
       item.reject(err);
       if (removeQueue ?? true)
         this.remove(item);
     }
-    console.log("d6");
     return null;
   }
 }

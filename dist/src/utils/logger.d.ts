@@ -11,5 +11,5 @@ export declare class Logger {
     static addModule(name: string): void;
     static setModules(modules: string[]): void;
     constructor(moduleName: string);
-    log(msg: any[], traceBack?: number, stackNumber?: number): void;
+    log(msg: any[], traceAt?: number, stackNumber?: number): void;
 }
