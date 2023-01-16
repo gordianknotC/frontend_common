@@ -20,7 +20,7 @@ function time(): number {
   return new Date().getTime();
 }
 class QTester {
-  constructor(public q: AsyncQueue) {}
+  constructor(public q: AsyncQueue<any>) {}
 }
 
 describe("Services", () => {
@@ -48,7 +48,7 @@ describe("Services", () => {
   });
 
   describe("Queue", () => {
-    let q: AsyncQueue;
+    let q: AsyncQueue<any>;
     let span = 500;
     let idA = 1;
     let idB = 2;

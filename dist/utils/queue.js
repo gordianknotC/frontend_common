@@ -3,17 +3,23 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.SequencedQueueConsumer = exports.AsyncQueue = exports.IQueueConsumer = exports.IAsyncQueue = void 0;
 const crypto_1 = require("crypto");
 const __1 = require("..");
+/**
+ * @typeParam META - QueueItem 的 meta 型別
+ */
 class IAsyncQueue {
 }
 exports.IAsyncQueue = IAsyncQueue;
+/** {inheritDoc IAsyncQueue}
+ * @typeParam META - QueueItem 的 meta 型別
+*/
 class IQueueConsumer {
 }
 exports.IQueueConsumer = IQueueConsumer;
-/**
+/** {inheritDoc IAsyncQueue}
  * 應用如 api client 處理需籍由 websocket 傳送出去的請求, 將請求暫存於 queue 以後，待收到 socket
  * 資料，再由 queue 裡的 promise resolve 返回值， resolve 後無論成功失敗，移除該筆 queue
- * @typeParam T - {@link QueueItem}
- * @example
+ * @typeParam META - {@link QueueItem} 的 meta 型別
+* @example
    ```ts
    test("put three async in sequence and postpone to dequeue when on time", async ()=>{
       let rA, rB, rC, rD;
@@ -128,21 +134,6 @@ class AsyncQueue {
         if (dequeueImmediately)
             this.dequeue({ id, removeQueue: false });
         return completer.future;
-        // return new Promise((resolve, reject) => {
-        //   this.queue.push({
-        //     id,
-        //     timestamp,
-        //     meta,
-        //     timeout: setTimeout(() => {
-        //       this.onTimeout(id);
-        //     }, timeout),
-        //     promise,
-        //     resolve,
-        //     reject
-        //   });
-        //   if (dequeueImmediately)
-        //     this.dequeue({id, removeQueue: false});
-        // });
     }
     /** 與  {@link enqueue} 相同，只是 id 自動生成
      * @returns Completer 物件，非 async Promise

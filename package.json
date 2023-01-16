@@ -1,6 +1,6 @@
 {
   "name": "@gdknot/frontend_common",
-  "version": "0.9.1",
+  "version": "0.9.3",
   "description": "common js util for frontend development",
   "scripts": {
     "build": "tsc --project tsconfig.build.json && tsc-alias -p tsconfig.build.json",
@@ -9,8 +9,8 @@
     "test": "jest",
     "test:watch": "clear && jest --watch",
     "---------- DOC ------------": "",
-    "doc": "merge-markdown -m merge_markdown.yml && typedoc src/index.ts",
-    "serve:doc": "merge-markdown -m merge_markdown.yml && typedoc src/index.ts && serve docs/build",
+    "doc": "yarn build && merge-markdown -m merge_markdown.yml && typedoc src/index.ts",
+    "serve:doc": "yarn build && merge-markdown -m merge_markdown.yml && typedoc src/index.ts && serve docs/build",
     "---------- NPM ------------": "",
     "login": "npm login",
     "publish": "npm publish",

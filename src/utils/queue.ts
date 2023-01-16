@@ -14,8 +14,11 @@ export type QueueItem<M=any> = {
   timeout: NodeJS.Timeout;
 };
 
-export abstract class IAsyncQueue {
-  abstract queue: ArrayDelegate<Completer<any, QueueItem>>;
+/**
+ * @typeParam META - QueueItem 的 meta 型別
+ */
+export abstract class IAsyncQueue<META> {
+  abstract queue: ArrayDelegate<Completer<any, QueueItem<META>>>;
   abstract get isEmpty(): boolean;
   abstract enqueue(
     id: number|string,
@@ -27,21 +30,21 @@ export abstract class IAsyncQueue {
   abstract clearQueue(): void;
 }
 
- 
-
-
-export abstract class IQueueConsumer {
-  abstract queue: IAsyncQueue;
-  abstract feedRequest(request: () => Promise<any>):  Completer<any, QueueItem>;
+/** {inheritDoc IAsyncQueue} 
+ * @typeParam META - QueueItem 的 meta 型別
+*/
+export abstract class IQueueConsumer<META> {
+  abstract queue: IAsyncQueue<META>;
+  abstract feedRequest(request: () => Promise<any>):  Completer<any, QueueItem<META>>;
   abstract consumeAll(): Promise<any>;
-  abstract consumeAllWhen(condition: (item:  Completer<any, QueueItem>)=>boolean): Promise<any>;
+  abstract consumeAllWhen(condition: (item:  Completer<any, QueueItem<META>>)=>boolean): Promise<any>;
 }
 
-/**
+/** {inheritDoc IAsyncQueue} 
  * 應用如 api client 處理需籍由 websocket 傳送出去的請求, 將請求暫存於 queue 以後，待收到 socket
  * 資料，再由 queue 裡的 promise resolve 返回值， resolve 後無論成功失敗，移除該筆 queue
- * @typeParam T - {@link QueueItem}
- * @example
+ * @typeParam META - {@link QueueItem} 的 meta 型別
+* @example
    ```ts
    test("put three async in sequence and postpone to dequeue when on time", async ()=>{
       let rA, rB, rC, rD;
@@ -90,8 +93,8 @@ export abstract class IQueueConsumer {
     });
    ```
  */
-export class AsyncQueue  implements IAsyncQueue {
-  queue: ArrayDelegate<Completer<any, QueueItem>> = Arr([]);
+export class AsyncQueue<META=any> implements IAsyncQueue<META> {
+  queue: ArrayDelegate<Completer<any, QueueItem<META>>> = Arr([]);
   /** 判斷 {@link queue} 是否為空 */
   get isEmpty(){
     return this.queue.length == 0;
@@ -105,7 +108,7 @@ export class AsyncQueue  implements IAsyncQueue {
     }
   ){}
 
-  getQueueItem(id:number|string):Completer<any, QueueItem> | null{
+  getQueueItem(id:number|string):Completer<any, QueueItem<META>> | null{
     if (this.queue.length == 0)
       return null;
     return this.queue.firstWhere((_)=>_._meta!.id == id);
@@ -151,7 +154,7 @@ export class AsyncQueue  implements IAsyncQueue {
     dequeueImmediately: boolean = true,
   ): Promise<any> {
     const timestamp = new Date().getTime();
-    const completer = new Completer<any, QueueItem>({
+    const completer = new Completer<any, QueueItem<META>>({
       id,
       timestamp,
       meta,
@@ -164,21 +167,6 @@ export class AsyncQueue  implements IAsyncQueue {
     if (dequeueImmediately)
         this.dequeue({id, removeQueue: false});
     return completer.future;
-    // return new Promise((resolve, reject) => {
-    //   this.queue.push({
-    //     id,
-    //     timestamp,
-    //     meta,
-    //     timeout: setTimeout(() => {
-    //       this.onTimeout(id);
-    //     }, timeout),
-    //     promise,
-    //     resolve,
-    //     reject
-    //   });
-    //   if (dequeueImmediately)
-    //     this.dequeue({id, removeQueue: false});
-    // });
   }
 
   /** 與  {@link enqueue} 相同，只是 id 自動生成 
@@ -189,7 +177,7 @@ export class AsyncQueue  implements IAsyncQueue {
     timeout: number = 10000,
     meta: any = {},
     dequeueImmediately: boolean = true,
-  ): Completer<any, QueueItem>{
+  ): Completer<any, QueueItem<META>>{
     this.enqueue(this._getId() , promise, timeout, meta, dequeueImmediately);
     const item = this.queue.last;
     return item;
@@ -205,7 +193,7 @@ export class AsyncQueue  implements IAsyncQueue {
     item.reject(this.timeoutErrorObj);
   }
 
-  private remove(item: Completer<any, QueueItem>, reject: boolean = false) {
+  private remove(item: Completer<any, QueueItem<META>>, reject: boolean = false) {
     clearTimeout(item._meta.timeout);
     if (reject)
       item.reject({
@@ -312,10 +300,10 @@ export class AsyncQueue  implements IAsyncQueue {
   }
 }
 
-export class SequencedQueueConsumer 
-  implements IQueueConsumer
+export class SequencedQueueConsumer <META>
+  implements IQueueConsumer<META>
 {
-  constructor(public queue: IAsyncQueue){}
+  constructor(public queue: IAsyncQueue<META>){}
 
   private _getId(): number|string{
     return randomUUID();

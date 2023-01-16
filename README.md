@@ -594,7 +594,7 @@ abstract class _Completer<T> {
 }
 ```
 
-當我們以 [Completer](#Completer) 存放 QueueItem 物件時便能於外部 resolve Promise [Completer](#Completer) 則作為一個 存放 Promise 物件及相應 reject/resolve 方法的容器
+當我們以 [Completer](#Completer) 存放 QueueItem 物件時便能於外部 resolve Promise,  而不用受限於 Promise 結構只能於自身建溝子進行 resolve，[Completer](#Completer)本身則作為一個容器，存放 Promise 物件及相應 reject/resolve 方法，以便於外部調用. 
 
 ### enqueue
 > 將 Promise 請求包入 QueueItem 並推到 Queue 裡，並有以下二種選擇 (視 @param dequeueImmediately)
