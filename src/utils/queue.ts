@@ -24,7 +24,7 @@ export abstract class IAsyncQueue<META> {
     id: number|string,
     promise: () => Promise<any>,
     timeout?: number
-  ): Promise<any>;
+  ): Completer<any, QueueItem<META>>;
   abstract dequeue(option: {id: number|string, removeQueue: boolean}): Promise<any>;
   abstract dequeueByResult(option: {id: number|string, result: any}): void;
   abstract clearQueue(): void;
@@ -152,7 +152,7 @@ export class AsyncQueue<META=any> implements IAsyncQueue<META> {
     timeout: number = 10000,
     meta: any = {},
     dequeueImmediately: boolean = true,
-  ): Promise<any> {
+  ): Completer<any, QueueItem<META>> {
     const timestamp = new Date().getTime();
     const completer = new Completer<any, QueueItem<META>>({
       id,
@@ -166,7 +166,7 @@ export class AsyncQueue<META=any> implements IAsyncQueue<META> {
     this.queue.push(completer)
     if (dequeueImmediately)
         this.dequeue({id, removeQueue: false});
-    return completer.future;
+    return completer;
   }
 
   /** 與  {@link enqueue} 相同，只是 id 自動生成 

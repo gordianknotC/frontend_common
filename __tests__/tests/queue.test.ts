@@ -172,7 +172,7 @@ describe("Services", () => {
         });
       });
       function getPendingResult() {
-        return pending;
+        return pending.future;
       }
       await wait(wD);
       q.dequeueByResult({
@@ -211,7 +211,7 @@ describe("Services", () => {
             reject("reject...");
             console.log("resolve B");
           });
-        })
+        }).future
       ).rejects.toEqual("reject...");
       expect(q.queue.length).toBe(2);
       expect(q.dequeue).toBeCalledTimes(2);
