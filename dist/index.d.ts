@@ -19,7 +19,7 @@ export type { QueueItem,
 IAsyncQueue as IQueue, IAsyncQueue, IQueueConsumer } from "./utils/queue";
 export { 
 /** @deprecated use AsyncQueue instead */
-AsyncQueue as Queue, AsyncQueue, SequencedQueueConsumer } from "./utils/queue";
+AsyncQueue as Queue, AsyncQueue, SequencedQueueConsumer, uuidV4 } from "./utils/queue";
 export { Completer } from "./utils/completer";
 /**
  *
@@ -36,3 +36,4 @@ export { setupComputed, setupRef, setupWatch, setupReactive, setupCurrentEnv, } 
 export { Logger, } from "./utils/logger";
 export type { LogRecord, LogOption, ColorNames, AllowedModule, AllowedLoggerByEnv, RawAllowedLogger, RawAllowedLoggerByEnv, ColorConfig, LoggerAllowanceMode } from "./utils/logger.types";
 export type { ELevel, } from "./utils/logger.types";
+export type { PickOne, Optional, } from "./utils/types";

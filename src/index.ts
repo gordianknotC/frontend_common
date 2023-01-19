@@ -77,7 +77,8 @@ export type {
 export { 
   /** @deprecated use AsyncQueue instead */
   AsyncQueue as Queue, 
-  AsyncQueue, SequencedQueueConsumer
+  AsyncQueue, SequencedQueueConsumer,
+  uuidV4
  } from "~/utils/queue";
 export { Completer } from "~/utils/completer";
 

@@ -1,7 +1,6 @@
-import { randomUUID } from "crypto";
 import { ArrayDelegate, Arr, Completer } from "..";
 import { PickOne } from "./types";
-
+import { v4 } from 'uuid';
 
 export type QueueItem<M=any> = {
   /** id: QueueItem identifier */
@@ -15,6 +14,10 @@ export type QueueItem<M=any> = {
   /** timeout: timeout id */
   timeout: NodeJS.Timeout;
 };
+
+export function uuidV4(): number|string{
+  return v4();
+}
 
 /**
  * @typeParam META - QueueItem 的 meta 型別
@@ -186,7 +189,7 @@ export class AsyncQueue<META=any> implements IAsyncQueue<META> {
   }
 
   private _getId(): number|string{
-    return randomUUID();
+    return v4();
   }
 
   /** reject outdated queue and remove it by id*/
@@ -341,7 +344,7 @@ export class SequencedQueueConsumer <META>
   constructor(public queue: IAsyncQueue<META>){}
 
   private _getId(): number|string{
-    return randomUUID();
+    return uuidV4();
   }
   feedRequest(request: () => Promise<any>): Completer<any, QueueItem> {
     this.queue.enqueue(this._getId() , request);

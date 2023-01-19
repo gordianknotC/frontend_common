@@ -1,8 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SequencedQueueConsumer = exports.AsyncQueue = exports.IQueueConsumer = exports.IAsyncQueue = void 0;
-const crypto_1 = require("crypto");
+exports.SequencedQueueConsumer = exports.AsyncQueue = exports.IQueueConsumer = exports.IAsyncQueue = exports.uuidV4 = void 0;
 const __1 = require("..");
+const uuid_1 = require("uuid");
+function uuidV4() {
+    return (0, uuid_1.v4)();
+}
+exports.uuidV4 = uuidV4;
 /**
  * @typeParam META - QueueItem 的 meta 型別
  */
@@ -144,7 +148,7 @@ class AsyncQueue {
         return item;
     }
     _getId() {
-        return (0, crypto_1.randomUUID)();
+        return (0, uuid_1.v4)();
     }
     /** reject outdated queue and remove it by id*/
     onTimeout(id) {
@@ -177,7 +181,8 @@ class AsyncQueue {
      * 所傳入的 promise 結果，直接取代其 result
      *
      * @param option.id - 取得queue的id
-     * @param option.removeQueue - 預設 true
+     * @param option.result - sync result 與 async result 二擇一
+     * @param option.asyncResult - async result 與 sync result 二擇一
      * @returns
      * @example
      ```ts
@@ -228,8 +233,7 @@ class AsyncQueue {
      ```
      */
     dequeueByResult(option) {
-        const { id, result } = option;
-        const removeQueue = true;
+        const { id, result, asyncResult } = option;
         const item = this.queue.firstWhere(_ => _._meta.id == id);
         if (!item) {
             return null;
@@ -241,14 +245,23 @@ class AsyncQueue {
             else if (item.isRejected) {
                 return this.remove(item);
             }
-            item.complete(result);
-            if (removeQueue !== null && removeQueue !== void 0 ? removeQueue : true)
+            if (result) {
+                item.complete(result);
                 this.remove(item);
+            }
+            else if (asyncResult) {
+                asyncResult.then((_) => {
+                    item.complete(_);
+                    this.remove(item);
+                }).catch((_) => {
+                    item.reject(_);
+                    this.remove(item);
+                });
+            }
         }
         catch (err) {
             item.reject(err);
-            if (removeQueue !== null && removeQueue !== void 0 ? removeQueue : true)
-                this.remove(item);
+            this.remove(item);
         }
     }
     /**
@@ -286,7 +299,7 @@ class SequencedQueueConsumer {
         this.queue = queue;
     }
     _getId() {
-        return (0, crypto_1.randomUUID)();
+        return uuidV4();
     }
     feedRequest(request) {
         this.queue.enqueue(this._getId(), request);

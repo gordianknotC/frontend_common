@@ -1,5 +1,6 @@
 /// <reference types="node" />
 import { ArrayDelegate, Completer } from "..";
+import { PickOne } from "./types";
 export declare type QueueItem<M = any> = {
     /** id: QueueItem identifier */
     id: number | string;
@@ -12,6 +13,7 @@ export declare type QueueItem<M = any> = {
     /** timeout: timeout id */
     timeout: NodeJS.Timeout;
 };
+export declare function uuidV4(): number | string;
 /**
  * @typeParam META - QueueItem 的 meta 型別
  */
@@ -147,7 +149,8 @@ export declare class AsyncQueue<META = any> implements IAsyncQueue<META> {
      * 所傳入的 promise 結果，直接取代其 result
      *
      * @param option.id - 取得queue的id
-     * @param option.removeQueue - 預設 true
+     * @param option.result - sync result 與 async result 二擇一
+     * @param option.asyncResult - async result 與 sync result 二擇一
      * @returns
      * @example
      ```ts
@@ -199,8 +202,10 @@ export declare class AsyncQueue<META = any> implements IAsyncQueue<META> {
      */
     dequeueByResult(option: {
         id: number | string;
+    } & PickOne<{
         result: any;
-    }): void;
+        asyncResult: Promise<any>;
+    }>): void;
     /**
      * 依所提供的 id 查找相應的 QueueItem，執行 QueueItem 裡的 Promise 請求並依
      * option.removeQueue 決定是否移除 QueueItem, 預設 option.removeQueue 為 true
