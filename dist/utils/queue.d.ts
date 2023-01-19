@@ -18,7 +18,7 @@ export declare type QueueItem<M = any> = {
 export declare abstract class IAsyncQueue<META> {
     abstract queue: ArrayDelegate<Completer<any, QueueItem<META>>>;
     abstract get isEmpty(): boolean;
-    abstract enqueue(id: number | string, promise: () => Promise<any>, timeout?: number): Promise<any>;
+    abstract enqueue(id: number | string, promise: () => Promise<any>, timeout?: number): Completer<any, QueueItem<META>>;
     abstract dequeue(option: {
         id: number | string;
         removeQueue: boolean;
@@ -130,7 +130,7 @@ export declare class AsyncQueue<META = any> implements IAsyncQueue<META> {
         q.dequeue({id: idC, removeQueue});
        ```
      */
-    enqueue(id: number | string, promise: () => Promise<any>, timeout?: number, meta?: any, dequeueImmediately?: boolean): Promise<any>;
+    enqueue(id: number | string, promise: () => Promise<any>, timeout?: number, meta?: any, dequeueImmediately?: boolean): Completer<any, QueueItem<META>>;
     /** 與  {@link enqueue} 相同，只是 id 自動生成
      * @returns Completer 物件，非 async Promise
     */

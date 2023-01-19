@@ -697,7 +697,7 @@ test("expect raise exception while it's queuing", async () => {
         reject("reject...");
         console.log("resolve B");
       });
-    })
+    }).future
   ).rejects.toEqual("reject...");
   expect(q.queue.length).toBe(2);
   expect(q.dequeue).toBeCalledTimes(2);
@@ -754,7 +754,7 @@ const pending = q.enqueue(pendingId, async ()=>{
 });
 // 覆寫內容於是能將值返回, pending 狀態於是 resolved 
 q.dequeueByResult({id: pendingId, result: {succeed: true}});
-expect(pending).resolves.toEquals({succeed: true});
+expect(pending.future).resolves.toEquals({succeed: true});
 ```
 #### getQueueItem
 ```ts

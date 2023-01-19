@@ -133,7 +133,7 @@ class AsyncQueue {
         this.queue.push(completer);
         if (dequeueImmediately)
             this.dequeue({ id, removeQueue: false });
-        return completer.future;
+        return completer;
     }
     /** 與  {@link enqueue} 相同，只是 id 自動生成
      * @returns Completer 物件，非 async Promise
