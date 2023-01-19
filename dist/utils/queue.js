@@ -146,11 +146,14 @@ class AsyncQueue {
     _getId() {
         return (0, crypto_1.randomUUID)();
     }
+    /** reject outdated queue and remove it */
     onTimeout(id) {
         const item = this.queue.firstWhere(_ => _._meta.id == id);
         if (!item)
             return;
         item.reject(this.timeoutErrorObj);
+        this.remove(item);
+        return this.timeoutErrorObj;
     }
     remove(item, reject = false) {
         clearTimeout(item._meta.timeout);

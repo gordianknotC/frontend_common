@@ -187,10 +187,13 @@ export class AsyncQueue<META=any> implements IAsyncQueue<META> {
     return randomUUID();
   }
 
+  /** reject outdated queue and remove it by id*/
   private onTimeout(id: number|string) {
     const item = this.queue.firstWhere(_ => _._meta.id == id)!;
     if (!item) return;
     item.reject(this.timeoutErrorObj);
+    this.remove(item);
+    return this.timeoutErrorObj;
   }
 
   private remove(item: Completer<any, QueueItem<META>>, reject: boolean = false) {

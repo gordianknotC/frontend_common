@@ -18,7 +18,10 @@
  */
 export declare class Completer<T, M = T> {
     _meta?: M;
-    isCompleted: boolean;
+    private _isCompleted;
+    private _isRejected;
+    get isCompleted(): boolean;
+    get isRejected(): boolean;
     /** 同 Promise.resolve, resolve {@link future} 本身*/
     complete: (value: T | PromiseLike<T>) => void;
     /** 同 Promise.reject, reject {@link future} 本身 */
@@ -39,5 +42,7 @@ export declare class Completer<T, M = T> {
      */
     constructor(_meta?: M);
     private _onComplete?;
+    private _onReject?;
     onComplete(cb: (self: Completer<T, M>) => void): void;
+    onReject(cb: (self: Completer<T, M>) => void): void;
 }

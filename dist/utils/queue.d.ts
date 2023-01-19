@@ -136,6 +136,7 @@ export declare class AsyncQueue<META = any> implements IAsyncQueue<META> {
     */
     enqueueWithoutId(promise: () => Promise<any>, timeout?: number, meta?: any, dequeueImmediately?: boolean): Completer<any, QueueItem<META>>;
     private _getId;
+    /** reject outdated queue and remove it */
     private onTimeout;
     private remove;
     /**清除 {@link queue} */
