@@ -105,6 +105,19 @@ describe("Services", () => {
         expect(rejected).toEqual(Q.timeoutErrorObj);
         expect(Q.queue.length).toBe(0);
       });
+
+      test("dequeue an already completed object", ()=>{
+        const timeout = 100;
+        const completer = Q.enqueue(123, async ()=>{
+          await wait(500);
+        }, timeout)
+        completer.complete("hello");
+        expect(Q.queue.length).toBe(1)
+        
+        Q.dequeueByResult({id: 123, result: "999"});
+        expect(completer.future).resolves.toEqual("hello")
+        expect(Q.queue.length).toBe(0)
+      })
     });
     
     describe("Compound functioning testing", ()=>{

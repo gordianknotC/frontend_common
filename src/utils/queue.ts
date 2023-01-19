@@ -255,6 +255,22 @@ export class AsyncQueue<META=any> implements IAsyncQueue<META> {
         }
     });
    ```
+
+   @example - dequeue an already resolved promise
+   ```ts
+   test("dequeue an already completed object", ()=>{
+      const timeout = 100;
+      const completer = Q.enqueue(123, async ()=>{
+        await wait(500);
+      }, timeout)
+      completer.complete("hello");
+      expect(Q.queue.length).toBe(1)
+      
+      Q.dequeueByResult({id: 123, result: "999"});
+      expect(completer.future).resolves.toEqual("hello")
+      expect(Q.queue.length).toBe(0)
+    })
+   ```
    */
   public dequeueByResult(option: {id: number|string, result: any}): void {
     const {id, result} = option;
@@ -264,6 +280,11 @@ export class AsyncQueue<META=any> implements IAsyncQueue<META> {
       return null;
     }
     try {
+      if (item.isCompleted){
+        return this.remove(item);
+      }else if (item.isRejected){
+        return this.remove(item);
+      }
       item.complete(result);
       if (removeQueue ?? true)
         this.remove(item);

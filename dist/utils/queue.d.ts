@@ -136,7 +136,7 @@ export declare class AsyncQueue<META = any> implements IAsyncQueue<META> {
     */
     enqueueWithoutId(promise: () => Promise<any>, timeout?: number, meta?: any, dequeueImmediately?: boolean): Completer<any, QueueItem<META>>;
     private _getId;
-    /** reject outdated queue and remove it */
+    /** reject outdated queue and remove it by id*/
     private onTimeout;
     private remove;
     /**清除 {@link queue} */
@@ -179,6 +179,22 @@ export declare class AsyncQueue<META = any> implements IAsyncQueue<META> {
             return response;
           }
       });
+     ```
+  
+     @example - dequeue an already resolved promise
+     ```ts
+     test("dequeue an already completed object", ()=>{
+        const timeout = 100;
+        const completer = Q.enqueue(123, async ()=>{
+          await wait(500);
+        }, timeout)
+        completer.complete("hello");
+        expect(Q.queue.length).toBe(1)
+        
+        Q.dequeueByResult({id: 123, result: "999"});
+        expect(completer.future).resolves.toEqual("hello")
+        expect(Q.queue.length).toBe(0)
+      })
      ```
      */
     dequeueByResult(option: {
