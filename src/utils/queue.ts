@@ -1,5 +1,7 @@
 import { randomUUID } from "crypto";
 import { ArrayDelegate, Arr, Completer } from "..";
+import { PickOne } from "./types";
+
 
 export type QueueItem<M=any> = {
   /** id: QueueItem identifier */
@@ -222,7 +224,8 @@ export class AsyncQueue<META=any> implements IAsyncQueue<META> {
    * 所傳入的 promise 結果，直接取代其 result
    * 
    * @param option.id - 取得queue的id
-   * @param option.removeQueue - 預設 true
+   * @param option.result - sync result 與 async result 二擇一
+   * @param option.asyncResult - async result 與 sync result 二擇一
    * @returns 
    * @example
    ```ts
@@ -272,9 +275,8 @@ export class AsyncQueue<META=any> implements IAsyncQueue<META> {
     })
    ```
    */
-  public dequeueByResult(option: {id: number|string, result: any}): void {
-    const {id, result} = option;
-    const removeQueue = true;
+  public dequeueByResult(option: {id: number|string} & PickOne<{result: any, asyncResult: Promise<any>}>): void {
+    const {id, result, asyncResult} = option;
     const item = this.queue.firstWhere(_ => _._meta.id == id)!;
     if (!item) {
       return null;
@@ -285,13 +287,22 @@ export class AsyncQueue<META=any> implements IAsyncQueue<META> {
       }else if (item.isRejected){
         return this.remove(item);
       }
-      item.complete(result);
-      if (removeQueue ?? true)
+
+      if (result){
+        item.complete(result);
         this.remove(item);
+      }else if (asyncResult){
+        asyncResult!.then((_)=>{
+          item.complete(_);
+          this.remove(item);
+        }).catch((_)=>{
+          item.reject(_);
+          this.remove(item);
+        })
+      }
     } catch (err) {
       item.reject(err);
-      if (removeQueue ?? true)
-        this.remove(item);
+      this.remove(item);
     }
   }
 

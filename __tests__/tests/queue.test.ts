@@ -118,6 +118,18 @@ describe("Services", () => {
         expect(completer.future).resolves.toEqual("hello")
         expect(Q.queue.length).toBe(0)
       })
+
+      test("dequeue with an async result", ()=>{
+        const timeout = 100;
+        const completer = Q.enqueue(123, async ()=>{
+          await wait(500);
+          return "originalResult"
+        }, timeout)
+        expect(Q.queue.length).toBe(1)
+        
+        Q.dequeueByResult({id: 123, asyncResult: Promise.resolve("hello")});
+        expect(completer.future).resolves.toEqual("hello")
+      })
     });
     
     describe("Compound functioning testing", ()=>{
