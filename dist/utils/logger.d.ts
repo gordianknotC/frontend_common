@@ -132,7 +132,7 @@ export declare class Logger<M> implements LoggerMethods {
     static clearModules(): void;
     private static allowedModules;
     private static addModule;
-    private static getEnv;
+    protected static getEnv: () => Env;
     _prevLog?: LogRecord;
     _allowance?: AllowedModule<M>;
     constructor(option?: Pick<AllowedModule<M>, "moduleName">);

@@ -35,5 +35,5 @@ export { LazyHolder, CallableDelegate as Callable } from "./utils/lazy";
 export { setupComputed, setupRef, setupWatch, setupReactive, setupCurrentEnv, } from "./extension/extension_setup";
 export { Logger, } from "./utils/logger";
 export type { LogRecord, LogOption, ColorNames, AllowedModule, AllowedLoggerByEnv, RawAllowedLogger, RawAllowedLoggerByEnv, ColorConfig, LoggerAllowanceMode } from "./utils/logger.types";
-export type { ELevel, } from "./utils/logger.types";
+export { ELevel, } from "./utils/logger.types";
 export type { PickOne, Optional, } from "./utils/types";

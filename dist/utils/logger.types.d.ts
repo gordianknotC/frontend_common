@@ -9,6 +9,7 @@ export declare type LogRecord = {
     lBound: number;
     rBound: number;
     moduleName: string;
+    message: string[];
 };
 /**
 * @typeParam M - module name

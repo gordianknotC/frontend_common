@@ -12,6 +12,7 @@ export type LogRecord = {
   lBound: number;
   rBound: number;
   moduleName: string;
+  message: string[];
 };
 
 /** 

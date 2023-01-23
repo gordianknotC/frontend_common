@@ -126,7 +126,7 @@ export type {
   LoggerAllowanceMode
 } from "~/utils/logger.types";
 
-export type {
+export {
   ELevel,
 } from "~/utils/logger.types";
 

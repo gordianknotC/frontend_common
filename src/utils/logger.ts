@@ -50,6 +50,7 @@ function message(
     lBound,
     Math.min(stackNumber, maxStackRecs)
   );
+  const message = msg as string[];
   const rBound = lBound + stacksOnDisplay.length;
   const renderedModuleName = (defaultColorCaster[level] as any)(`[${moduleName}]`);
   console.log(renderedModuleName, ...msg, "\n" + stacksOnDisplay.join("\n"));
@@ -59,6 +60,7 @@ function message(
     lBound,
     rBound,
     moduleName,
+    message,
   };
 }
  
@@ -121,7 +123,7 @@ let LOGGER_MODE = final<LoggerAllowanceMode>();
  */
 export class Logger<M> implements LoggerMethods {
   static setCurrentEnv(envGetter: ()=>Env) {
-    this.getEnv = envGetter;
+    Logger.getEnv = envGetter;
   }
   static isDisallowed(option: AllowedModule<any>, level: ELevel) {
     return !this.isAllowed(option, level);
@@ -139,8 +141,12 @@ export class Logger<M> implements LoggerMethods {
         return false;
       }
     }
-    const module = this.allowedModules[this.getEnv()][option.moduleName as any];
-    assert(()=>module != undefined, `module: ${option.moduleName} not found, please setLoggerAllowance first! For more info "https://github.com/gordianknotC/frontend_common#%E8%A2%91%E5%A7%8B%E5%8C%96"`);
+    const module = this.allowedModules[Logger.getEnv()]?.[option.moduleName as any];
+    if (!module){
+      console.warn(`module: ${option.moduleName} not found, please setLoggerAllowance first! For more info "https://github.com/gordianknotC/frontend_common#%E8%A2%91%E5%A7%8B%E5%8C%96"`);
+      return false;
+    }
+
     const allowed = !(
       module!.disallowedHandler(module.logLevelHandler(level)) ?? true
     );
@@ -154,7 +160,6 @@ export class Logger<M> implements LoggerMethods {
     });
     return result;
   }
-
 
   /** 設定不同 level 要程現什麼樣的色彩
    * @example
@@ -249,11 +254,11 @@ export class Logger<M> implements LoggerMethods {
       newOption[env as keyof (RawAllowedLoggerByEnv<M>)] = this.toAllowedLogger(v);
     })
     Logger.allowedModules = Object.assign({...EmptyLogOption}, newOption);
-    return this.allowedModules[this.getEnv()];
+    return LazyHolder(()=>this.allowedModules[Logger.getEnv()] ?? {});
   }
 
   static hasModule<M>(option: AllowedModule<M>) {
-    return this.allowedModules[this.getEnv()][option.moduleName as any] != undefined;
+    return this.allowedModules[Logger.getEnv()][option.moduleName as any] != undefined;
   }
 
   static clearModules(){
@@ -268,8 +273,7 @@ export class Logger<M> implements LoggerMethods {
   private static addModule<M>(allowance: AllowedModule<M>) {
     Logger.allowedModules[Logger.getEnv()][allowance.moduleName as any] = allowance;
   }
-  private static getEnv = ()=> _currentEnv.value;
-
+  protected static getEnv = ()=> _currentEnv.value;
   
   _prevLog?: LogRecord;
   _allowance?: AllowedModule<M>;

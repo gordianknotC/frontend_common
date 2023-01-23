@@ -39,6 +39,7 @@ function message(moduleName, level, msg, traceAt = 2, stackNumber = 5) {
     const maxStackRecs = allStacks.length;
     const lBound = Math.min(traceAt + 1, maxStackRecs);
     const stacksOnDisplay = allStacks.splice(lBound, Math.min(stackNumber, maxStackRecs));
+    const message = msg;
     const rBound = lBound + stacksOnDisplay.length;
     const renderedModuleName = defaultColorCaster[level](`[${moduleName}]`);
     console.log(renderedModuleName, ...msg, "\n" + stacksOnDisplay.join("\n"));
@@ -48,6 +49,7 @@ function message(moduleName, level, msg, traceAt = 2, stackNumber = 5) {
         lBound,
         rBound,
         moduleName,
+        message,
     };
 }
 let LOGGER_MODE = (0, lazy_1.final)();
@@ -129,7 +131,7 @@ class Logger {
         }
     }
     static setCurrentEnv(envGetter) {
-        this.getEnv = envGetter;
+        Logger.getEnv = envGetter;
     }
     static isDisallowed(option, level) {
         return !this.isAllowed(option, level);
@@ -138,7 +140,7 @@ class Logger {
      * 如果是 dev mode (develop/test) 狀態下，預許不顯示 info 以下的 log
      */
     static isAllowed(option, level) {
-        var _a;
+        var _a, _b;
         if (!option)
             return false;
         level !== null && level !== void 0 ? level : (level = logger_types_1.ELevel.trace);
@@ -148,9 +150,12 @@ class Logger {
                 return false;
             }
         }
-        const module = this.allowedModules[this.getEnv()][option.moduleName];
-        (0, assert_1.assert)(() => module != undefined, `module: ${option.moduleName} not found, please setLoggerAllowance first! For more info "https://github.com/gordianknotC/frontend_common#%E8%A2%91%E5%A7%8B%E5%8C%96"`);
-        const allowed = !((_a = module.disallowedHandler(module.logLevelHandler(level))) !== null && _a !== void 0 ? _a : true);
+        const module = (_a = this.allowedModules[Logger.getEnv()]) === null || _a === void 0 ? void 0 : _a[option.moduleName];
+        if (!module) {
+            console.warn(`module: ${option.moduleName} not found, please setLoggerAllowance first! For more info "https://github.com/gordianknotC/frontend_common#%E8%A2%91%E5%A7%8B%E5%8C%96"`);
+            return false;
+        }
+        const allowed = !((_b = module.disallowedHandler(module.logLevelHandler(level))) !== null && _b !== void 0 ? _b : true);
         return allowed;
     }
     static toAllowedLogger(modules) {
@@ -247,10 +252,10 @@ class Logger {
             newOption[env] = this.toAllowedLogger(v);
         });
         Logger.allowedModules = Object.assign({ ...EmptyLogOption }, newOption);
-        return this.allowedModules[this.getEnv()];
+        return (0, lazy_1.LazyHolder)(() => { var _a; return (_a = this.allowedModules[Logger.getEnv()]) !== null && _a !== void 0 ? _a : {}; });
     }
     static hasModule(option) {
-        return this.allowedModules[this.getEnv()][option.moduleName] != undefined;
+        return this.allowedModules[Logger.getEnv()][option.moduleName] != undefined;
     }
     static clearModules() {
         this.allowedModules = { ...EmptyLogOption };
