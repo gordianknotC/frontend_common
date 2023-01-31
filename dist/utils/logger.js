@@ -1,8 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Logger = void 0;
+const tslib_1 = require("tslib");
 const extension_setup_1 = require("../extension/extension_setup");
 const colorsPlugin_1 = require("../plugin/colorsPlugin");
+const safe_1 = tslib_1.__importDefault(require("colors/safe"));
 const assert_1 = require("./assert");
 const lazy_1 = require("./lazy");
 const logger_types_1 = require("./logger.types");
@@ -16,22 +18,22 @@ const defaultLogOption = { traceAt: 3, stackNumber: 5 };
 const defaultColorCaster = {
     [logger_types_1.ELevel.trace]: (msg) => msg.grey,
     [logger_types_1.ELevel.debug]: function (msg) {
-        return msg.white;
+        return safe_1.default.white(msg);
     },
     [logger_types_1.ELevel.info]: function (msg) {
-        return msg.blue;
+        return safe_1.default.blue(msg);
     },
     [logger_types_1.ELevel.warn]: function (msg) {
-        return msg.yellow;
+        return safe_1.default.yellow(msg);
     },
     [logger_types_1.ELevel.current]: function (msg) {
-        return msg.cyan;
+        return safe_1.default.cyan(msg);
     },
     [logger_types_1.ELevel.error]: function (msg) {
-        return msg.red;
+        return safe_1.default.red(msg);
     },
     [logger_types_1.ELevel.fatal]: function (msg) {
-        return msg.bgBrightRed;
+        return safe_1.default.bgRed(msg);
     },
 };
 function message(moduleName, level, msg, traceAt = 2, stackNumber = 5) {

@@ -200,6 +200,9 @@ describe("Logger", () => {
     });
   });
 
+  describe("integration tests - no setup", ()=>{
+
+  });
   describe("integration tests - setupA", () => {
     let helper: LoggerHelper;;
     beforeEach(() => {

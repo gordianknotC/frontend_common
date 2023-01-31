@@ -1,6 +1,6 @@
 import { setupCurrentEnv, _currentEnv, Env } from "@/extension/extension_setup";
 import { useColors } from "@/plugin/colorsPlugin";
-import { Color, strip } from "colors";
+import colors from "colors/safe";
 import { assert } from "./assert";
 import { final, LazyHolder } from "./lazy";
 import { RawAllowedLoggerByEnv, LoggerAllowanceMode, LoggerMethods, AllowedLoggerByEnv, ELevel, AllowedModule, LogRecord, LogOption, RawAllowedLogger } from "./logger.types";
@@ -17,22 +17,22 @@ const defaultLogOption = { traceAt: 3, stackNumber: 5 };
 const defaultColorCaster: Record<ELevel, (msg: string) => string> = {
   [ELevel.trace]: (msg) => msg.grey,
   [ELevel.debug]: function (msg: string): string {
-    return msg.white;
+    return colors.white(msg);
   },
   [ELevel.info]: function (msg: string): string {
-    return msg.blue;
+    return colors.blue(msg);
   },
   [ELevel.warn]: function (msg: string): string {
-    return msg.yellow;
+    return colors.yellow(msg);
   },
   [ELevel.current]: function (msg: string): string {
-    return msg.cyan;
+    return colors.cyan(msg);
   },
   [ELevel.error]: function (msg: string): string {
-    return msg.red;
+    return colors.red(msg);
   },
   [ELevel.fatal]: function (msg: string): string {
-    return msg.bgBrightRed;
+    return colors.bgRed(msg);
   },
 };
 

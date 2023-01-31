@@ -1,8 +1,8 @@
-import colors from "colors";
+import colors from "colors/safe";
 const forWebpackReloadingTypescript = "";
 
 export function useColors(){
-  colors.enable();
+  // colors.enable();
   colors.setTheme({
     silly: "rainbow",
     input: "grey",

@@ -2,11 +2,11 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.useColors = void 0;
 const tslib_1 = require("tslib");
-const colors_1 = tslib_1.__importDefault(require("colors"));
+const safe_1 = tslib_1.__importDefault(require("colors/safe"));
 const forWebpackReloadingTypescript = "";
 function useColors() {
-    colors_1.default.enable();
-    colors_1.default.setTheme({
+    // colors.enable();
+    safe_1.default.setTheme({
         silly: "rainbow",
         input: "grey",
         verbose: "cyan",
