@@ -1,11 +1,14 @@
 import { setupCurrentEnv, _currentEnv, Env } from "@/extension/extension_setup";
-import { useColors } from "@/plugin/colorsPlugin";
+// import { useColors } from "@/plugin/colorsPlugin";
+console.log("------------");
+
 import colors from "colors/safe";
 import { assert } from "./assert";
 import { final, LazyHolder } from "./lazy";
 import { RawAllowedLoggerByEnv, LoggerAllowanceMode, LoggerMethods, AllowedLoggerByEnv, ELevel, AllowedModule, LogRecord, LogOption, RawAllowedLogger } from "./logger.types";
  
 const EmptyLogOption: RawAllowedLoggerByEnv<any> = {test: {}, develop: {}};
+// console.log("colors:", colors);
 
 /**
  * @property traceAt - 由現在的位置({@link message})向前 traceAt 多少行, 因實作因素預設3
@@ -17,21 +20,27 @@ const defaultLogOption = { traceAt: 3, stackNumber: 5 };
 const defaultColorCaster: Record<ELevel, (msg: string) => string> = {
   [ELevel.trace]: (msg) => msg.grey,
   [ELevel.debug]: function (msg: string): string {
+    return "";
     return colors.white(msg);
   },
   [ELevel.info]: function (msg: string): string {
+    return "";
     return colors.blue(msg);
   },
   [ELevel.warn]: function (msg: string): string {
+    return "";
     return colors.yellow(msg);
   },
   [ELevel.current]: function (msg: string): string {
+    return "";
     return colors.cyan(msg);
   },
   [ELevel.error]: function (msg: string): string {
+    return "";
     return colors.red(msg);
   },
   [ELevel.fatal]: function (msg: string): string {
+    return "";
     return colors.bgRed(msg);
   },
 };
@@ -286,7 +295,7 @@ export class Logger<M> implements LoggerMethods {
       this._allowance = Logger.allowedModules[Logger.getEnv()][option.moduleName];
       // todo: remind of user that module configuration never being override
     } else {
-      useColors();
+      // useColors();
       this._allowance = Object.assign(
         {
           disallowedHandler: (level: ELevel) => {

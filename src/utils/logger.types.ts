@@ -1,5 +1,5 @@
 import { setupCurrentEnv, _currentEnv, Env } from "@/extension/extension_setup";
-import { Color, strip } from "colors";
+import type { Color } from "colors";
 
 export type ColorNames = keyof Color;
 

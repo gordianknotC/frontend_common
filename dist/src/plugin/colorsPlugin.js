@@ -1,6 +1,5 @@
 // import colors from "colors/safe";
 // const forWebpackReloadingTypescript = "";
-
 // export function useColors(){
 //   // colors.enable();
 //   colors.setTheme({
@@ -16,3 +15,4 @@
 //     error: "red"
 //   });
 // }
+//# sourceMappingURL=colorsPlugin.js.map

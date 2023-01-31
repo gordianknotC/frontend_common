@@ -87,7 +87,8 @@ export { Completer } from "~/utils/completer";
  *        C O R E
  *
  * */
-export { Obj, Arr, ArrayDelegate, ObjDelegate } from "~/base/builtinTypes";
+export { Obj, Arr } from "~/base/builtinTypes";
+export type {  ArrayDelegate, ObjDelegate } from "~/base/builtinTypes";
 export { assertMsg } from "~/utils/assert";
 export { is } from "~/utils/typeInference";
 export {
@@ -134,3 +135,4 @@ export type {
   PickOne,
   Optional,
 } from "~/utils/types";
+
