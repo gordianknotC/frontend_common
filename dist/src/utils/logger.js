@@ -2,8 +2,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Logger = void 0;
 const tslib_1 = require("tslib");
-const extension_setup_1 = require("@/extension/extension_setup");
-// import { useColors } from "@/plugin/colorsPlugin";
+const extension_setup_1 = require("../extension/extension_setup");
+// import { useColors } from "../plugin/colorsPlugin";
 console.log("------------");
 const safe_1 = tslib_1.__importDefault(require("colors/safe"));
 const assert_1 = require("./assert");

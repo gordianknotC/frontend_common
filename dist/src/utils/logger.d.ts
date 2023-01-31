@@ -1,4 +1,4 @@
-import { Env } from "@/extension/extension_setup";
+import { Env } from "../extension/extension_setup";
 import { LoggerMethods, AllowedLoggerByEnv, ELevel, AllowedModule, LogRecord, LogOption, RawAllowedLogger } from "./logger.types";
 /** 預設 logger color */
 declare const defaultColorCaster: Record<ELevel, (msg: string) => string>;

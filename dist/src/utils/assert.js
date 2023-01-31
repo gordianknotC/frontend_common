@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ensureNoRaise = exports.assert = exports.AssertionError = exports.assertMsg = exports.AssertMsg = void 0;
-const extension_setup_1 = require("~/extension/extension_setup");
+const extension_setup_1 = require("../extension/extension_setup");
 class AssertMsg {
     constructor() {
         this.idNotSpecified = "id not Specified";
