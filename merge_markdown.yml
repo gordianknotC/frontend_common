@@ -1,6 +1,6 @@
 
 input:
- docs/readme.md:  {noYAML: true, doctoc: true, replace: {<!--#-->: "# 前端常用工具:"}}
+ docs/readme.md:  {noYAML: true, doctoc: true, replace: {<!--#-->: ""}}
  docs/facade.md:  {noYAML: true, doctoc: true, replace: {<!--#-->: "# Facade:"}}
  docs/lazyloading.md:  {noYAML: true, doctoc: true, replace: {<!--#-->: "# Lazy Loading:"}}
  docs/queue.md:  {noYAML: true, doctoc: true, replace: {<!--#-->: "# AsyncQueue:"}}
@@ -9,7 +9,7 @@ input:
  docs/common_util.md:  {noYAML: true, doctoc: true, replace: {<!--#-->: "# Common Utils:"}}
  docs/apiTestUtil_CRUD.md:  {noYAML: true, doctoc: true, replace: {<!--#-->: "# Writing pseudo code for api - 測試API工具:"}}
  docs/reactive.md:  {noYAML: true, doctoc: true, replace: {<!--#-->: "# 注入 ui framework reactive 方法:"}}
-output: 
+output:
   name: README.md
   doctoc:
     title: "table of content"

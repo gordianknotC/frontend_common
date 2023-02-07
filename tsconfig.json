@@ -66,7 +66,6 @@
     "__tests__/**/*.tsx",
     "__tests__/*.tsx",
     "__tests__/*.ts",
-    "src/index.ts",
     "jest.d.ts"
   ],
   // support jest-expect message, see: https://github.com/mattphillips/jest-expect-message

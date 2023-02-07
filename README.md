@@ -1,7 +1,8 @@
 
 
 
-# 前端常用工具:
+
+前端常用工具
 
 ## 安裝
 ```bash
@@ -27,7 +28,6 @@ yarn serve:doc
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 table of content
 
-- [前端常用工具:](#%E5%89%8D%E7%AB%AF%E5%B8%B8%E7%94%A8%E5%B7%A5%E5%85%B7)
   - [安裝](#%E5%AE%89%E8%A3%9D)
   - [documentation](#documentation)
   - [Feature](#feature)
@@ -77,6 +77,7 @@ table of content
 [s-test-queue]: __tests__/queue.test.ts
 [s-test-completer]: __tests__/completer.test.ts
 [s-test-logger]: __tests__/logger.test.ts
+
 
 ---
 # Facade:
@@ -895,8 +896,8 @@ expect(helper.authGuard!.canProcessFulFill).toBeCalled();
 # Logger:
 ### Feature
 - 針對 trace/debug/info/warn/current/error/fatal 設置不同色彩
-  ![logger_image](/Users/knot1981/Documents/IdeasProject/commonJSBuiltin/docs/loggerA.png) 
-  ![logger_image](/Users/knot1981/Documents/IdeasProject/commonJSBuiltin/docs/loggerB.png | width=250)
+  ![logger_image](/Users/knot1981/Documents/IdeasProject/fontend_common/docs/loggerA.png) 
+  ![logger_image](/Users/knot1981/Documents/IdeasProject/fontend_common/docs/loggerB.png | width=250)
 - logger 可設置 traceBack 由第幾個 stack 開始追蹤至第幾個結束
 - 根據環境變數設置 overall log level
 - 根據各別模組設置 log level
