@@ -28,43 +28,56 @@ yarn serve:doc
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 table of content
 
-  - [安裝](#%E5%AE%89%E8%A3%9D)
-  - [documentation](#documentation)
-  - [Feature](#feature)
 - [Table of Content](#table-of-content)
 - [Facade:](#facade)
   - [Provider Pattern](#provider-pattern)
-    - [Dependency Provider(對應 dependency injector)](#dependency-provider%E5%B0%8D%E6%87%89-dependency-injector)
-    - [Facade Provider (對應Facade Injector)](#facade-provider-%E5%B0%8D%E6%87%89facade-injector)
+    - [Dependency Provider(對應 dependency injector)](#dependency-provider對應-dependency-injector)
+      - [provideDependency](#providedependency)
+      - [不指定 Ident](#不指定-ident)
+      - [指定 Ident](#指定-ident)
+      - [without enabling merge](#without-enabling-merge)
+      - [with enabling merge](#with-enabling-merge)
+    - [Facade Provider (對應Facade Injector)](#facade-provider-對應facade-injector)
+      - [不合併 provide 物件](#不合併-provide-物件)
+      - [合併 provide 物件](#合併-provide-物件)
   - [Injector Pattern](#injector-pattern)
     - [InjectDependency](#injectdependency)
     - [InjectFacade](#injectfacade)
-  - [應用於 App 上開發](#%E6%87%89%E7%94%A8%E6%96%BC-app-%E4%B8%8A%E9%96%8B%E7%99%BC)
-    - [以 Domain Driven Design 為架構的 App 為例](#%E4%BB%A5-domain-driven-design-%E7%82%BA%E6%9E%B6%E6%A7%8B%E7%9A%84-app-%E7%82%BA%E4%BE%8B)
+  - [應用於 App 上開發](#應用於-app-上開發)
+    - [以 Domain Driven Design 為架構的 App 為例](#以-domain-driven-design-為架構的-app-為例)
 - [Lazy Loading:](#lazy-loading)
   - [lazyHolder - lazy loading for objects](#lazyholder---lazy-loading-for-objects)
-    - [Example: 以Locale 為例](#example-%E4%BB%A5locale-%E7%82%BA%E4%BE%8B)
+    - [Example: 以Locale 為例](#example-以locale-為例)
   - [CallableDelegate - lazy loading for functions](#callabledelegate---lazy-loading-for-functions)
-    - [以注入 vue watch method 為例](#%E4%BB%A5%E6%B3%A8%E5%85%A5-vue-watch-method-%E7%82%BA%E4%BE%8B)
+    - [以注入 vue watch method 為例](#以注入-vue-watch-method-為例)
 - [AsyncQueue:](#asyncqueue)
     - [queue](#queue)
     - [enqueue](#enqueue)
     - [dequeue](#dequeue)
-    - [其他方法](#%E5%85%B6%E4%BB%96%E6%96%B9%E6%B3%95)
+    - [其他方法](#其他方法)
+      - [dequeueByResult](#dequeuebyresult)
+      - [getQueueItem](#getqueueitem)
+      - [enqueueWithoutId](#enqueuewithoutid)
+      - [clearQueue](#clearqueue)
 - [Completer:](#completer)
-    - [特性](#%E7%89%B9%E6%80%A7)
+    - [特性](#特性)
 - [Logger:](#logger)
     - [Feature](#feature-1)
-    - [袑始化](#%E8%A2%91%E5%A7%8B%E5%8C%96)
-    - [設置色彩](#%E8%A8%AD%E7%BD%AE%E8%89%B2%E5%BD%A9)
-    - [設置允許的 Logger](#%E8%A8%AD%E7%BD%AE%E5%85%81%E8%A8%B1%E7%9A%84-logger)
-- [Writing pseudo code for api - 測試API工具:](#writing-pseudo-code-for-api---%E6%B8%AC%E8%A9%A6api%E5%B7%A5%E5%85%B7)
+      - [__型別__ | source](#型別--source)
+      - [__靜態方法__](#靜態方法)
+    - [袑始化](#袑始化)
+    - [設置色彩](#設置色彩)
+    - [設置允許的 Logger](#設置允許的-logger)
+      - [setLoggerAllowance](#setloggerallowance)
+      - [AllowedModule](#allowedmodule)
+      - [setLoggerAllowanceByEnv](#setloggerallowancebyenv)
+- [Writing pseudo code for api - 測試API工具:](#writing-pseudo-code-for-api---測試api工具)
   - [CRUD](#crud)
     - [Example](#example)
-- [注入 ui framework reactive 方法:](#%E6%B3%A8%E5%85%A5-ui-framework-reactive-%E6%96%B9%E6%B3%95)
+- [注入 ui framework reactive 方法:](#注入-ui-framework-reactive-方法)
   - [Inject Reactive Method](#inject-reactive-method)
-    - [Vue 為例](#vue-%E7%82%BA%E4%BE%8B)
-    - [React 為例](#react-%E7%82%BA%E4%BE%8B)
+    - [Vue 為例](#vue-為例)
+    - [React 為例](#react-為例)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -81,7 +94,7 @@ table of content
 
 ---
 # Facade:
-籍用 [Facade design pattern](https://refactoring.guru/design-patterns/facade) 的概念，為App / Framework提供一個入口界面，這個入口界面依循相依分離原則，進一部使界面分離成為可能，其內部基本 design pattern 為一個 provider/injector design pattern 及為 facade 專門化的 provider/injector design pattern
+籍用 [Facade design pattern](https://refactoring.guru/design-patterns/facade) 的概念，為App / Framework提供一個入口界面，這個入口界面依循相依分離原則，進一部使界面分離成為可能，其內部基本 design pattern 為一個 container + provider/injector design pattern 及為 facade 專門化的 provider/injector 方法
 
 __example__ 
 ```ts
