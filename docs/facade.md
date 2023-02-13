@@ -34,7 +34,7 @@ provideFacade({
 2) 提供 [Facade Provider](#facade-provider-%E5%B0%8D%E6%87%89facade-injector) design pattern，將 dependency 以 FACADE_KEY 作為 key 植入 container, 為App開發時提供一個入口，以存取所需的一切資料. 
   
 
-## Provider Pattern
+## Provider 
 ### Dependency Provider(對應 dependency injector)
 #### provideDependency
 [source][s-provideDependency] | 型別定義
@@ -200,7 +200,7 @@ assert(facade.appended.a == 1);
 ```
 
 
-## Injector Pattern
+## Injector
 ### InjectDependency
 ```ts
 /**
