@@ -6,25 +6,27 @@
 __example__
 ```ts
 //宣告 facade 界面
-export type AppFacade = 
+export type AppFacade =
   FacadeMappers &
   FacadeDateSource &
   FacadeRepository &
   FacadePresentationStore &
   FacadeDomainService;
 
+// 實例化 facade 物件，其內容為空，實作上為一個 Proxy 物件加上了 
+// typescript 的型別，內部為 proxy lazyloading, 除非存取才會真的實例化
 export const facade = IFacade<AppFacade>();
 
 // inject facade 內容, 因內部為 lazy loading, 即便在這 provide
 // 依然尚未初始化，除非存取
 provideFacade({
-    deps: {
-      ...mappers,
-      ...dataSource,
-      ...rep,
-      ...presentation,
-      ...services
-    }, 
+  deps: {
+    ...mappers,
+    ...dataSource,
+    ...rep,
+    ...presentation,
+    ...services
+  },
 });
 
 // 使用時, another_file.ts|js
