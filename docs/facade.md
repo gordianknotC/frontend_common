@@ -1,9 +1,9 @@
 
 ---
 <!--#-->
-籍用 [Facade design pattern](https://refactoring.guru/design-patterns/facade) 的概念，為App / Framework提供一個入口界面，這個入口界面依循相依分離原則，進一部使界面分離成為可能，其內部基本 design pattern 為一個 provider/injector design pattern 及為 facade 專門化的 provider/injector 方法
+借用 [Facade design pattern](https://refactoring.guru/design-patterns/facade) 的概念，為App / Framework提供一個入口界面，這個入口界面依循相依分離原則，進一部使界面分離成為可能，其內部基本 design pattern 為一個 container + provider/injector design pattern 及為 facade 專門化的 provider/injector 方法
 
-__example__ 
+__example__
 ```ts
 //宣告 facade 界面
 export type AppFacade = 
@@ -15,7 +15,8 @@ export type AppFacade =
 
 export const facade = IFacade<AppFacade>();
 
-// inject facade 內容
+// inject facade 內容, 因內部為 lazy loading, 即便在這 provide
+// 依然尚未初始化，除非存取
 provideFacade({
     deps: {
       ...mappers,
@@ -25,6 +26,9 @@ provideFacade({
       ...services
     }, 
 });
+
+// 使用時, another_file.ts|js
+facade.services.xxx
 ```
 
 
