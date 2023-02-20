@@ -13,6 +13,11 @@ export declare type QueueItem<M = any> = {
     /** timeout: timeout id */
     timeout: NodeJS.Timeout;
 };
+export declare type EnqueueOption<META> = {
+    timeout?: number;
+    meta?: META;
+    dequeueImmediately?: boolean;
+};
 export declare function uuidV4(): number | string;
 /**
  * @typeParam META - QueueItem 的 meta 型別
@@ -20,7 +25,7 @@ export declare function uuidV4(): number | string;
 export declare abstract class IAsyncQueue<META> {
     abstract queue: ArrayDelegate<Completer<any, QueueItem<META>>>;
     abstract get isEmpty(): boolean;
-    abstract enqueue(id: number | string, promise: () => Promise<any>, timeout?: number): Completer<any, QueueItem<META>>;
+    abstract enqueue(id: number | string, promise: () => Promise<any>, option?: EnqueueOption<META>): Completer<any, QueueItem<META>>;
     abstract dequeue(option: {
         id: number | string;
         removeQueue: boolean;
@@ -30,15 +35,7 @@ export declare abstract class IAsyncQueue<META> {
         result: any;
     }): void;
     abstract clearQueue(): void;
-}
-/** {inheritDoc IAsyncQueue}
- * @typeParam META - QueueItem 的 meta 型別
-*/
-export declare abstract class IQueueConsumer<META> {
-    abstract queue: IAsyncQueue<META>;
-    abstract feedRequest(request: () => Promise<any>): Completer<any, QueueItem<META>>;
-    abstract consumeAll(): Promise<any>;
-    abstract consumeAllWhen(condition: (item: Completer<any, QueueItem<META>>) => boolean): Promise<any>;
+    abstract remove(item: Completer<any, QueueItem<META>>, reject: boolean): void;
 }
 /** {inheritDoc IAsyncQueue}
  * 應用如 api client 處理需籍由 websocket 傳送出去的請求, 將請求暫存於 queue 以後，待收到 socket
@@ -85,7 +82,7 @@ export declare abstract class IQueueConsumer<META> {
       const resultA = await q.dequeue({id: idA});
       const resultB = await q.dequeue({id: idB});
       const resultC = await q.dequeue({id: idC});
-      
+
       expect(resultA).toEqual({idA});
       expect(resultB).toEqual({idB});
       expect(resultC).toEqual({idC});
@@ -106,9 +103,9 @@ export declare class AsyncQueue<META = any> implements IAsyncQueue<META> {
      * 2） 不立即執行 promise 非同部請求 {@link dequeue} ，直到使用者自行 {@link dequeue} 後，移除該列隊
      * @param id - 請求 ID
      * @param promise - 處理非同部請求邏輯，待請求完成後，queue 生命周期完成移除
-     * @param timeout - default 10 * 1000
-     * @param meta - 使用者自定義註解
-     * @param dequeueImmediately - enqueue 後馬上 dequeue，即執上 promise 直到 promise resolve 後
+     * @param option.timeout - default 10 * 1000
+     * @param option.meta - 使用者自定義註解
+     * @param option.dequeueImmediately - enqueue 後馬上 dequeue，即執行 promise 直到 promise resolve 後
      * @returns
      * @example - 1
         ```ts
@@ -132,15 +129,17 @@ export declare class AsyncQueue<META = any> implements IAsyncQueue<META> {
         q.dequeue({id: idC, removeQueue});
        ```
      */
-    enqueue(id: number | string, promise: () => Promise<any>, timeout?: number, meta?: any, dequeueImmediately?: boolean): Completer<any, QueueItem<META>>;
+    enqueue(id: number | string, promise: () => Promise<any>, option?: EnqueueOption<META>): Completer<any, QueueItem<META>>;
     /** 與  {@link enqueue} 相同，只是 id 自動生成
      * @returns Completer 物件，非 async Promise
     */
-    enqueueWithoutId(promise: () => Promise<any>, timeout?: number, meta?: any, dequeueImmediately?: boolean): Completer<any, QueueItem<META>>;
+    enqueueWithoutId(promise: () => Promise<any>, option?: EnqueueOption<META>): Completer<any, QueueItem<META>>;
+    /** 自動生成 uuid4 */
     private _getId;
     /** reject outdated queue and remove it by id*/
     private onTimeout;
-    private remove;
+    /** remove queue by QueueItem */
+    remove(item: Completer<any, QueueItem<META>>, reject?: boolean): void;
     /**清除 {@link queue} */
     clearQueue(): void;
     /**
@@ -193,7 +192,7 @@ export declare class AsyncQueue<META = any> implements IAsyncQueue<META> {
         }, timeout)
         completer.complete("hello");
         expect(Q.queue.length).toBe(1)
-        
+  
         Q.dequeueByResult({id: 123, result: "999"});
         expect(completer.future).resolves.toEqual("hello")
         expect(Q.queue.length).toBe(0)
@@ -217,12 +216,4 @@ export declare class AsyncQueue<META = any> implements IAsyncQueue<META> {
         id: number | string;
         removeQueue?: boolean;
     }): Promise<any>;
-}
-export declare class SequencedQueueConsumer<META> implements IQueueConsumer<META> {
-    queue: IAsyncQueue<META>;
-    constructor(queue: IAsyncQueue<META>);
-    private _getId;
-    feedRequest(request: () => Promise<any>): Completer<any, QueueItem>;
-    consumeAll(): Promise<any>;
-    consumeAllWhen(condition: (item: Completer<any, QueueItem<any>>) => boolean): Promise<any>;
 }

@@ -1,24 +1,22 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SequencedQueueConsumer = exports.AsyncQueue = exports.IQueueConsumer = exports.IAsyncQueue = exports.uuidV4 = void 0;
+exports.AsyncQueue = exports.IAsyncQueue = exports.uuidV4 = void 0;
 const __1 = require("..");
 const uuid_1 = require("uuid");
 function uuidV4() {
     return (0, uuid_1.v4)();
 }
 exports.uuidV4 = uuidV4;
+const DEFAULT_ENQUEUE_OPTION = {
+    timeout: 10000,
+    dequeueImmediately: true
+};
 /**
  * @typeParam META - QueueItem 的 meta 型別
  */
 class IAsyncQueue {
 }
 exports.IAsyncQueue = IAsyncQueue;
-/** {inheritDoc IAsyncQueue}
- * @typeParam META - QueueItem 的 meta 型別
-*/
-class IQueueConsumer {
-}
-exports.IQueueConsumer = IQueueConsumer;
 /** {inheritDoc IAsyncQueue}
  * 應用如 api client 處理需籍由 websocket 傳送出去的請求, 將請求暫存於 queue 以後，待收到 socket
  * 資料，再由 queue 裡的 promise resolve 返回值， resolve 後無論成功失敗，移除該筆 queue
@@ -64,7 +62,7 @@ exports.IQueueConsumer = IQueueConsumer;
       const resultA = await q.dequeue({id: idA});
       const resultB = await q.dequeue({id: idB});
       const resultC = await q.dequeue({id: idC});
-      
+
       expect(resultA).toEqual({idA});
       expect(resultB).toEqual({idB});
       expect(resultC).toEqual({idC});
@@ -97,9 +95,9 @@ class AsyncQueue {
      * 2） 不立即執行 promise 非同部請求 {@link dequeue} ，直到使用者自行 {@link dequeue} 後，移除該列隊
      * @param id - 請求 ID
      * @param promise - 處理非同部請求邏輯，待請求完成後，queue 生命周期完成移除
-     * @param timeout - default 10 * 1000
-     * @param meta - 使用者自定義註解
-     * @param dequeueImmediately - enqueue 後馬上 dequeue，即執上 promise 直到 promise resolve 後
+     * @param option.timeout - default 10 * 1000
+     * @param option.meta - 使用者自定義註解
+     * @param option.dequeueImmediately - enqueue 後馬上 dequeue，即執行 promise 直到 promise resolve 後
      * @returns
      * @example - 1
         ```ts
@@ -123,7 +121,10 @@ class AsyncQueue {
         q.dequeue({id: idC, removeQueue});
        ```
      */
-    enqueue(id, promise, timeout = 10000, meta = {}, dequeueImmediately = true) {
+    enqueue(id, promise, option = DEFAULT_ENQUEUE_OPTION) {
+        const { timeout, meta, dequeueImmediately } = Object.assign({
+            ...DEFAULT_ENQUEUE_OPTION
+        }, option);
         const timestamp = new Date().getTime();
         const completer = new __1.Completer({
             id,
@@ -142,11 +143,12 @@ class AsyncQueue {
     /** 與  {@link enqueue} 相同，只是 id 自動生成
      * @returns Completer 物件，非 async Promise
     */
-    enqueueWithoutId(promise, timeout = 10000, meta = {}, dequeueImmediately = true) {
-        this.enqueue(this._getId(), promise, timeout, meta, dequeueImmediately);
+    enqueueWithoutId(promise, option = DEFAULT_ENQUEUE_OPTION) {
+        this.enqueue(this._getId(), promise, option);
         const item = this.queue.last;
         return item;
     }
+    /** 自動生成 uuid4 */
     _getId() {
         return (0, uuid_1.v4)();
     }
@@ -159,12 +161,14 @@ class AsyncQueue {
         this.remove(item);
         return this.timeoutErrorObj;
     }
+    /** remove queue by QueueItem */
     remove(item, reject = false) {
         clearTimeout(item._meta.timeout);
-        if (reject)
+        if (reject) {
             item.reject({
                 reason: "flushed"
             });
+        }
         this.queue.remove(item);
         console.log("remove:", item._meta.id);
     }
@@ -225,7 +229,7 @@ class AsyncQueue {
         }, timeout)
         completer.complete("hello");
         expect(Q.queue.length).toBe(1)
-        
+  
         Q.dequeueByResult({id: 123, result: "999"});
         expect(completer.future).resolves.toEqual("hello")
         expect(Q.queue.length).toBe(0)
@@ -273,45 +277,26 @@ class AsyncQueue {
      */
     async dequeue(option) {
         const { id, removeQueue } = option;
-        const item = this.queue.firstWhere(_ => _._meta.id == id);
-        if (!item) {
+        const completerItem = this.queue.firstWhere(_ => _._meta.id == id);
+        if (!completerItem) {
             return null;
         }
         try {
-            const result = await item._meta.promise();
+            const result = await completerItem._meta.promise();
             if (removeQueue !== null && removeQueue !== void 0 ? removeQueue : true) {
-                this.remove(item);
+                this.remove(completerItem);
             }
-            item.complete(result);
+            completerItem.complete(result);
             return result;
         }
         catch (err) {
-            item.reject(err);
+            console.error("reject:", err);
+            completerItem.reject(err);
             if (removeQueue !== null && removeQueue !== void 0 ? removeQueue : true)
-                this.remove(item);
+                this.remove(completerItem);
         }
         return null;
     }
 }
 exports.AsyncQueue = AsyncQueue;
-class SequencedQueueConsumer {
-    constructor(queue) {
-        this.queue = queue;
-    }
-    _getId() {
-        return uuidV4();
-    }
-    feedRequest(request) {
-        this.queue.enqueue(this._getId(), request);
-        const item = this.queue.queue.last;
-        return item;
-    }
-    consumeAll() {
-        throw new Error("Method not implemented.");
-    }
-    consumeAllWhen(condition) {
-        throw new Error("Method not implemented.");
-    }
-}
-exports.SequencedQueueConsumer = SequencedQueueConsumer;
 //# sourceMappingURL=queue.js.map

@@ -16,10 +16,11 @@ export { isRefImpl, asEnum, getAccessibleProperties, flattenInstance, asUnWrappe
 export type { TUnWrapVueRef, InterfaceIs } from "./utils/typeInference";
 export type { QueueItem, 
 /** @deprecated use IAsyncQueue instead */
-IAsyncQueue as IQueue, IAsyncQueue, IQueueConsumer } from "./utils/queue";
+IAsyncQueue as IQueue, IAsyncQueue, } from "./utils/queue";
 export { 
 /** @deprecated use AsyncQueue instead */
-AsyncQueue as Queue, AsyncQueue, SequencedQueueConsumer, uuidV4 } from "./utils/queue";
+AsyncQueue as Queue, AsyncQueue, uuidV4 } from "./utils/queue";
+export { IQueueConsumer, SequencedQueueConsumer } from "./utils/queue_consumer";
 export { Completer } from "./utils/completer";
 /**
  *
