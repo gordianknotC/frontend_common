@@ -1,6 +1,6 @@
 {
   "name": "@gdknot/frontend_common",
-  "version": "0.9.14",
+  "version": "0.10.0",
   "description": "common js util for frontend development",
   "scripts": {
     "build": "clear && tsc --project tsconfig.build.json && tsc-alias -p tsconfig.build.json",
@@ -97,7 +97,7 @@
     "@originjs/vite-plugin-require-context": "^1.0.9",
     "@vitejs/plugin-vue": "^4.0.0",
     "@vitejs/plugin-vue-jsx": "^3.0.0"
-    
+
   },
   "author": "gordianknot",
   "license": "ISC"
