@@ -16,7 +16,7 @@ class SequencedQueueConsumer {
     _getId() {
         return (0, __1.uuidV4)();
     }
-    addRequest(request) {
+    enqueue(request) {
         return this.queue.enqueue(this._getId(), request, { dequeueImmediately: false });
     }
     async consumeAll() {
@@ -29,7 +29,6 @@ class SequencedQueueConsumer {
             const id = qItems[i]._meta.id;
             const futureItem = this.queue.dequeue({ id, removeQueue: false });
             result.push(futureItem);
-            console.log("start consume:", id, qItems[i]);
             try {
                 await futureItem;
             }
@@ -41,7 +40,6 @@ class SequencedQueueConsumer {
                 this.queue.remove(qItems[i], false);
             }
         }
-        this.queue.clearQueue();
         return result;
     }
 }
