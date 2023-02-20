@@ -15,10 +15,20 @@ export type QueueItem<M=any> = {
   timeout: NodeJS.Timeout;
 };
 
+export type EnqueueOption<META> = {
+  timeout?: number,
+  meta?: META,
+  dequeueImmediately?: boolean
+};
+
 export function uuidV4(): number|string{
   return v4();
 }
 
+const DEFAULT_ENQUEUE_OPTION = {
+  timeout: 10000,
+  dequeueImmediately:  true
+};
 /**
  * @typeParam META - QueueItem 的 meta 型別
  */
@@ -28,7 +38,7 @@ export abstract class IAsyncQueue<META> {
   abstract enqueue(
     id: number|string,
     promise: () => Promise<any>,
-    timeout?: number
+    option?: EnqueueOption<META>
   ): Completer<any, QueueItem<META>>;
   abstract dequeue(option: {id: number|string, removeQueue: boolean}): Promise<any>;
   abstract dequeueByResult(option: {id: number|string, result: any}): void;
@@ -36,14 +46,6 @@ export abstract class IAsyncQueue<META> {
   abstract remove(item: Completer<any, QueueItem<META>>, reject: boolean): void;
 }
 
-/** {inheritDoc IAsyncQueue}
- * @typeParam META - QueueItem 的 meta 型別
-*/
-export abstract class IQueueConsumer<META> {
-  abstract queue: IAsyncQueue<META>;
-  abstract feedRequest(request: () => Promise<any>):  Completer<any, QueueItem<META>>;
-  abstract consumeAll(): Promise<any>;
-}
 
 /** {inheritDoc IAsyncQueue}
  * 應用如 api client 處理需籍由 websocket 傳送出去的請求, 將請求暫存於 queue 以後，待收到 socket
@@ -125,9 +127,9 @@ export class AsyncQueue<META=any> implements IAsyncQueue<META> {
    * 2） 不立即執行 promise 非同部請求 {@link dequeue} ，直到使用者自行 {@link dequeue} 後，移除該列隊
    * @param id - 請求 ID
    * @param promise - 處理非同部請求邏輯，待請求完成後，queue 生命周期完成移除
-   * @param timeout - default 10 * 1000
-   * @param meta - 使用者自定義註解
-   * @param dequeueImmediately - enqueue 後馬上 dequeue，即執行 promise 直到 promise resolve 後
+   * @param option.timeout - default 10 * 1000
+   * @param option.meta - 使用者自定義註解
+   * @param option.dequeueImmediately - enqueue 後馬上 dequeue，即執行 promise 直到 promise resolve 後
    * @returns
    * @example - 1
       ```ts
@@ -154,10 +156,11 @@ export class AsyncQueue<META=any> implements IAsyncQueue<META> {
   public enqueue(
     id: number|string,
     promise: () => Promise<any>,
-    timeout: number = 10000,
-    meta: any = {},
-    dequeueImmediately: boolean = true,
+    option: EnqueueOption<META> = DEFAULT_ENQUEUE_OPTION,
   ): Completer<any, QueueItem<META>> {
+    const {timeout, meta, dequeueImmediately} = Object.assign({
+      ...DEFAULT_ENQUEUE_OPTION
+    }, option);
     const timestamp = new Date().getTime();
     const completer = new Completer<any, QueueItem<META>>({
       id,
@@ -179,15 +182,14 @@ export class AsyncQueue<META=any> implements IAsyncQueue<META> {
   */
   public enqueueWithoutId(
     promise: () => Promise<any>,
-    timeout: number = 10000,
-    meta: any = {},
-    dequeueImmediately: boolean = true,
+    option: EnqueueOption<META> = DEFAULT_ENQUEUE_OPTION,
   ): Completer<any, QueueItem<META>>{
-    this.enqueue(this._getId() , promise, timeout, meta, dequeueImmediately);
+    this.enqueue(this._getId() , promise, option);
     const item = this.queue.last;
     return item;
   }
 
+  /** 自動生成 uuid4 */
   private _getId(): number|string{
     return v4();
   }
@@ -201,6 +203,7 @@ export class AsyncQueue<META=any> implements IAsyncQueue<META> {
     return this.timeoutErrorObj;
   }
 
+  /** remove queue by QueueItem */
   remove(item: Completer<any, QueueItem<META>>, reject: boolean = false) {
     clearTimeout(item._meta.timeout);
     if (reject) {
@@ -318,56 +321,24 @@ export class AsyncQueue<META=any> implements IAsyncQueue<META> {
    */
   public async dequeue(option: {id: number|string, removeQueue?: boolean}): Promise<any> {
     const {id, removeQueue} = option;
-    const item = this.queue.firstWhere(_ => _._meta.id == id)!;
-    if (!item) {
+    const completerItem = this.queue.firstWhere(_ => _._meta.id == id)!;
+    if (!completerItem) {
       return null;
     }
     try {
-      const result = await item._meta.promise();
+      const result = await completerItem._meta.promise();
       if (removeQueue ?? true){
-        this.remove(item);
+        this.remove(completerItem);
       }
-      item.complete(result);
+      completerItem.complete(result);
       return result;
     } catch (err) {
-      item.reject(err);
+      console.error("reject:", err);
+      completerItem.reject(err);
       if (removeQueue ?? true)
-        this.remove(item);
+        this.remove(completerItem);
     }
     return null;
   }
 }
 
-export class SequencedQueueConsumer <META>
-  implements IQueueConsumer<META>
-{
-  constructor(public queue: IAsyncQueue<META>){}
-
-  private _getId(): number|string{
-    return uuidV4();
-  }
-  feedRequest(request: () => Promise<any>): Completer<any, QueueItem> {
-    this.queue.enqueue(this._getId() , request);
-    const item = this.queue.queue.last;
-    return item;
-  }
-
-  async consumeAll(): Promise<any> {
-    return this.consumeWhen((_)=>true);
-  }
-
-  protected async consumeWhen(condition: (item: Completer<any, QueueItem<any>>) => boolean): Promise<any> {
-    const qItems = this.queue.queue.filter(condition);
-    const result = [];
-    for (let i = 0; i < qItems.length; i++) {
-      const futureItem = qItems[i].future;
-      result.push(futureItem);
-      await (futureItem.catch((_)=>{
-        return _;
-      }));
-      this.queue.remove(qItems[i], false);
-    }
-    this.queue.clearQueue();
-    return result;
-  }
-}

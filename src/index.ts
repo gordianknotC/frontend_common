@@ -1,5 +1,6 @@
 "use strict";
 
+
 export {
   _computed,
   _ref,
@@ -64,23 +65,32 @@ export {
   getOmitsBy,
 } from "~/utils/typeInference";
 
-export type { 
+export type {
   TUnWrapVueRef, InterfaceIs
  } from "~/utils/typeInference";
-export type { 
-  QueueItem, 
+export type {
+  QueueItem,
   /** @deprecated use IAsyncQueue instead */
-  IAsyncQueue as IQueue, 
+  IAsyncQueue as IQueue,
   IAsyncQueue,
-  IQueueConsumer 
 } from "~/utils/queue";
-export { 
+export {
   /** @deprecated use AsyncQueue instead */
-  AsyncQueue as Queue, 
-  AsyncQueue, SequencedQueueConsumer,
+  AsyncQueue as Queue,
+  AsyncQueue,
   uuidV4
  } from "~/utils/queue";
+
+export {
+  IQueueConsumer,
+  SequencedQueueConsumer
+} from "@/utils/queue_consumer";
+
+
 export { Completer } from "~/utils/completer";
+
+
+
 
 /**
  *
@@ -131,7 +141,7 @@ export {
   ELevel,
 } from "~/utils/logger.types";
 
-export type { 
+export type {
   PickOne,
   Optional,
 } from "~/utils/types";
