@@ -8,7 +8,7 @@ import { v4 } from 'uuid';
 */
 export abstract class IQueueConsumer<META> {
   abstract queue: IAsyncQueue<META>;
-  abstract addRequest(request: () => Promise<any>):  Completer<any, QueueItem<META>>;
+  abstract enqueue(request: () => Promise<any>):  Completer<any, QueueItem<META>>;
   abstract consumeAll(): Promise<any>;
 }
 
@@ -23,7 +23,7 @@ export class SequencedQueueConsumer <META>
     return uuidV4();
   }
 
-  addRequest(request: () => Promise<any>): Completer<any, QueueItem> {
+  enqueue(request: () => Promise<any>): Completer<any, QueueItem> {
     return this.queue.enqueue(this._getId() , request, {dequeueImmediately: false});
   }
 
@@ -38,7 +38,6 @@ export class SequencedQueueConsumer <META>
       const id = qItems[i]._meta!.id;
       const futureItem = this.queue.dequeue({id, removeQueue: false});
       result.push(futureItem);
-      console.log("start consume:",id,  qItems[i]);
       try{
         await futureItem;
       }catch(e){
@@ -49,7 +48,6 @@ export class SequencedQueueConsumer <META>
       }
 
     }
-    this.queue.clearQueue();
     return result;
   }
 }

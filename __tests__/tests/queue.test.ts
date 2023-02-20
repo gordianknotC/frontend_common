@@ -381,11 +381,10 @@ describe("Services", () => {
         let id = -1;
         let requests = 4;
         for (let i = 0; i < requests; i++) {
-          s.addRequest(()=>{
+          s.enqueue(()=>{
             return new Promise(async (resolve, reject)=>{
               await wait(span);
               id ++;
-              console.log("id increased:", id,Date.now());
               resolve(id);
             })
           });
@@ -396,7 +395,6 @@ describe("Services", () => {
         expect(id).toBe(-1);
 
         await wait(span + 30);
-        console.log( Date.now());
         expect(s.queue.queue.length).toBe(3);
         expect(id).toBe(0);
 

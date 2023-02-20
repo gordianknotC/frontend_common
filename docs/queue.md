@@ -2,7 +2,9 @@
 
 ---
 <!--#-->
-Promise 實作駐列處理, 由以下成員組成
+Promise 實作駐列處理, 該駐列不強制線性列隊等待規則，線性列隊等待需使用 [SequencedQueueConsumer](#SequencedQueueConsumer)。
+
+AsyncQueue 由以下成員組成
 － queue
 用來代表每個等待處理或處理中的Promise請求，由 Array<[Completer](#Completer)<QueueItem>> 物件陣列 存放所有 Promise 駐列每個駐列成員為一個 [Completer](#Completer)<QueueItem>, [Completer](#Completer) 本身類似 Promise 物件，只是將 resolve / reject 方法直接存在 [Completer](#Completer) 物件裡, 只要使用者持有 Completer 物件，就能自行由外部呼叫 resolve 方法，不用侷限於 new Promise 的結構
 
@@ -259,4 +261,90 @@ public clearQueue(): void {
     this.remove(item, true);
   }
 }
+```
+
+
+## SequencedQueueConsumer
+AsyncQueue 只提供 enqueue / dequeue 方法，並不限制一定要依線性列隊的方式依序處理，
+而 SequencedQueueConsumer 則是實作一 QueueConsumer, 以線性列隊的方式依序處理AsyncQueue
+
+#### source
+```ts
+/** 以線性序列的方式 consume queue */
+export class SequencedQueueConsumer <META>
+  implements IQueueConsumer<META>
+{
+  constructor(public queue: IAsyncQueue<META>){}
+
+  private _getId(): number|string{
+    return uuidV4();
+  }
+
+  enqueue(request: () => Promise<any>): Completer<any, QueueItem> {
+    return this.queue.enqueue(this._getId() , request, {dequeueImmediately: false});
+  }
+
+  async consumeAll(): Promise<any> {
+    return this.consumeWhen((_)=>true);
+  }
+
+  protected async consumeWhen(condition: (item: Completer<any, QueueItem<any>>) => boolean): Promise<any> {
+    const qItems = this.queue.queue.filter(condition);
+    const result = [];
+    for (let i = 0; i < qItems.length; i++) {
+      const id = qItems[i]._meta!.id;
+      const futureItem = this.queue.dequeue({id, removeQueue: false});
+      result.push(futureItem);
+      try{
+        await futureItem;
+      }catch(e){
+        console.error(e);
+      } finally {
+        console.log("end of consume:", qItems[i]);
+        this.queue.remove(qItems[i], false);
+      }
+
+    }
+    return result;
+  }
+}
+```
+
+#### example
+```ts
+test("Put four async requests, expect resolved sequentially", async ()=>{
+  let id = -1;
+  let requests = 4;
+  let q = new AsyncQueue();
+  let s = new SequencedQueueConsumer<any>(q);
+  for (let i = 0; i < requests; i++) {
+    s.enqueue(()=>{
+      return new Promise(async (resolve, reject)=>{
+        await wait(span);
+        id ++;
+        resolve(id);
+      })
+    });
+  }
+
+  s.consumeAll();
+  expect(s.queue.queue.length).toBe(4);
+  expect(id).toBe(-1);
+
+  await wait(span + 30);
+  expect(s.queue.queue.length).toBe(3);
+  expect(id).toBe(0);
+
+  await wait(span + 30);
+  expect(s.queue.queue.length).toBe(2);
+  expect(id).toBe(1);
+
+  await wait(span + 30);
+  expect(s.queue.queue.length).toBe(1);
+  expect(id).toBe(2);
+
+  await wait(span + 30);
+  expect(s.queue.queue.length).toBe(0);
+  expect(id).toBe(3);
+});
 ```
